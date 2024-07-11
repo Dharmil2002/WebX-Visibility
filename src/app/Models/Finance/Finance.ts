@@ -11,58 +11,60 @@ export class VoucherRequestModel {
   data: VoucherDataRequestModel
   details: DebitVoucherdetailsRequestModel[]
   debitAgainstDocumentList: DebitAgainstDocumentList[]
-  accountPosting: boolean = false;
+  accountPosting?: boolean = false;
+  constructor() {
+  }
 }
 
 export class VoucherDataRequestModel {
-  voucherNo: string
-  transCode: number
-  transType: string
-  voucherCode: number
-  voucherType: string
-  transactionNumber: string = '';
-  transDate: Date
-  docType: string
-  branch: string
-  finYear: string
-  accLocation: string
-  preperedFor: string
-  partyCode: string
-  partyName: string
-  partyState: string
-  paymentState: string
-  entryBy: string
-  entryDate: Date
-  panNo: string
-  tdsSectionCode: string
-  tdsSectionName: string
-  tdsRate: number
-  tdsAmount: number
-  tdsAtlineitem: boolean
-  tcsSectionCode: string
-  tcsSectionName: string
-  tcsRate: number
-  tcsAmount: number
-  IGST: number
-  UGST: number
-  SGST: number
-  CGST: number
-  GSTTotal: number
-  GrossAmount: number
-  netPayable: number
-  roundOff: number
-  voucherCanceled: boolean
-  paymentMode: string
-  refNo: string
-  accountName: string
-  accountCode: string
-  date: string
-  scanSupportingDocument: string
-  mANNUM: string
-  mREFNUM: string
-  nAR: string;
-  onAccount: boolean = false;
-  reverseVoucher: boolean = false;
+  voucherNo?: string
+  transCode?: number
+  transType?: string
+  voucherCode?: number
+  voucherType?: string
+  transactionNumber?: string = '';
+  transDate?: Date
+  docType?: string
+  branch?: string
+  finYear?: string
+  accLocation?: string
+  preperedFor?: string
+  partyCode?: string
+  partyName?: string
+  partyState?: string
+  paymentState?: string
+  entryBy?: string
+  entryDate?: Date
+  panNo?: string
+  tdsSectionCode?: string
+  tdsSectionName?: string
+  tdsRate?: number
+  tdsAmount?: number
+  tdsAtlineitem?: boolean
+  tcsSectionCode?: string
+  tcsSectionName?: string
+  tcsRate?: number
+  tcsAmount?: number
+  IGST?: number
+  UGST?: number
+  SGST?: number
+  CGST?: number
+  GSTTotal?: number
+  GrossAmount?: number
+  netPayable?: number
+  roundOff?: number
+  voucherCanceled?: boolean
+  paymentMode?: string
+  refNo?: string
+  accountName?: string
+  accountCode?: string
+  date?: string
+  scanSupportingDocument?: string
+  mANNUM?: string
+  mREFNUM?: string
+  nAR?: string;
+  onAccount?: boolean = false;
+  reverseVoucher?: boolean = false;
 }
 
 export class DebitVoucherdetailsRequestModel {
@@ -407,4 +409,10 @@ export function GetLeadgerInfoFromLocalStorage(LeadgerCode: string) {
     console.error('Error getting Leadger Info from Local Storage:', error);
     return null; // Return null or handle the error as needed
   }
+}
+export const GSTTypeMapping = {
+  UGST: { accCode: ledgerInfo['LIA002002'].LeadgerCode, accName: ledgerInfo['LIA002002'].LeadgerName, accCategory: ledgerInfo['LIA002002'].LeadgerCategory, prop: "uGST" },
+  CGST: { accCode: ledgerInfo['LIA002003'].LeadgerCode, accName: ledgerInfo['LIA002003'].LeadgerName, accCategory: ledgerInfo['LIA002003'].LeadgerCategory, prop: "cGST" },
+  IGST: { accCode: ledgerInfo['LIA002004'].LeadgerCode, accName: ledgerInfo['LIA002004'].LeadgerName, accCategory: ledgerInfo['LIA002004'].LeadgerCategory, prop: "iGST" },
+  SGST: { accCode: ledgerInfo['LIA002001'].LeadgerCode, accName: ledgerInfo['LIA002001'].LeadgerName, accCategory: ledgerInfo['LIA002001'].LeadgerCategory, prop: "sGST" },
 }

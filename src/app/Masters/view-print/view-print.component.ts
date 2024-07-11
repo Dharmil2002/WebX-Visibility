@@ -64,9 +64,22 @@ export class ViewPrintComponent implements OnInit {
 
     this.ViewPrintList = viewType.map((x) => {
       return {
-        name: x.vNM, value: x.vTYPE, FieldName: x.pFIELD
+        name: x.vNM, value: x.vTYPE, FieldName: x.pFIELD, sID: x.sID || null // Assign null if sID does not exist    
       };
     });
+    // Sort by sID if it exists
+    this.ViewPrintList.sort((a, b) => {
+      if (a.sID !== null && b.sID !== null) {
+        return a.sID - b.sID;
+      } else if (a.sID === null && b.sID !== null) {
+        return 1; // Place items without sID after those with sID
+      } else if (a.sID !== null && b.sID === null) {
+        return -1; // Place items with sID before those without sID
+      } else {
+        return 0; // Leave order unchanged if both sID are null
+      }
+    });
+
     // Filtering the data and updating the viewTableForm
     this.filter.Filter(
       this.jsonControlViewArray,

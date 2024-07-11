@@ -213,7 +213,6 @@ export class GCNSummaryComponent implements OnInit {
         'D$and': [
           { dKTDT: { 'D$gte': startValue } }, // Start date condition
           { dKTDT: { 'D$lte': endValue } }, // End date condition 
-          { "D$expr": { "D$ne": ["$custHeader.bSTS", 4] } },
           ...(location ? [{ 'dEST': { 'D$in': location } }] : []), // Location condition
           ...(modeList.length > 0 ? [{ 'tRNMOD': { 'D$in': modeList } }] : []), // Mode list condition
           ...(payBasis ? [{ 'pAYTYP': { 'D$in': payBasis } }] : []), // Pay basis condition
@@ -225,32 +224,6 @@ export class GCNSummaryComponent implements OnInit {
         companyCode,
         collectionName,
         filters: [
-          {
-            D$lookup: {
-              from: "cust_bill_details",
-              localField: "dKTNO",
-              foreignField: "dKTNO",
-              as: "custDetails"
-            }
-          },
-          {
-            D$addFields: {
-              firstBillNo: {
-                D$arrayElemAt: ["$custDetails.bILLNO", 0]
-              }
-            }
-          },
-          {
-            D$lookup: {
-              from: "cust_bill_headers",
-              localField: "firstBillNo",
-              foreignField: "bILLNO",
-              as: "custHeader"
-            }
-          },
-          {
-            D$unwind: "$custHeader"
-          },
           { D$match: matchQuery }, // Apply match query  
           {
             D$group: {
@@ -264,7 +237,7 @@ export class GCNSummaryComponent implements OnInit {
                 D$sum: 1
               },
               tTLAMT: {
-                D$sum: "$custHeader.cOL.bALAMT"
+                D$sum: "$tOTAMT"
               }
             }
           },
@@ -348,7 +321,7 @@ export class GCNSummaryComponent implements OnInit {
         fSTS: item.fSTS
       }))
       .uniqBy('fSTSN')
-      //.sortBy('fSTS')
+      .orderBy('fSTS', 'desc')
       .value();
 
     const columnGroup = [{
@@ -524,7 +497,7 @@ export class GCNSummaryComponent implements OnInit {
         data.LocationCode === "Grand Total" ? filter.location = this.filterData.location :
           filter.location = [data.LocationCode];
 
-      const result = await this.getTOPayPaidRegister(filter);
+      const result = await this.getGCNRegister(filter);
 
       if (!result || (Array.isArray(result) && result.length === 0)) {
         Swal.fire({
@@ -554,7 +527,7 @@ export class GCNSummaryComponent implements OnInit {
   }
   //#endregion
   //#region to made query for report and get data
-  async getTOPayPaidRegister(data) {
+  async getGCNRegister(data) {
 
     const { startValue, endValue, location, modeList, payBasis, service, fSTS } = data;
 

@@ -94,7 +94,8 @@ export class ViewTrackingPopupComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.CompanyCode = this.storage.companyCode;    
-    this.FormTitle = this.data.DokNo?this.data.DokNo:'C-Not Tracking List'    
+    const sfx = this.data.Sfx ? ` (${this.data.Sfx})` : '';
+    this.FormTitle = this.data.DokNo? `${this.data.DokNo}${sfx}` : 'C-Not Tracking List'
   }
 
   ngOnInit(): void {
@@ -113,6 +114,9 @@ export class ViewTrackingPopupComponent implements OnInit {
               },
               {
                 dKTNO: this.data.DokNo
+              },
+              {
+                sFX: this.data.Sfx
               }
             ]
           }

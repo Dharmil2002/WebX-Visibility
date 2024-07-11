@@ -254,7 +254,7 @@ export class TrackingPageComponent implements OnInit {
   }
   ViewFunction(eventData) {
     const dialogRef = this.dialog.open(ViewTrackingPopupComponent, {
-      data: { TrackingList: eventData?.DocketTrackingData, DokNo: eventData.dKTNO },
+      data: { TrackingList: [], DokNo: eventData.dKTNO, Sfx: eventData.sFX },
       minWidth: "90%",
       height: "95%",
       disableClose: true,
@@ -296,45 +296,39 @@ export class TrackingPageComponent implements OnInit {
   ExportFunction() {
     const csvData = this.TableData.map((x) => {
       return {
-        CnoteNo: x.dKTNO,
-        EDD: moment(new Date(x.sTSTM)).format("DD MMM YY"),
-        ATD: "",
+        [this.DocCalledAs.Docket]: x.dKTNO,        
+        Suffix: x.sFX,
+        ["Booking Date"]: moment(new Date(x.dKTDT)).format("DD MMM YY"),
+        EDD: moment(new Date(x.sTSTM)).format("DD MMM YY"),        
+        ATD: x.ATD ? moment(new Date(x.ATD)).format("DD MMM YY") : "",
         Status: x.oPSSTS,
-        docketDate: moment(new Date(x.docketData.dKTDT)).format("DD MMM YY"),
-        TransitMode: `${x.TransitMode.Servis} / ${x.TransitMode.Mod} / ${x.TransitMode.Servis} `,
-        EWB: "",
-        Valid: "",
+        ["Transit Mode"]: ( x.TransitMode && x.TransitMode.length > 0) ? x.TransitMode.join(" / ") : "",
+        EWBNo: x.eWBNO || "",
+        Valid: x.eXPDT ? moment(new Date(x.eXPDT)).format("DD MMM YY") : "",
         Movement: x.oRGN && x.dEST ? `${x.oRGN} -> ${x.dEST}` : "",
         Consignor: x.Consignor,
         Consignee: x.Consignee,
+        Packages: x.pKGS,
+        Weight: x.aCTWT
       };
     });
     this.ExportToCsv(csvData);
   }
 
   ExportToCsv(jsonCsv) {
+    if(jsonCsv && jsonCsv.length > 0) {
     this.csvFileName = this.QueryData.Docket
       ? `DocTracking ${this.QueryData.Docket}`
       : `DocTracking ${moment(new Date(this.QueryData.start)).format(
         "DD_MM_YYYY"
       )} To ${moment(new Date(this.QueryData.end)).format("DD_MM_YYYY")}`;
-    const formattedData = [
-      Object.values(this.headerForCsv),
-      ...jsonCsv.map((row) => {
-        return Object.keys(this.headerForCsv).map((col) => {
-          let value =
-            col.toLowerCase().includes("date") ||
-              col.toLowerCase().includes("dob") ||
-              col.toLowerCase().includes("dt")
-              ? moment(new Date(row[col])).format("DD MMM YY") ===
-                "Invalid date"
-                ? row[col]
-                : moment(new Date(row[col])).format("DD MMM YY")
-              : row[col];
-          return value;
-        });
-      }),
-    ];
-    CsvDataServiceService.exportToCsv(this.csvFileName, formattedData);
+
+      const header = {};
+      Object.keys(jsonCsv[0]).map(k => {
+        header[k] = k;
+      });
+      const formattedData = [ header, ...jsonCsv];      
+      CsvDataServiceService.exportToCsv(this.csvFileName, formattedData);
+    }
   }
 }

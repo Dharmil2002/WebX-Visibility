@@ -66,8 +66,8 @@
                         </p>
                         <p (click)="OpenDocketView(item.dKTNO)" class="Cnotlink font-width-600"
                             style="font-size: 14px; padding-top: 5px; color: #0794e1;">
-                            {{item.dKTNO}}
-                        </p>
+                            {{item.dKTNO}} <span *ngIf="item.sFX > 0">({{item.sFX}})</span>
+                        </p>                        
                     </div>
                     <div class="trakingCard" style="width: 18%; ">
                         <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
@@ -96,6 +96,27 @@
                         </p>
                     </div>
                     <div class="trakingCard" style="width: 14%; ">
+                        <div style="display: flex; justify-content: space-between; align-items: center; height: 50%;">
+                            <p>Booking Date:</p>
+                            <p *ngIf="item.dKTDT" class="font-width-600" style="color: #ff8e11">
+                                <mat-icon *ngIf="item.dKTDT"
+                                style="font-size: 16px; height: 16px; width: 16px; margin-right: 3px; color:#ff8e11;"
+                                fontIcon="verified"></mat-icon>
+                            {{item.dKTDT | date: "dd/MM/YY"}}
+                            </p>
+                        </div>
+                        <div style="display: flex; align-items: center; height: 50%;">
+                            <p>Pkg:</p>
+                            <p *ngIf="item.pKGS" class="font-width-600">
+                                {{item.pKGS}}
+                            </p>
+                            <p>Wt:</p>
+                            <p *ngIf="item.aCTWT" class="font-width-600">
+                                {{item.aCTWT}}
+                            </p>
+                        </div>
+                        
+                        <!-- 
                         <p>
                             Booking Date:
                         </p>
@@ -104,7 +125,7 @@
                                 style="font-size: 16px; height: 16px; width: 16px; margin-right: 3px; color:#ff8e11;"
                                 fontIcon="verified"></mat-icon>
                             {{item.dKTDT | date: "dd/MM/YY"}}
-                        </p>
+                        </p> -->
                     </div>
                     <div class="trakingCard" style="width: 15%; text-align: center; ">
                         <p>

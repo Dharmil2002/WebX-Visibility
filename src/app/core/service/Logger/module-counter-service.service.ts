@@ -46,7 +46,7 @@ export class ModuleCounterServiceService {
       },
       ePOS: {
         tYP: 'Point',
-        cDNATES: [location.longitude, location.latitude],
+        cDNATES: [location.latitude, location.longitude],
       },
       mID: MenuInfo?.MenuId || 0,
       mNM: MenuInfo?.MenuName || '',

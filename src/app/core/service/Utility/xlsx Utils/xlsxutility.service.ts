@@ -398,9 +398,27 @@ export class xlsxutilityService {
       let preValue, nextValue
       for (const rule of rules) {
         const value = item[rule.ItemsName];
+        const gstex = item["GSTApplicable"];
         for (const validation of rule.Validations) {
-          if ("Required" in validation && validation.Required && !value) {
-            errors.push(`${rule.ItemsName} is required.`);
+          if (rule.ItemsName == "GSTRate"){
+            if (gstex == "Y" && "Numeric" in validation && validation.Numeric) {
+              if (value === undefined || value === null || value === "") {
+                  errors.push(`${rule.ItemsName} is required.`);
+              } else if (isNaN(parseFloat(value))) {
+                  errors.push(`${rule.ItemsName} must be numeric.`);
+              } else if (parseFloat(value) === 0 && parseFloat(validation.given) <= 0) {
+                  errors.push(`If ${rule.ItemsName} is 0, then ${rule.ItemsName} validation must be greater than 0.`);
+              }
+            }
+          }
+          else
+          {
+            if ("Required" in validation && validation.Required && !value) {
+              errors.push(`${rule.ItemsName} is required.`);
+            }
+            if ("Numeric" in validation && validation.Numeric && isNaN(parseFloat(value))) {
+              errors.push(`${rule.ItemsName} must be numeric. `);
+            }
           }
           if ("dateLimit" in validation && value) {
             const { range } = rule.Validations.find((x) => x.range);
@@ -439,10 +457,6 @@ export class xlsxutilityService {
           if ("Exists" in validation && validation.Exists.find(listItem =>
             String(listItem).toLowerCase() === String(value).toLowerCase())) {
             errors.push(`${rule.ItemsName} already exists. Please enter another ${rule.ItemsName}.`);
-          }
-
-          if ("Numeric" in validation && validation.Numeric && isNaN(parseFloat(value))) {
-            errors.push(`${rule.ItemsName} must be numeric.`);
           }
           if ("MinValue" in validation && !isNaN(parseFloat(value)) && parseFloat(value) < validation.MinValue) {
             errors.push(`${rule.ItemsName} must be at least ${validation.MinValue}.`);

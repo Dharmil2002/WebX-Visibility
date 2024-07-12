@@ -44,6 +44,7 @@ import { CustomerService } from "src/app/Utility/module/masters/customer/custome
 import moment from "moment";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import {
+  GSTTypeMapping,
   SACInfo,
   VoucherDataRequestModel,
   VoucherInstanceType,
@@ -121,8 +122,8 @@ export class ConsignmentEntryFormComponent
   NonFreightAmount = 0;
   linkArray = [];
   NonFreightLoaded = false;
-  VoucherRequestModel = new VoucherRequestModel();
-  VoucherDataRequestModel = new VoucherDataRequestModel();
+  voucherModel = new VoucherRequestModel();
+  voucherDataModel = new VoucherDataRequestModel();
   DocCalledAs: DocCalledAsModel;
   InvoiceDetailsList: { count: any; title: string; class: string }[];
   matrials: AutoComplete[];
@@ -991,7 +992,7 @@ export class ConsignmentEntryFormComponent
           this.model.consignmentTableForm.controls["cnbp"].disable();
           break;
         default:
-         
+
         // Handle other cases or throw an error
       }
     } else {
@@ -1271,9 +1272,9 @@ export class ConsignmentEntryFormComponent
       const json = {
         id: invoice.length + 1,
         ewayBillNo: this.model.invoiceTableForm.value.ewayBillNo,
-        billDate: this.model.invoiceTableForm.value.billDate ? moment( this.model.invoiceTableForm.value.billDate).format("DD MMM YY HH:MM") : "",
-        expiryDate: this.model.invoiceTableForm.value.expiryDate ? moment( this.model.invoiceTableForm.value.expiryDate).format("DD MMM YY HH:MM") : "",
-        invoiceDate: this.model.invoiceTableForm.value.invoiceDate?moment( this.model.invoiceTableForm.value.invoiceDate).format("DD MMM YY HH:MM") : "",
+        billDate: this.model.invoiceTableForm.value.billDate ? moment(this.model.invoiceTableForm.value.billDate).format("DD MMM YY HH:MM") : "",
+        expiryDate: this.model.invoiceTableForm.value.expiryDate ? moment(this.model.invoiceTableForm.value.expiryDate).format("DD MMM YY HH:MM") : "",
+        invoiceDate: this.model.invoiceTableForm.value.invoiceDate ? moment(this.model.invoiceTableForm.value.invoiceDate).format("DD MMM YY HH:MM") : "",
         invoiceNo: this.model.invoiceTableForm.value.invoiceNo,
         invoiceAmount: this.model.invoiceTableForm.value.invoiceAmount,
         noofPkts: this.model.invoiceTableForm.value.noofPkts,
@@ -1482,12 +1483,12 @@ export class ConsignmentEntryFormComponent
     this.isManual = this.checkboxChecked == true ? false : true;
     this.isUpdate = this.checkboxChecked == true ? false : true;
     this.model.consignmentTableForm.controls['docketNumber'].setValue(event.event.checked ? "Computerized" : "");
-    if(this.isManual){
+    if (this.isManual) {
       this.model.consignmentTableForm.controls['docketNumber'].enable();
     }
-    else{
+    else {
       this.model.consignmentTableForm.controls['docketNumber'].disable();
-    
+
     }
   }
   checkDocketRules() {
@@ -2095,11 +2096,11 @@ export class ConsignmentEntryFormComponent
         "A8888";
       docketDetails["cnoAddress"] =
         this.model.consignmentTableForm.controls["cnoAddress"].value?.name ||
-        this.model.consignmentTableForm.controls["cnoAddress"]?.value||"";
+        this.model.consignmentTableForm.controls["cnoAddress"]?.value || "";
       docketDetails["cnogst"] =
         this.model.consignmentTableForm.controls["cnogst"]?.value;
       docketDetails["cneAddress"] =
-        this.model.consignmentTableForm.controls["cneAddress"].value?.name ||   this.model.consignmentTableForm.controls["cneAddress"]?.value||"";
+        this.model.consignmentTableForm.controls["cneAddress"].value?.name || this.model.consignmentTableForm.controls["cneAddress"]?.value || "";
       docketDetails["cnegst"] =
         this.model.consignmentTableForm.controls["cnegst"]?.value;
       docketDetails["billingParty"] = bParty?.value;
@@ -2508,7 +2509,7 @@ export class ConsignmentEntryFormComponent
       Swal.fire({
         icon: "success",
         title: "Docket Update Successfully",
-        text:"GCN No: " + this.model.consignmentTableForm.controls["docketNumber"].value,
+        text: "GCN No: " + this.model.consignmentTableForm.controls["docketNumber"].value,
         confirmButtonText: 'OK',
         showConfirmButton: true,
         denyButtonText: 'Print',
@@ -2518,7 +2519,7 @@ export class ConsignmentEntryFormComponent
       }).then((result) => {
         if (result.isConfirmed) {
           this.navService.navigateTotab("docket", "dashboard/Index");
-        }else if (result.isDenied) {
+        } else if (result.isDenied) {
           // Handle the action for the deny button here.
           const templateBody = {
             templateName: "DKT",
@@ -2737,13 +2738,13 @@ export class ConsignmentEntryFormComponent
   calculateRate() {
     if (parseInt(this.model.FreightTableForm.controls['gstAmount'].value) > 100) {
       Swal.fire({
-          icon: 'warning',
-          title: 'Warning',
-          text: 'GST rate should not be greater than 100 %'
+        icon: 'warning',
+        title: 'Warning',
+        text: 'GST rate should not be greater than 100 %'
       });
       this.model.FreightTableForm.controls['gstAmount'].setValue(0);
-      return 
-  }
+      return
+    }
 
     if (this.model.FreightTableForm.controls['rcm'].value == "N") {
       const gstRate = parseFloat(this.model.FreightTableForm.controls['gstAmount'].value);
@@ -3069,7 +3070,7 @@ export class ConsignmentEntryFormComponent
   getTermValue(term, isOrigin) {
     const typeMapping = { "Area": "AR", "Pincode": "PIN", "Location": "LOC", "City": "CT", "State": "ST" };
     let fieldKey = isOrigin ? "fromCity" : "toCity";
-    if(term == "Location") {
+    if (term == "Location") {
       fieldKey = isOrigin ? "origin" : "destination";
     }
     const type = typeMapping[term];
@@ -3082,10 +3083,10 @@ export class ConsignmentEntryFormComponent
         break;
       case "Pincode":
         valueKey = "pincode";
-        break;  
+        break;
       case "Location":
-          valueKey = "value";
-          break;   
+        valueKey = "value";
+        break;
       case "City":
         valueKey = "ct";
         break;
@@ -3097,9 +3098,9 @@ export class ConsignmentEntryFormComponent
     }
     const controls = this.model.consignmentTableForm.controls;
     let value;
-    if(fieldKey == "origin") {
+    if (fieldKey == "origin") {
       value = controls[fieldKey].value;
-    } else { 
+    } else {
       value = controls[fieldKey].value[valueKey];
     }
     if (value) {
@@ -3139,7 +3140,7 @@ export class ConsignmentEntryFormComponent
         0
       );
     }
-    const terms = ["Area", "Pincode","Location", "City", "State"];
+    const terms = ["Area", "Pincode", "Location", "City", "State"];
     const allCombinations = generateCombinations(terms);
     let matches = allCombinations
       .map(([fromTerm, toTerm]) => {
@@ -3154,16 +3155,16 @@ export class ConsignmentEntryFormComponent
         return null;
       })
       .filter((x) => x != null);
-      matches.push({
-        D$and: [
-          { "D$in": ['$fTYPE', [null, ""]] },
-          { "D$in": ['$fROM', [null, ""]] }]
-      });
-      matches.push({
-        D$and: [
-          { "D$in": ['$tTYPE', [null, ""]] },
-          { "D$in": ['$tO', [null, ""]] }]
-      });
+    matches.push({
+      D$and: [
+        { "D$in": ['$fTYPE', [null, ""]] },
+        { "D$in": ['$fROM', [null, ""]] }]
+    });
+    matches.push({
+      D$and: [
+        { "D$in": ['$tTYPE', [null, ""]] },
+        { "D$in": ['$tO', [null, ""]] }]
+    });
     let reqBody = {
       companyCode: this.storage.companyCode,
       customerCode: this.model.consignmentTableForm.value.billingParty.value,
@@ -3428,81 +3429,75 @@ export class ConsignmentEntryFormComponent
         const TotalAmount =
           this.model.FreightTableForm.controls["totalAmount"].value;
 
-        this.VoucherRequestModel.companyCode = this.storage.companyCode;
-        this.VoucherRequestModel.docType = "VR";
-        this.VoucherRequestModel.branch = this.storage.branch;
-        this.VoucherRequestModel.finYear = financialYear;
+        this.voucherModel = {
+          companyCode: this.storage.companyCode,
+          docType: "VR",
+          branch: this.storage.branch,
+          finYear: financialYear,
+          debitAgainstDocumentList: [],
+          data: new VoucherDataRequestModel(),
+          details: []
+        };
 
-        this.VoucherDataRequestModel.voucherNo = "";
-        this.VoucherDataRequestModel.transCode =
-          VoucherInstanceType.CNoteBooking;
-        this.VoucherDataRequestModel.transType =
-          VoucherInstanceType[VoucherInstanceType.CNoteBooking];
-        this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
-        this.VoucherDataRequestModel.voucherType =
-          VoucherType[VoucherType.JournalVoucher];
+        this.voucherDataModel = {
+          voucherNo: "",
+          transCode: VoucherInstanceType.CNoteBooking,
+          transType: VoucherInstanceType[VoucherInstanceType.CNoteBooking],
+          voucherCode: VoucherType.JournalVoucher,
+          voucherType: VoucherType[VoucherType.JournalVoucher],
+          transDate: this.model.consignmentTableForm.value.docketDate,
+          docType: "VR",
+          branch: this.storage.branch,
+          finYear: financialYear,
+          accLocation: this.storage.branch,
+          preperedFor: "Customer",
+          partyCode: this.model.consignmentTableForm.value?.billingParty?.value,
+          partyName: this.model.consignmentTableForm.value?.billingParty?.name,
+          partyState: "",
+          entryBy: this.storage.userName,
+          entryDate: new Date(),
+          panNo: "",
+          tdsSectionCode: "",
+          tdsSectionName: "",
+          tdsRate: 0,
+          tdsAmount: 0,
+          tdsAtlineitem: false,
+          tcsSectionCode: "",
+          tcsSectionName: "",
+          tcsRate: 0,
+          tcsAmount: 0,
+          IGST: 0,
+          SGST: 0,
+          CGST: 0,
+          UGST: 0,
+          GSTTotal: GSTAmount,
+          GrossAmount: TotalAmount,
+          netPayable: TotalAmount,
+          roundOff: 0,
+          voucherCanceled: false,
+          paymentMode: "",
+          refNo: "",
+          accountName: "",
+          date: "",
+          scanSupportingDocument: "",
+          transactionNumber: DocketNo,
+        }
 
-        this.VoucherDataRequestModel.transDate =
-          this.model.consignmentTableForm.value.docketDate;
-        this.VoucherDataRequestModel.docType = "VR";
-        this.VoucherDataRequestModel.branch = this.storage.branch;
-        this.VoucherDataRequestModel.finYear = financialYear;
-
-        this.VoucherDataRequestModel.accLocation = this.storage.branch;
-        this.VoucherDataRequestModel.preperedFor = "Customer";
-        (this.VoucherDataRequestModel.partyCode =
-          this.model.consignmentTableForm.value?.billingParty?.value),
-          (this.VoucherDataRequestModel.partyName =
-            this.model.consignmentTableForm.value?.billingParty?.name),
-          (this.VoucherDataRequestModel.partyState = "");
-        this.VoucherDataRequestModel.entryBy = this.storage.userName;
-        this.VoucherDataRequestModel.entryDate = new Date();
-        this.VoucherDataRequestModel.panNo = "";
-
-        this.VoucherDataRequestModel.tdsSectionCode = "";
-        this.VoucherDataRequestModel.tdsSectionName = "";
-        this.VoucherDataRequestModel.tdsRate = 0;
-        this.VoucherDataRequestModel.tdsAmount = 0;
-        this.VoucherDataRequestModel.tdsAtlineitem = false;
-        this.VoucherDataRequestModel.tcsSectionCode = "";
-        this.VoucherDataRequestModel.tcsSectionName = "";
-        this.VoucherDataRequestModel.tcsRate = 0;
-        this.VoucherDataRequestModel.tcsAmount = 0;
-
-        this.VoucherDataRequestModel.IGST = 0;
-        this.VoucherDataRequestModel.SGST = 0;
-        this.VoucherDataRequestModel.CGST = 0;
-        this.VoucherDataRequestModel.UGST = 0;
-        this.VoucherDataRequestModel.GSTTotal = GSTAmount;
-
-        this.VoucherDataRequestModel.GrossAmount = TotalAmount;
-        this.VoucherDataRequestModel.netPayable = TotalAmount;
-        this.VoucherDataRequestModel.roundOff = 0;
-        this.VoucherDataRequestModel.voucherCanceled = false;
-
-        this.VoucherDataRequestModel.paymentMode = "";
-        this.VoucherDataRequestModel.refNo = "";
-        this.VoucherDataRequestModel.accountName = "";
-        this.VoucherDataRequestModel.date = "";
-        this.VoucherDataRequestModel.scanSupportingDocument = "";
-        this.VoucherDataRequestModel.transactionNumber = DocketNo;
         var VoucherlineitemList = this.GetVouchersLedgers(TotalAmount, DocketNo);
 
-
-        this.VoucherRequestModel.details = VoucherlineitemList;
-        this.VoucherRequestModel.data = this.VoucherDataRequestModel;
-        this.VoucherRequestModel.debitAgainstDocumentList = [];
+        this.voucherModel.details = VoucherlineitemList;
+        this.voucherModel.data = this.voucherDataModel;
+        this.voucherModel.debitAgainstDocumentList = [];
 
         this.voucherServicesService
-          .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)
+          .FinancePost("fin/account/voucherentry", this.voucherModel)
           .subscribe({
             next: (res: any) => {
               let reqBody = {
                 companyCode: this.storage.companyCode,
                 voucherNo: res?.data?.mainData?.ops[0].vNO,
                 transCode: VoucherInstanceType.CNoteBooking,
-                transType:
-                  VoucherInstanceType[VoucherInstanceType.CNoteBooking],
+                transType: VoucherInstanceType[VoucherInstanceType.CNoteBooking],
                 voucherCode: VoucherType.JournalVoucher,
                 voucherType: VoucherType[VoucherType.JournalVoucher],
                 transDate: Date(),
@@ -3511,10 +3506,8 @@ export class ConsignmentEntryFormComponent
                 docType: "Voucher",
                 partyType: "Customer",
                 docNo: DocketNo,
-                partyCode:
-                  this.model.consignmentTableForm.value?.billingParty?.value,
-                partyName:
-                  this.model.consignmentTableForm.value?.billingParty?.name,
+                partyCode: this.model.consignmentTableForm.value?.billingParty?.value,
+                partyName: this.model.consignmentTableForm.value?.billingParty?.name,
                 entryBy: this.storage.getItem(StoreKeys.UserId),
                 entryDate: Date(),
                 debit: VoucherlineitemList.filter(item => item.credit == 0).map(function (item) {
@@ -3678,9 +3671,7 @@ export class ConsignmentEntryFormComponent
       const tranDetail = await getApiCompanyDetail(this.masterService);
       const data = RequestData?.data;
       const gstAppliedList = await this.stateService.checkGst(tranDetail?.data[0].gstNo, data?.cnogst);
-      const gstTypes = Object.fromEntries(
-        Object.entries(gstAppliedList).filter(([key, value]) => value === true)
-      )
+      const gstTypesArray = Object.keys(gstAppliedList).filter(key => gstAppliedList[key]) || [];
       let jsonBillingList = [
         {
           _id: "",
@@ -3698,14 +3689,14 @@ export class ConsignmentEntryFormComponent
           gSTRT: data?.gstAmount || 0.00,
           tOTAMT: data?.totalAmount || 0.00,
           fCHRG: data?.freight_rate || 0.00,
-          sGST: 'SGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gstChargedAmount) / 2 : 0,
-          sGSTRT: 'SGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data.gstAmount || 0) / 2 : 0,
-          cGST: 'CGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gstChargedAmount) / 2 : 0,
-          cGSTRT: 'CGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data.gstAmount || 0) / 2 : 0,
-          uTGST: 'UTGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gstChargedAmount) : 0,
-          uTGSTRT: 'UTGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data.gstAmount || 0) : 0,
-          iGST: 'IGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gstChargedAmount) : 0,
-          iGSTRT: 'IGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data.gstAmount || 0) : 0,
+          sGST: gstTypesArray.includes('SGST') ? parseFloat(data?.gstChargedAmount) / 2 : 0,
+          sGSTRT: gstTypesArray.includes('SGST') ? parseFloat(data.gstAmount || 0) / 2 : 0,
+          cGST: gstTypesArray.includes('CGST') ? parseFloat(data?.gstChargedAmount) / 2 : 0,
+          cGSTRT: gstTypesArray.includes('CGST') ? parseFloat(data.gstAmount || 0) / 2 : 0,
+          uTGST: gstTypesArray.includes('UTGST') ? parseFloat(data?.gstChargedAmount) : 0,
+          uTGSTRT: gstTypesArray.includes('UTGST') ? parseFloat(data.gstAmount || 0) : 0,
+          iGST: gstTypesArray.includes('IGST') ? parseFloat(data?.gstChargedAmount) : 0,
+          iGSTRT: gstTypesArray.includes('IGST') ? parseFloat(data.gstAmount || 0) : 0,
           eNTDT: new Date(),
           eNTLOC: this.storage.branch || "",
           eNTBY: this.storage?.userName || "",
@@ -3731,8 +3722,8 @@ export class ConsignmentEntryFormComponent
         "gEN": {
           "lOC": data?.origin || "",
           "cT": data?.fromCity || "",
-          "sT": "",
-          "gSTIN": "",
+          "sT": tranDetail?.data[0]?.state || "",
+          "gSTIN": tranDetail?.data[0].gstNo || "",
         },
         "sUB": {
           "lOC": this.storage.branch,
@@ -3759,12 +3750,12 @@ export class ConsignmentEntryFormComponent
           "cGNM": custGroup?.groupName || "",
         },
         "gST": {
-          "tYP": Object.keys(gstTypes).join() || "",
+          "tYP": gstTypesArray.toString() || "",
           "rATE": data?.gstAmount || 0.00,
-          "iGST": 'IGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gstChargedAmount) : 0,
-          "uTGST": 'UTGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gstChargedAmount) : 0,
-          "cGST": 'CGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gstChargedAmount) / 2 : 0,
-          "sGST": 'SGST'.includes(Object.keys(gstTypes).join()) ? parseFloat(data?.gstChargedAmount) / 2 : 0,
+          "sGST": gstTypesArray.includes('SGST') ? parseFloat(data?.gstChargedAmount) / 2 : 0,
+          "cGST": gstTypesArray.includes('CGST') ? parseFloat(data?.gstChargedAmount) / 2 : 0,
+          "uTGST": gstTypesArray.includes('UTGST') ? parseFloat(data?.gstChargedAmount) : 0,
+          "iGST": gstTypesArray.includes('IGST') ? parseFloat(data?.gstChargedAmount) : 0,
           "aMT": data?.gstChargedAmount || 0.00,
         },
         "aPR": {
@@ -3818,65 +3809,65 @@ export class ConsignmentEntryFormComponent
         const TotalAmount = billData?.aMT || 0;
         const GstAmount = billData?.gST?.aMT || 0;
 
-        this.VoucherRequestModel.companyCode = this.storage.companyCode;
-        this.VoucherRequestModel.docType = "VR";
-        this.VoucherRequestModel.branch = this.storage.branch;
-        this.VoucherRequestModel.finYear = financialYear
+        this.voucherModel.companyCode = this.storage.companyCode;
+        this.voucherModel.docType = "VR";
+        this.voucherModel.branch = this.storage.branch;
+        this.voucherModel.finYear = financialYear
 
-        this.VoucherDataRequestModel.voucherNo = "";
-        this.VoucherDataRequestModel.transCode = VoucherInstanceType.BillApproval;
-        this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.BillApproval];
-        this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
-        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
-        this.VoucherDataRequestModel.transDate = new Date();
-        this.VoucherDataRequestModel.docType = "VR";
-        this.VoucherDataRequestModel.branch = this.storage.branch;
-        this.VoucherDataRequestModel.finYear = financialYear
+        this.voucherDataModel.voucherNo = "";
+        this.voucherDataModel.transCode = VoucherInstanceType.BillApproval;
+        this.voucherDataModel.transType = VoucherInstanceType[VoucherInstanceType.BillApproval];
+        this.voucherDataModel.voucherCode = VoucherType.JournalVoucher;
+        this.voucherDataModel.voucherType = VoucherType[VoucherType.JournalVoucher];
+        this.voucherDataModel.transDate = new Date();
+        this.voucherDataModel.docType = "VR";
+        this.voucherDataModel.branch = this.storage.branch;
+        this.voucherDataModel.finYear = financialYear
 
-        this.VoucherDataRequestModel.accLocation = this.storage.branch;
-        this.VoucherDataRequestModel.preperedFor = "Customer";
-        this.VoucherDataRequestModel.partyCode = billData?.cUST?.cD || "";
-        this.VoucherDataRequestModel.partyName = billData?.cUST?.nM || "";
-        this.VoucherDataRequestModel.partyState = billData?.cUST?.sT || "";
-        this.VoucherDataRequestModel.entryBy = this.storage.userName;
-        this.VoucherDataRequestModel.entryDate = new Date();
-        this.VoucherDataRequestModel.panNo = ""
+        this.voucherDataModel.accLocation = this.storage.branch;
+        this.voucherDataModel.preperedFor = "Customer";
+        this.voucherDataModel.partyCode = billData?.cUST?.cD || "";
+        this.voucherDataModel.partyName = billData?.cUST?.nM || "";
+        this.voucherDataModel.partyState = billData?.cUST?.sT || "";
+        this.voucherDataModel.entryBy = this.storage.userName;
+        this.voucherDataModel.entryDate = new Date();
+        this.voucherDataModel.panNo = ""
 
-        this.VoucherDataRequestModel.tdsSectionCode = "";
-        this.VoucherDataRequestModel.tdsSectionName = "";
-        this.VoucherDataRequestModel.tdsRate = 0;
-        this.VoucherDataRequestModel.tdsAmount = 0;
-        this.VoucherDataRequestModel.tdsAtlineitem = false;
-        this.VoucherDataRequestModel.tcsSectionCode = "";
-        this.VoucherDataRequestModel.tcsSectionName = "";
-        this.VoucherDataRequestModel.tcsRate = 0;
-        this.VoucherDataRequestModel.tcsAmount = 0;
+        this.voucherDataModel.tdsSectionCode = "";
+        this.voucherDataModel.tdsSectionName = "";
+        this.voucherDataModel.tdsRate = 0;
+        this.voucherDataModel.tdsAmount = 0;
+        this.voucherDataModel.tdsAtlineitem = false;
+        this.voucherDataModel.tcsSectionCode = "";
+        this.voucherDataModel.tcsSectionName = "";
+        this.voucherDataModel.tcsRate = 0;
+        this.voucherDataModel.tcsAmount = 0;
 
-        this.VoucherDataRequestModel.IGST = billData?.gST?.iGST || 0;
-        this.VoucherDataRequestModel.SGST = billData?.gST?.sGST || 0;
-        this.VoucherDataRequestModel.CGST = billData?.gST?.cGST || 0;
-        this.VoucherDataRequestModel.UGST = billData?.gST?.uTGST || 0;
-        this.VoucherDataRequestModel.GSTTotal = GstAmount;
+        this.voucherDataModel.IGST = billData?.gST?.iGST || 0;
+        this.voucherDataModel.SGST = billData?.gST?.sGST || 0;
+        this.voucherDataModel.CGST = billData?.gST?.cGST || 0;
+        this.voucherDataModel.UGST = billData?.gST?.uTGST || 0;
+        this.voucherDataModel.GSTTotal = GstAmount;
 
-        this.VoucherDataRequestModel.GrossAmount = TotalAmount || 0;
-        this.VoucherDataRequestModel.netPayable = TotalAmount;
-        this.VoucherDataRequestModel.roundOff = 0;
-        this.VoucherDataRequestModel.voucherCanceled = false
-        this.VoucherDataRequestModel.transactionNumber = BillNo;
-        this.VoucherDataRequestModel.paymentMode = "";
-        this.VoucherDataRequestModel.refNo = "";
-        this.VoucherDataRequestModel.accountName = "";
-        this.VoucherDataRequestModel.accountCode = "";
-        this.VoucherDataRequestModel.date = "";
-        this.VoucherDataRequestModel.scanSupportingDocument = "";
+        this.voucherDataModel.GrossAmount = TotalAmount || 0;
+        this.voucherDataModel.netPayable = TotalAmount;
+        this.voucherDataModel.roundOff = 0;
+        this.voucherDataModel.voucherCanceled = false
+        this.voucherDataModel.transactionNumber = BillNo;
+        this.voucherDataModel.paymentMode = "";
+        this.voucherDataModel.refNo = "";
+        this.voucherDataModel.accountName = "";
+        this.voucherDataModel.accountCode = "";
+        this.voucherDataModel.date = "";
+        this.voucherDataModel.scanSupportingDocument = "";
         var VoucherlineitemList = this.GetVouchersLedgersForAutoBilling(billData, BillNo);
 
-        this.VoucherRequestModel.details = VoucherlineitemList
-        this.VoucherRequestModel.data = this.VoucherDataRequestModel;
-        this.VoucherRequestModel.debitAgainstDocumentList = [];
+        this.voucherModel.details = VoucherlineitemList
+        this.voucherModel.data = this.voucherDataModel;
+        this.voucherModel.debitAgainstDocumentList = [];
 
         this.voucherServicesService
-          .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)
+          .FinancePost("fin/account/voucherentry", this.voucherModel)
           .subscribe({
             next: (res: any) => {
 
@@ -3933,9 +3924,9 @@ export class ConsignmentEntryFormComponent
                       showCancelButton: true
                     }).then((result) => {
                       if (result.isConfirmed) {
-                       // Redirect after the alert is closed with OK button.
-                      this.navService.navigateTotab('docket', "dashboard/Index");
-                      }else if (result.isDenied) {
+                        // Redirect after the alert is closed with OK button.
+                        this.navService.navigateTotab('docket', "dashboard/Index");
+                      } else if (result.isDenied) {
                         // Handle the action for the deny button here.
                         const templateBody = {
                           templateName: "DKT",
@@ -4032,15 +4023,9 @@ export class ConsignmentEntryFormComponent
       response.push(createVoucher(LeadgerDetails.LeadgerCode, LeadgerDetails.LeadgerName, LeadgerDetails.LeadgerCategory, 0, DocketAmount));
     }
 
-    const gstTypeMapping = {
-      UGST: { accCode: ledgerInfo['LIA002002'].LeadgerCode, accName: ledgerInfo['LIA002002'].LeadgerName, accCategory: ledgerInfo['LIA002002'].LeadgerCategory, prop: "uGST" },
-      cGST: { accCode: ledgerInfo['LIA002003'].LeadgerCode, accName: ledgerInfo['LIA002003'].LeadgerName, accCategory: ledgerInfo['LIA002003'].LeadgerCategory, prop: "cGST" },
-      IGST: { accCode: ledgerInfo['LIA002004'].LeadgerCode, accName: ledgerInfo['LIA002004'].LeadgerName, accCategory: ledgerInfo['LIA002004'].LeadgerCategory, prop: "iGST" },
-      SGST: { accCode: ledgerInfo['LIA002001'].LeadgerCode, accName: ledgerInfo['LIA002001'].LeadgerName, accCategory: ledgerInfo['LIA002001'].LeadgerCategory, prop: "sGST" },
-    };
-
+    const gstTypeMapping = GSTTypeMapping;
     const gstType = billData?.gST?.tYP;
-    const GSTTypeList = [gstType]
+    const GSTTypeList = gstType.split(',');
     GSTTypeList.forEach(element => {
       if (gstType && gstTypeMapping[element]) {
         const { accCode, accName, accCategory, prop } = gstTypeMapping[element];

@@ -2207,6 +2207,7 @@ export class ThcGenerationComponent implements OnInit {
 
     const destinationMapping = await this.locationService.locationFromApi({ locCity: this.thcTableForm.controls['toCity'].value });
     this.thcTableForm.controls['closingBranch'].setValue(destinationMapping[0]?.value || "");
+    
     if (this.isUpdate) {
       const podDetails = typeof (docket) == "object" ? docket : ""
       this.thcTableForm.removeControl("docket");
@@ -2241,13 +2242,22 @@ export class ThcGenerationComponent implements OnInit {
           "aCTDT": new Date()
         }
       }
-      const branch = this.storage.branch;
+
       // Fetch location details asynchronously
-      const locData = await this.thcService.getLocationDetail(branch);
+      const locData = this.currentLocation.extraData;
       // Determine if the destination has been arrived at
-      const toCityValue = this.thcTableForm.getRawValue();
-      const isArrivedDel = toCityValue.toCity.toLowerCase() == locData?.locCity?.toLowerCase() || locData?.mappedCity.includes(toCityValue.toCity);
-       const isVia=toCityValue.via.includes(locData?.locCity?.toLowerCase()) ||  locData?.mappedCity.some(cityItem => toCityValue.via.includes(cityItem));
+
+      const thcFormData = this.thcTableForm.getRawValue();
+      const isArrivedDel = thcFormData.toCity.toLowerCase() == locData?.locCity?.toLowerCase() || locData?.mappedCity?.includes(thcFormData.toCity);
+      let isVia = false;
+      if(thcFormData.via && Array.isArray(thcFormData.via) && thcFormData.via.length > 0) {
+        isVia = thcFormData.via?.some(c => c.toLowerCase() == locData?.locCity?.toLowerCase());
+        
+        if(!isVia && locData?.mappedCity && Array.isArray(locData?.mappedCity)) {
+          isVia = locData?.mappedCity?.some(c => thcFormData.via?.includes(c))
+        }
+      }
+      
       if (!isArrivedDel || isVia) {
         if (this.tableData.length == podDetails.length) {
           Swal.fire({
@@ -2278,7 +2288,7 @@ export class ThcGenerationComponent implements OnInit {
         this.operationService,
         podDetails,
         this.VehicleTableForm.get("vehicle").value,
-        this.currentLocation,
+        locData,
         this.DocketsContainersWise,
         data.prqNo
       );

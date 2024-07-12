@@ -26,7 +26,15 @@ async function updateThcStatus(data, tripId, operationService, podDetails, vehic
         //Event = EVN0004: Delivered, EVN0005: Arrived
         //Status = 3: Delivered, 4: Arrived
 
-        let eventId = (element.tCT.toUpperCase() === currentLocation.locCity.toUpperCase()) ? "EVN0004" : "EVN0005";
+        let mappedCity = [];
+        if(currentLocation.mappedCity && Array.isArray(currentLocation.mappedCity)){ 
+            mappedCity = currentLocation.mappedCity;
+        }
+        
+        let eventId = (element.tCT.toUpperCase() === currentLocation.locCity.toUpperCase()
+                    ||  mappedCity.some(c => c.toUpperCase() == element.tCT.toUpperCase() ))
+                    ? "EVN0004" : "EVN0005";
+
         let sts = (eventId == "EVN0004") ? 3 : 4;
         let stsnm = (eventId == "EVN0004") ? "Delivered" : "Arrived";
         let opsts = (eventId == "EVN0004")

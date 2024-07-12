@@ -5,6 +5,8 @@ import { NgxSpinnerService } from "ngx-spinner";
 import { PlatformLocation } from "@angular/common";
 import { FailedApiServiceService } from "./core/service/api-tracking-service/failed-api-service.service";
 import { RetryAndDownloadService } from "./core/service/api-tracking-service/retry-and-download.service";
+import { GoogleAnalyticsService } from "./core/service/googleAnalytics.service";
+import { environment } from "src/environments/environment";
 
 
 @Component({
@@ -22,10 +24,11 @@ export class AppComponent {
   constructor(
     public appservice: AuthService,
     public _router: Router,
-    location: PlatformLocation,
+    location: PlatformLocation,    
     //private failedApiService: FailedApiServiceService,
     //private retryAndDownloadService: RetryAndDownloadService,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private readonly googleAnalyticsService: GoogleAnalyticsService
   ) {
     this._router.events.subscribe((routerEvent: Event) => {
       if (routerEvent instanceof NavigationStart) {
@@ -44,8 +47,11 @@ export class AppComponent {
     });
   }
   ngOnInit(): void {
-
+    if (environment.gAnalyticsId) {
+      this.googleAnalyticsService.initialize();
+    }
   }
+  
   // // Listen for page reload attempts
   // @HostListener('window:beforeunload', ['$event'])
   // unloadNotification($event: any): void {

@@ -61,6 +61,7 @@ import { locationEntitySearch } from "./Utility/locationEntitySearch";
 import { SearchComponent } from "./layout/header/search/search.component";
 import * as StorageService from 'src/app/core/service/storage.service';
 import { StoreKeys } from "./config/myconstants";
+import { ModuleCounterServiceService } from "./core/service/Logger/module-counter-service.service";
 
 
 export function MSALInstanceFactory(): IPublicClientApplication {
@@ -118,12 +119,12 @@ export function createTranslateLoader(http: HttpClient): any {
     NgMultiSelectDropDownModule.forRoot(),
     SharedModule,
     JwtModule.forRoot({
-       config: {
-         tokenGetter: (request) => {
-           return StorageService.getItem(StoreKeys.Token);
-         },
-         disallowedRoutes: [environment.AuthAPIGetway + "RefreshToken"],
-       },
+      config: {
+        tokenGetter: (request) => {
+          return StorageService.getItem(StoreKeys.Token);
+        },
+        disallowedRoutes: [environment.AuthAPIGetway + "RefreshToken"],
+      },
     }),
     MsalModule
   ],
@@ -148,7 +149,8 @@ export function createTranslateLoader(http: HttpClient): any {
     MsalService,
     MsalGuard,
     MsalBroadcastService,
-    locationEntitySearch
+    locationEntitySearch,
+    ModuleCounterServiceService
   ],
   bootstrap: [AppComponent],
 })

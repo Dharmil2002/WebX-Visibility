@@ -25,10 +25,10 @@ export class GeolocationService {
   }
 
   async getLocation() {
-    const location = await this.getCurrentLocation().toPromise();
+    const location = await firstValueFrom(this.getCurrentLocation());
     return location;
   }
-  async getIpAddress(): Promise<string> {
+  async getIpAddress() {
     const apiUrl = 'https://jsonip.com';
     try {
       const response = await firstValueFrom(this.http.get<any>(apiUrl));

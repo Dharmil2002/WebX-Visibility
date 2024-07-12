@@ -57,7 +57,7 @@ export class ModuleCounterServiceService {
     this.gAnalyticsService.eventV2('module_counter', this.MCounterRequest);
   }
 
-  async getIpAddress(): Promise<string> {
+  async getIpAddress() {
     const result = await this.GeolocationService.getIpAddress();
     return result;
   }

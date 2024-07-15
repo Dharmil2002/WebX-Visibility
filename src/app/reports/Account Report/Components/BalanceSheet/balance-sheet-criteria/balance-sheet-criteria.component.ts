@@ -13,6 +13,7 @@ import { AccountReportService } from 'src/app/Utility/module/reports/accountrepo
 import { Router } from '@angular/router';
 import { BalanceSheetReport } from 'src/assets/FormControls/Reports/Account Reports/BalanceSheetReport';
 import { financialYear } from 'src/app/Utility/date/date-utils';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 @Component({
   selector: 'app-balance-sheet-criteria',
   templateUrl: './balance-sheet-criteria.component.html'
@@ -61,7 +62,8 @@ export class BalanceSheetCriteriaComponent implements OnInit {
     private filter: FilterUtils,
     private router: Router,
     private storage: StorageService,
-    private masterServices: MasterService
+    private masterServices: MasterService,
+    private MCountrService: ModuleCounterService
   ) {
     this.initializeFormControl();
   }
@@ -244,6 +246,7 @@ export class BalanceSheetCriteriaComponent implements OnInit {
           "Schedule": "Schedule III Compliant",
           "BalanceSheetDetails": Result
         }
+        this.MCountrService.PushModuleCounter();
         this.accountReportService.setDataForTrialBalance("BalanceSheet", RequestData);
         window.open('/#/Reports/AccountReport/BalanceSheetview', '_blank');
 

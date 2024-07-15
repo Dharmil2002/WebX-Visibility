@@ -15,6 +15,7 @@ import { AccountReportService } from 'src/app/Utility/module/reports/accountrepo
 import { Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { TrialBalanceReport } from 'src/assets/FormControls/Reports/Account Reports/TrialBalanceReport';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 @Component({
   selector: 'app-trial-balance-criteria',
   templateUrl: './trial-balance-criteria.component.html'
@@ -69,7 +70,8 @@ export class TrialBalanceCriteriaComponent implements OnInit {
     private filter: FilterUtils,
     private router: Router,
     private storage: StorageService,
-    private masterServices: MasterService
+    private masterServices: MasterService,
+    private MCountrService: ModuleCounterService
   ) {
     this.initializeFormControl();
   }
@@ -344,6 +346,7 @@ export class TrialBalanceCriteriaComponent implements OnInit {
           "Title": "TRIAL BALANCE STATEMENT",
           "Data": Result
         }
+        this.MCountrService.PushModuleCounter()
         this.accountReportService.setDataForTrialBalance("TrialBalanceData", RequestData);
         this.accountReportService.setDataForTrialBalance("TrialBalanceRequest", this.reqBody);
         window.open('/#/Reports/AccountReport/TrialBalanceview', '_blank');

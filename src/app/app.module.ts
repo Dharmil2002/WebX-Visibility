@@ -61,7 +61,7 @@ import { locationEntitySearch } from "./Utility/locationEntitySearch";
 import { SearchComponent } from "./layout/header/search/search.component";
 import * as StorageService from 'src/app/core/service/storage.service';
 import { StoreKeys } from "./config/myconstants";
-import { ModuleCounterServiceService } from "./core/service/Logger/module-counter-service.service";
+import { ModuleCounterService } from "./core/service/Logger/module-counter-service.service";
 
 
 export function MSALInstanceFactory(): IPublicClientApplication {
@@ -150,7 +150,7 @@ export function createTranslateLoader(http: HttpClient): any {
     MsalGuard,
     MsalBroadcastService,
     locationEntitySearch,
-    ModuleCounterServiceService
+    ModuleCounterService
   ],
   bootstrap: [AppComponent],
 })

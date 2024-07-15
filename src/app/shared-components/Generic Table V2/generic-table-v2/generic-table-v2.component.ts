@@ -236,8 +236,11 @@ export class GenericTableV2Component
           return isValidDate(val) ? moment(new Date(val)).format(colDef.format || "HH:mm") : "";
         case "currency":
           return ConvertToNumber(val || 0).toFixed(2);
+        case "amount":
+          return this.formatNumberWithThousandSeparator(val || 0);
         case "number":
           return ConvertToNumber(val || 0).toFixed(colDef.decimalPlaces || 0);
+
         default:
           return val;
       }
@@ -524,5 +527,19 @@ export class GenericTableV2Component
        this.dialogClosed.emit(result);
     });
   }
-  
+  formatNumberWithThousandSeparator(value: number | string): string {
+    let numberValue: number;
+
+    if (typeof value === 'string') {
+      numberValue = parseFloat(value);
+    } else {
+      numberValue = value;
+    }
+
+    return new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(numberValue);
+  }
+
 }

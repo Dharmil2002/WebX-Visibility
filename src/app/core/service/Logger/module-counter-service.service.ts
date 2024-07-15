@@ -10,7 +10,7 @@ import { GoogleAnalyticsService } from '../googleAnalytics.service';
 @Injectable({
   providedIn: 'root'
 })
-export class ModuleCounterServiceService {
+export class ModuleCounterService {
 
   MCounterRequest = new ModuleCounter();
   constructor(private http: HttpClient,
@@ -26,7 +26,7 @@ export class ModuleCounterServiceService {
    * @param codeType The code type to retrieve the details of.
    * @returns The details of the specified code type.
    */
-  async prepareMCounterRequest() {
+  async PushModuleCounter() {
     const ipAddress = await this.getIpAddress(); // Wait for IP address
     const browserInfo = this.getBrowserInfo(); // No await needed here, unless GeolocationService.getBrowserInfo() returns a Promise
     const location = await this.getLocation(); // Wait for location
@@ -53,7 +53,6 @@ export class ModuleCounterServiceService {
       mCAT: MenuInfo?.Category || '',
       mSCAT: MenuInfo?.SubCategory || '',
     };
-    this.gAnalyticsService.initialize()
     this.gAnalyticsService.eventV2('module_counter', this.MCounterRequest);
   }
 

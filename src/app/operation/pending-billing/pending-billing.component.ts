@@ -72,6 +72,7 @@ export class PendingBillingComponent implements OnInit {
       Title: "Unbilled Amount (₹)",
       class: "matcolumncenter",
       Style: "min-width: 100px",
+      datatype: "amount",
     },
     action: {
       Title: "Action",
@@ -140,6 +141,7 @@ export class PendingBillingComponent implements OnInit {
     this.tableLoad = true;
     const unBillingData = await this.invoiceService.getPendingDetails(data.start, data.end, data.customer);
     this.tableData = unBillingData.map(item => {
+      item.sum = parseFloat(item.sum.toFixed(2));
       item.action = item.dockets != 0 ? "Generate Invoice" : "";
       return item;
     });
@@ -180,9 +182,10 @@ export class PendingBillingComponent implements OnInit {
     }
   }
   getKpiCount() {
-    const totalShipment = this.tableData.reduce((acc, item) => acc + item.pendShipment, 0);
-    const totolApproved = this.tableData.reduce((acc, item) => acc + item.dockets, 0); //this.tableData.map((item) => item.dockets).length;
-    const unBillamt = this.tableData.reduce((acc, item) => acc + item.sum, 0);
+    const totalShipment = parseFloat(this.tableData.reduce((acc, item) => acc + item.pendShipment, 0).toFixed(2));
+    const totalApproved = parseFloat(this.tableData.reduce((acc, item) => acc + item.dockets, 0).toFixed(2));
+    const unBillamt = parseFloat(this.tableData.reduce((acc, item) => acc + item.sum, 0).toFixed(2));
+
     const createShipDataObject = (
       count: number,
       title: string,
@@ -195,8 +198,8 @@ export class PendingBillingComponent implements OnInit {
     const pendingBilling = [
       createShipDataObject(totalShipment, "Unbilled Shipments", "bg-c-Bottle-light"),
       createShipDataObject(unBillamt, "Unbilled Amount", "bg-c-Grape-light"),
-      createShipDataObject(totolApproved, "Approved for Billing ", "bg-c-Daisy-light"),
-      createShipDataObject(totolApproved, "Pending PODs", "bg-c-Grape-light"),
+      createShipDataObject(totalApproved, "Approved for Billing ", "bg-c-Daisy-light"),
+      createShipDataObject(totalApproved, "Pending PODs", "bg-c-Grape-light"),
     ];
     this.boxData = pendingBilling
   }

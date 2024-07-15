@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
-import { SACInfo, VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
+import { GSTTypeMapping, SACInfo, VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
 import { CustomerBillStatus } from 'src/app/Models/docStatus';
 
 @Component({
@@ -364,14 +364,10 @@ export class BillApprovalComponent implements OnInit {
     }
 
 
-    const gstTypeMapping = {
-      UGST: { accCode: ledgerInfo['LIA002002'].LeadgerCode, accName: ledgerInfo['LIA002002'].LeadgerName, accCategory: ledgerInfo['LIA002002'].LeadgerCategory, prop: "uGST" },
-      CGST: { accCode: ledgerInfo['LIA002003'].LeadgerCode, accName: ledgerInfo['LIA002003'].LeadgerName, accCategory: ledgerInfo['LIA002003'].LeadgerCategory, prop: "cGST" },
-      IGST: { accCode: ledgerInfo['LIA002004'].LeadgerCode, accName: ledgerInfo['LIA002004'].LeadgerName, accCategory: ledgerInfo['LIA002004'].LeadgerCategory, prop: "iGST" },
-      SGST: { accCode: ledgerInfo['LIA002001'].LeadgerCode, accName: ledgerInfo['LIA002001'].LeadgerName, accCategory: ledgerInfo['LIA002001'].LeadgerCategory, prop: "sGST" },
-    };
+    const gstTypeMapping = GSTTypeMapping
 
     const gstType = data?.gST?.tYP;
+
     const GSTTypeList = gstType.split(',');
     GSTTypeList.forEach(element => {
       if (gstType && gstTypeMapping[element]) {

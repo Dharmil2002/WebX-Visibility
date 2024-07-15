@@ -389,7 +389,6 @@ export class xlsxutilityService {
   }
 
   validateData(data: any[], rules: any[]): Observable<any[]> {
-    debugger
     const validatedData = JSON.parse(JSON.stringify(data));
     const validationObservables: Observable<void>[] = [];
 
@@ -441,6 +440,10 @@ export class xlsxutilityService {
             String(listItem).toLowerCase() === String(value).toLowerCase())) {
             errors.push(`${rule.ItemsName} already exists. Please enter another ${rule.ItemsName}.`);
           }
+
+          if ("Numeric" in validation && validation.Numeric && isNaN(parseFloat(value))) {
+            errors.push(`${rule.ItemsName} must be numeric.`);
+          }
           if ("MinValue" in validation && !isNaN(parseFloat(value)) && parseFloat(value) < validation.MinValue) {
             errors.push(`${rule.ItemsName} must be at least ${validation.MinValue}.`);
           }
@@ -453,9 +456,7 @@ export class xlsxutilityService {
               errors.push(`${rule.ItemsName} does not match the pattern.`);
             }
           }
-          if ("Numeric" in validation && validation.Numeric && isNaN(parseFloat(value))) {
-            errors.push(`${rule.ItemsName} must be numeric. `);
-          }
+
           if ("CompareMinMaxValue" in validation && validation.CompareMinMaxValue) {
             preValue = item[rule.ItemsName];
             if (preValue && nextValue && nextValue > preValue) {

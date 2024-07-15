@@ -69,6 +69,7 @@ export class RouteLocationService {
 }
   //#region to below function is used for the save the route
   async addRouteLocation(data,tableData) {
+    debugger
     const routeDetails=[]
     if(tableData && tableData.length>0){
       tableData.forEach(element => {
@@ -86,6 +87,16 @@ export class RouteLocationService {
       });
      
     }
+          // Summing the dTKM and tRNHR values, converting to numbers if necessary
+      const totals = routeDetails.reduce((acc, route) => {
+        const distance = parseFloat(route.dTKM) || 0; // Convert to number or use 0 if NaN
+        const transitHours = parseFloat(route.tRNHR) || 0; // Convert to number or use 0 if NaN
+        return {
+          totalDistance: acc.totalDistance + distance,
+          totalTransitHours: acc.totalTransitHours + transitHours
+        };
+      }, { totalDistance: 0, totalTransitHours: 0 });
+
     try {
       const dataRoute =
       {
@@ -94,7 +105,8 @@ export class RouteLocationService {
         "rUTNM": data?.route,
         "rUTMODE": data.routeMode,
         "rUTCT": "LONG HAUL",
-        "rUTKM": 0,
+        "rUTKM": totals.totalDistance, // Assigning the total distance here
+        "rUTHR": totals.totalTransitHours, // Assigning the total transit hours here
         "dPTM": null,
         "rUTDET": routeDetails,
         "cLOC": this.storage.branch,

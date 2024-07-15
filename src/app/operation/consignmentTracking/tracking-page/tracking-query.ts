@@ -48,7 +48,7 @@ export const GetTrakingDataPipeLine = () => {
       },
       {
         D$group: {
-          _id: "$dKTNO",
+          _id: { dKTNO: "$dKTNO", sFX: "$sFX" },
           doc: {
             D$first: "$$ROOT",
           },
@@ -133,9 +133,13 @@ export const GetTrakingDataPipeLine = () => {
       {
         D$project: {
           dKTNO: 1,
+          sFX: 1,
           dKTDT: "$docketData.dKTDT",
           eDDDT: "$docketData.eDDDT",
-          TransitMode: 1,          
+          TransitMode: 1,   
+          pKGS: 1,
+          aCTWT: 1,
+          cHRWT: 1,       
           ATD: 1,
           sTSNM: 1,
           sTSTM: 1,
@@ -200,10 +204,8 @@ export const GetTrakingDataPipeLine = () => {
       },
       {
         D$group: {
-          _id: "$dKTNO",
-          doc: {
-            D$first: "$$ROOT",
-          },
+          _id: { dKTNO: "$dKTNO", sFX: "$sFX" },
+          doc: { D$first: "$$ROOT" },
         },
       },
       {
@@ -216,7 +218,7 @@ export const GetTrakingDataPipeLine = () => {
           TransitMode: [ 
             { D$ifNull: ["$docketData.pAYTYPNM", ""] },
             { D$ifNull: ["$docketData.tRNMODNM", "Road"] },
-            { D$ifNull: ["$docketData.mODNM", "LTL"] },
+            { D$ifNull: ["$docketData.mODNM", "LTL"] }
           ], 
           Consignee: {
             D$concat: [
@@ -239,7 +241,7 @@ export const GetTrakingDataPipeLine = () => {
           ATD: {
             D$cond: {
               if: { 
-                $or: [ 
+                D$or: [ 
                   { D$eq: ["$iSDEL", true] },
                   { D$eq: ["$sTS", 10]}
                 ]
@@ -359,9 +361,13 @@ export const GetTrakingDataPipeLine = () => {
       {
         D$project: {
           dKTNO: 1,
+          sFX: 1,
           dKTDT: "$docketData.dKTDT",
           eDDDT: "$docketData.eDDDT",
           TransitMode: 1,
+          pKGS: 1,
+          aCTWT: 1,
+          cHRWT: 1,
           ATD: 1,
           sTSNM: 1,
           sTSTM: 1,

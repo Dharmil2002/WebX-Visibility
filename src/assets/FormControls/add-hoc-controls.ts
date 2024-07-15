@@ -54,7 +54,7 @@ export class AddHocControls {
       },
       {
         name: "distance",
-        label: "Distance",
+        label: "Km Distance from Previous Location",
         placeholder: "Distance ",
         type: "number",
         value: "",
@@ -64,7 +64,7 @@ export class AddHocControls {
       },
       {
         name: "transitHrs",
-        label: "Transit Hrs",
+        label: "Transit Hrs from Previous Location",
         placeholder: "Route Type",
         type: "number",
         value: "",

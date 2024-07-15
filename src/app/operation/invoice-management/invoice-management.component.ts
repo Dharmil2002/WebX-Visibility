@@ -52,7 +52,7 @@ export class InvoiceManagementComponent implements OnInit {
       Style: "max-width: 100px",
     },
     valueBl: {
-      Title: "Value",
+      Title: "Invoice Amt",
       class: "matcolumncenter",
       Style: "min-width: 100px",
     },
@@ -62,7 +62,7 @@ export class InvoiceManagementComponent implements OnInit {
       Style: "max-width: 220px",
     },
     penApAmt: {
-      Title: "Value​",
+      Title: "Pending Approval Amt",
       class: "matcolumncenter",
       Style: "max-width: 90px",
     },
@@ -72,7 +72,7 @@ export class InvoiceManagementComponent implements OnInit {
       Style: "max-width: 90px",
     },
     pendColAmt: {
-      Title: "Value​",
+      Title: "Pending Amt",
       class: "matcolumncenter",
       Style: "min-width: 90px",
     }
@@ -104,7 +104,7 @@ export class InvoiceManagementComponent implements OnInit {
   ) {
     this.companyCode = this.storage.companyCode;
     this.orgBranch = this.storage.branch;
-    
+
     this.range = this.DashboardFilterPage.group({
       start: new FormControl(),  // Create a form control for start date
       end: new FormControl(),    // Create a form control for end date
@@ -170,9 +170,10 @@ export class InvoiceManagementComponent implements OnInit {
     }
   }
   getKpiCount() {
-    const invoiceGenerated = this.tableData.reduce((acc, curr) => acc + curr.genCnt, 0);
-    const totolApproved = this.unBillingData.map((item) => item.dockets).length;
-    const unBillamt = this.unBillingData.reduce((acc, item) => acc + item.sum, 0);
+    const invoiceGenerated = parseFloat(this.tableData.reduce((acc, curr) => acc + curr.genCnt, 0).toFixed(2));
+    const totalApproved = this.unBillingData.length; // Assuming this is a count and not a sum
+    const unBillamt = parseFloat(this.unBillingData.reduce((acc, item) => acc + item.sum, 0).toFixed(2));
+
     // const invoiceGenerated= this.tableData.reduce((acc, curr) => acc + curr.genCnt, 0);
     const createShipDataObject = (
       count: number,
@@ -186,8 +187,8 @@ export class InvoiceManagementComponent implements OnInit {
     const pendingBilling = [
       createShipDataObject(invoiceGenerated, "Invoice Generated", "bg-c-Bottle-light"),
       createShipDataObject(unBillamt, "Unbilled Amount", "bg-c-Grape-light"),
-      createShipDataObject(totolApproved, "Pending Approval", "bg-c-Daisy-light"),
-      createShipDataObject(totolApproved, "Pending PODs", "bg-c-Grape-light"),
+      createShipDataObject(totalApproved, "Pending Approval", "bg-c-Daisy-light"),
+      createShipDataObject(totalApproved, "Pending PODs", "bg-c-Grape-light"),
     ];
     this.boxData = pendingBilling
   }

@@ -19,7 +19,14 @@ export class GeolocationService {
           });
           observer.complete();
         },
-        (error) => observer.error(error)
+        (error) => {
+          // On error, return an empty result
+          observer.next({
+            latitude: 0,
+            longitude: 0
+          });
+          observer.complete();
+        }
       );
     });
   }
@@ -28,14 +35,14 @@ export class GeolocationService {
     const location = await firstValueFrom(this.getCurrentLocation());
     return location;
   }
-  async getIpAddress() {
+  async getIpAddress(): Promise<string> {
     const apiUrl = 'https://jsonip.com';
     try {
-      const response = await firstValueFrom(this.http.get<any>(apiUrl));
+      const response = await firstValueFrom(this.http.get<{ ip: string }>(apiUrl));
       return response.ip;
     } catch (error) {
       console.error('Error fetching IP address:', error);
-      return null;
+      return "";
     }
   }
   getBrowserInfo(): { name: string, version: string } {

@@ -52,7 +52,7 @@ export class InvoiceDashboardComponent implements OnInit {
 
       // Fetch data from the service
       const count = await this.objInvoiceCountService.getDashboardData();
-      const ltlCount = await this.objInvoiceCountService.getDashboardDataForLTL(); 
+      const ltlCount = await this.objInvoiceCountService.getDashboardDataForLTL();
       const ltlCnCount = await this.objInvoiceCountService.getCreditNoteDashboardData();
 
       // Extract relevant data
@@ -83,7 +83,7 @@ export class InvoiceDashboardComponent implements OnInit {
             item['count'] = Unbilledcount + Unbilledcountltl || '0';
             break;
           case "Unbilled Amount":
-            item['count'] = Unbilled_aMT + Unbilled_aMTltl || '0.00';
+            item['count'] = parseFloat(Unbilled_aMT + Unbilled_aMTltl).toFixed(2) || '0.00';
             break;
           case "Approved For Billing":
             item['count'] = approvedBillCount + approvedBillCountltl || '0';
@@ -92,8 +92,8 @@ export class InvoiceDashboardComponent implements OnInit {
             item['count'] = approvedBillCount + approvedBillCountltl || '0';
             break;
           case "Credit Notes":
-              item['count'] = ltlCnCount || '0';
-              break;
+            item['count'] = ltlCnCount || '0';
+            break;
         }
       });
 

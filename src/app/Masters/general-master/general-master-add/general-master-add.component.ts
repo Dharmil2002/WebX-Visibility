@@ -8,6 +8,8 @@ import { formGroupBuilder } from "src/app/Utility/Form Utilities/formGroupBuilde
 import Swal from "sweetalert2";
 import { StorageService } from "src/app/core/service/storage.service";
 import { SnackBarUtilityService } from "../../../Utility/SnackBarUtility.service";
+import { firstValueFrom } from "rxjs";
+import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 @Component({
   selector: "app-general-master-add",
   templateUrl: "./general-master-add.component.html",
@@ -109,42 +111,14 @@ export class GeneralMasterAddComponent implements OnInit {
                   text: res.message,
                   showConfirmButton: true,
                 });
-                this.dialogRef.close(this.generalTableForm);
+                this.dialogRef.close(this.generalTableForm.value);
               }
             },
           });
         } else {
-          let req = {
-            companyCode: this.storage.companyCode,
-            collectionName: "General_master",
-            filter: { companyCode: this.storage.companyCode },
-          };
-          this.masterService.masterPost("generic/get", req).subscribe({
-            next: (res: any) => {
-              if (res) {
-                const lastCodeWithType = res.data
-                  .filter((item) => item.codeType === this.generalTabledata)
-                  .sort((a, b) => b.codeId.localeCompare(a.codeId))[0];
-
-                const lastGeneralCode = lastCodeWithType
-                  ? parseInt(lastCodeWithType.codeId.split("-")[1])
-                  : 0;
-
-                function generateGeneralCode(
-                  initialCode: number = 0,
-                  codeType: string
-                ) {
-                  const nextGeneralCode = initialCode + 1;
-                  const generalNumber = nextGeneralCode
-                    .toString()
-                    .padStart(4, "0");
-                  const generalCode = `${codeType}-${generalNumber}`;
-                  return generalCode;
-                }
-                this.newGeneralId = generateGeneralCode(
-                  lastGeneralCode,
-                  this.generalTabledata
-                );
+        const lastId= await this.getListId();
+        const lastCode = lastId?.codeId || `${this.generalTabledata}0000`;
+             this.newGeneralId = nextKeyCode(lastCode);
                 this.generalTableForm.controls["_id"].setValue(
                   this.newGeneralId
                 );
@@ -154,6 +128,8 @@ export class GeneralMasterAddComponent implements OnInit {
                 this.generalTableForm.controls["codeType"].setValue(
                   this.generalTabledata
                 );
+                let data=this.generalTableForm.value;
+                data['companyCode']=this.storage.companyCode
                 let req = {
                   companyCode: this.companyCode,
                   collectionName: "General_master",
@@ -169,13 +145,10 @@ export class GeneralMasterAddComponent implements OnInit {
                         text: res.message,
                         showConfirmButton: true,
                       });
-                      this.dialogRef.close(this.generalTableForm);
+                      this.dialogRef.close(this.generalTableForm.value);
                     }
                   },
                 });
-              }
-            },
-          });
         }
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal("error", error.message);
@@ -184,6 +157,21 @@ export class GeneralMasterAddComponent implements OnInit {
   }
   //#endregion
 
+  //#region 
+  async getListId() 
+  {
+    try {
+      let query = { companyCode: this.companyCode,codeType: this.generalTabledata};
+      const req = { companyCode: this.companyCode, collectionName: "General_master", filter: query, sorting: { _id: -1 } };
+      const response = await firstValueFrom(this.masterService.masterPost("generic/findLastOne", req));
+
+      return response?.data;
+    } catch (error) {
+      console.error("Error fetching user list:", error);
+      throw error;
+    }
+  }
+  //#endregion
   //#region Function Call Handler
   functionCallHandler($event) {
     let functionName = $event.functionName; // name of the function , we have to call

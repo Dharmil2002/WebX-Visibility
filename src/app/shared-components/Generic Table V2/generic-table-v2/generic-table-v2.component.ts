@@ -285,10 +285,13 @@ export class GenericTableV2Component
   }
   //#region Funtion to open Dialog to view
   View(item) {
-    this.dialog.open(this.viewComponent, {
+    const dialogRef=this.dialog.open(this.viewComponent, {
       width: "800px",
       height: "500px",
       data: item,
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+       this.dialogClosed.emit(result);
     });
   }
   //#endregion
@@ -512,10 +515,14 @@ export class GenericTableV2Component
     });
   }
   openImageDialog(data) {
-    this.dialog.open(ImagePreviewComponent, {
+    const dialogRef =  this.dialog.open(ImagePreviewComponent, {
       data: { imageUrl: data.pod },
       width: '30%',
       height: '50%',
     });
+    dialogRef.afterClosed().subscribe((result) => {
+       this.dialogClosed.emit(result);
+    });
   }
+  
 }

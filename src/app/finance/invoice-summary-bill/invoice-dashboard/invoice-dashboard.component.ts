@@ -62,15 +62,15 @@ export class InvoiceDashboardComponent implements OnInit {
 
       // Destructure data for better readability
       const {
-        Unbilledcount,
-        Unbilled_aMT,
-        approvedBillCount
+        Unbilledcount = 0,
+        Unbilled_aMT = 0,
+        approvedBillCount = 0,
       } = dashboardCounts;
 
       const {
-        Unbilledcountltl,
-        Unbilled_aMTltl,
-        approvedBillCountltl
+        Unbilledcountltl = 0,
+        Unbilled_aMTltl = 0,
+        approvedBillCountltl = 0,
       } = dashboardltlCounts;
 
       this.Transactions = Transactions;

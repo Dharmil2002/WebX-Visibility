@@ -55,6 +55,7 @@ export class InvoiceManagementComponent implements OnInit {
       Title: "Invoice Amt",
       class: "matcolumncenter",
       Style: "min-width: 100px",
+      datatype: "amount",
     },
     penAp: {
       Title: "Pending Approval",
@@ -65,6 +66,7 @@ export class InvoiceManagementComponent implements OnInit {
       Title: "Pending Approval Amt",
       class: "matcolumncenter",
       Style: "max-width: 90px",
+      datatype: "amount",
     },
     pendCol: {
       Title: "Pending Collection​",
@@ -75,6 +77,7 @@ export class InvoiceManagementComponent implements OnInit {
       Title: "Pending Amt",
       class: "matcolumncenter",
       Style: "min-width: 90px",
+      datatype: "amount",
     }
 
   }

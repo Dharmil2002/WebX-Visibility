@@ -53,7 +53,6 @@ export class ModuleCounterService {
       mCAT: MenuInfo?.Category || '',
       mSCAT: MenuInfo?.SubCategory || '',
     };
-    this.gAnalyticsService.initialize()
     this.gAnalyticsService.eventV2('module_counter', this.MCounterRequest);
   }
 

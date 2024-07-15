@@ -5,26 +5,26 @@
 export const environment = {
   production: false,
   appVersion: "1.0.3",
-  secretKey: "bRTsuawqfGB5Zd3e",  
-  gAnalyticsId: "",
+  secretKey: "bRTsuawqfGB5Zd3e",
+  gAnalyticsId: "G-JBVSH25Z2P",
   AuthAPIGetway: "http://localhost:3000/v1/auth/",
   localNumberFormat: "en-IN",
-  APIBaseURL:"http://localhost:3000/v1/",  
-  APIBaseBetaURL:"https://cnoteentry.azurewebsites.net/api/"
+  APIBaseURL: "http://localhost:3000/v1/",
+  APIBaseBetaURL: "https://cnoteentry.azurewebsites.net/api/"
 };
 
 
-  // gAnalyticsId: "G-4QFMXRWVJC",
-  // AuthAPIGetway: "https://tms-api.beta.mywebxpress.com/v1/auth/",
-  // localNumberFormat: "en-IN",
-  // APIBaseURL: "https://tms-api.beta.mywebxpress.com/v1/",
-  // APIBaseBetaURL: "https://cnoteentry.azurewebsites.net/api/"
+// gAnalyticsId: "G-4QFMXRWVJC",
+// AuthAPIGetway: "https://tms-api.beta.mywebxpress.com/v1/auth/",
+// localNumberFormat: "en-IN",
+// APIBaseURL: "https://tms-api.beta.mywebxpress.com/v1/",
+// APIBaseBetaURL: "https://cnoteentry.azurewebsites.net/api/"
 
-  // gAnalyticsId: "G-JBVSH25Z2P",
-  // AuthAPIGetway: "https://tms-api.mywebxpress.com/v1/auth/",
-  // localNumberFormat: "en-IN",
-  // APIBaseURL: "https://tms-api.mywebxpress.com/v1/",
-  // APIBaseBetaURL: "https://cnoteentry.azurewebsites.net/api/"
+// gAnalyticsId: "G-JBVSH25Z2P",
+// AuthAPIGetway: "https://tms-api.mywebxpress.com/v1/auth/",
+// localNumberFormat: "en-IN",
+// APIBaseURL: "https://tms-api.mywebxpress.com/v1/",
+// APIBaseBetaURL: "https://cnoteentry.azurewebsites.net/api/"
 /*
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.

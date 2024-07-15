@@ -22,6 +22,7 @@ import { ImagePreviewComponent } from 'src/app/shared-components/image-preview/i
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { StoreKeys } from 'src/app/config/myconstants';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 @Component({
   selector: 'app-debit-voucher',
   templateUrl: './debit-voucher.component.html',
@@ -108,6 +109,7 @@ export class DebitVoucherComponent implements OnInit {
     private objImageHandling: ImageHandling,
     private storage: StorageService,
     public snackBarUtilityService: SnackBarUtilityService,
+    public MCService: ModuleCounterService
 
   ) {
     this.companyCode = this.storage.companyCode;
@@ -118,6 +120,7 @@ export class DebitVoucherComponent implements OnInit {
   ngOnInit(): void {
     this.BindDataFromApi();
     this.initializeFormControl();
+    this.MCService.PushModuleCounter();
   }
   initializeFormControl() {
     this.DebitVoucherControl = new DebitVoucherControl("");

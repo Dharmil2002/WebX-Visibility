@@ -1,3 +1,4 @@
+import { SACInfo } from "src/app/Models/Finance/Finance";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { StoreKeys } from "src/app/config/myconstants";
 import * as StorageService from "src/app/core/service/storage.service";
@@ -102,7 +103,17 @@ export class StateWiseSummaryControl {
         generatecontrol: true,
         disable: true,
         Validations: [],
-      },      
+      },
+      {
+        name: "sacCode",
+        label: "GST SAC Code",
+        placeholder: "GST SAC Code",
+        type: "text",
+        value: SACInfo['996511'].sacCode + ":" + SACInfo['996511'].sacName,
+        generatecontrol: true,
+        disable: true,
+        Validations: [],
+      },
       {
         name: "generationOffice",
         label: "Generation Office",
@@ -147,8 +158,8 @@ export class StateWiseSummaryControl {
         value: "",
         generatecontrol: true,
         disable: false,
-        functions:{
-          onChange:"gstExemptedChange"
+        functions: {
+          onChange: "gstExemptedChange"
         },
         Validations: [],
       },
@@ -420,7 +431,7 @@ export class StateWiseSummaryControl {
         generatecontrol: true,
         disable: true,
         Validations: [],
-      },     
+      },
       {
         name: "gst",
         label: "GST(₹)",
@@ -440,7 +451,7 @@ export class StateWiseSummaryControl {
         generatecontrol: true,
         disable: true,
         Validations: [],
-      },      
+      },
       {
         name: "cgst",
         label: "CGST(₹)",
@@ -450,7 +461,7 @@ export class StateWiseSummaryControl {
         generatecontrol: true,
         disable: true,
         Validations: [],
-      },      
+      },
       {
         name: "sgst",
         label: "SGST(₹)",
@@ -489,8 +500,8 @@ export class StateWiseSummaryControl {
         value: 0,
         generatecontrol: true,
         disable: false,
-        functions:{
-         onChange:"roundOffChange"
+        functions: {
+          onChange: "roundOffChange"
         },
         Validations: [],
       },

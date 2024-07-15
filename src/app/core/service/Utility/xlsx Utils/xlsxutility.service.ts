@@ -389,6 +389,7 @@ export class xlsxutilityService {
   }
 
   validateData(data: any[], rules: any[]): Observable<any[]> {
+    debugger
     const validatedData = JSON.parse(JSON.stringify(data));
     const validationObservables: Observable<void>[] = [];
 
@@ -398,27 +399,9 @@ export class xlsxutilityService {
       let preValue, nextValue
       for (const rule of rules) {
         const value = item[rule.ItemsName];
-        const gstex = item["GSTApplicable"];
         for (const validation of rule.Validations) {
-          if (rule.ItemsName == "GSTRate"){
-            if (gstex == "Y" && "Numeric" in validation && validation.Numeric) {
-              if (value === undefined || value === null || value === "") {
-                  errors.push(`${rule.ItemsName} is required.`);
-              } else if (isNaN(parseFloat(value))) {
-                  errors.push(`${rule.ItemsName} must be numeric.`);
-              } else if (parseFloat(value) === 0 && parseFloat(validation.given) <= 0) {
-                  errors.push(`If ${rule.ItemsName} is 0, then ${rule.ItemsName} validation must be greater than 0.`);
-              }
-            }
-          }
-          else
-          {
-            if ("Required" in validation && validation.Required && !value) {
-              errors.push(`${rule.ItemsName} is required.`);
-            }
-            if ("Numeric" in validation && validation.Numeric && isNaN(parseFloat(value))) {
-              errors.push(`${rule.ItemsName} must be numeric. `);
-            }
+          if ("Required" in validation && validation.Required && !value) {
+            errors.push(`${rule.ItemsName} is required.`);
           }
           if ("dateLimit" in validation && value) {
             const { range } = rule.Validations.find((x) => x.range);
@@ -470,7 +453,9 @@ export class xlsxutilityService {
               errors.push(`${rule.ItemsName} does not match the pattern.`);
             }
           }
-
+          if ("Numeric" in validation && validation.Numeric && isNaN(parseFloat(value))) {
+            errors.push(`${rule.ItemsName} must be numeric. `);
+          }
           if ("CompareMinMaxValue" in validation && validation.CompareMinMaxValue) {
             preValue = item[rule.ItemsName];
             if (preValue && nextValue && nextValue > preValue) {

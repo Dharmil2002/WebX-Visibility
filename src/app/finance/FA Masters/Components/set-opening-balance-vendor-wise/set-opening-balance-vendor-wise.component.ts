@@ -303,10 +303,10 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
             ItemsName: "GSTApplicable",
             Validations: [{ Required: true }, { Type: "text" }, { YN: true }],
           },
-          {
-            ItemsName: "GSTRate",
-            Validations: [{ Required: true }, { Numeric: true }],
-          },
+          // {
+          //   ItemsName: "GSTRate",
+          //   Validations: [{ Required: true }, { Numeric: true }],
+          // },
           {
             ItemsName: "RCM",
             Validations: [{ Required: true }, { Type: "text" }, { YN: true }],
@@ -376,13 +376,21 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
           },
 
         ];
-
         const rPromise = firstValueFrom(this.xlsxUtils.validateData(jsonData, validationRules));
 
         rPromise.then(async response => {
           response.forEach((element) => {
+           
+           
             if (element.DebitAccount == "LIA001001") {
               element.error.push("Debit Account Should Not Be LIA001001 Account");
+            }
+            if (element.GSTApplicable == "Y" && (!element.GSTRate || isNaN(parseFloat(element.GSTRate)) || parseFloat(element.GSTRate) <= 0))  
+            {
+              if (!element.error) {
+                element.error = [];
+              }
+                element.error.push("GSTRate is required and must be a numeric value greater than 0.");
             }
           });
 

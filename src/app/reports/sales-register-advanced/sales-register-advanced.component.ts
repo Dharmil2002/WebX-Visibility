@@ -12,6 +12,7 @@ import { SalesRegisterService } from 'src/app/Utility/module/reports/sales-regis
 import { salesRegisterControl } from 'src/assets/FormControls/Reports/sales-register/sales-register-advance';
 import Swal from 'sweetalert2';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 @Component({
   selector: 'app-sales-register-advanced',
   templateUrl: './sales-register-advanced.component.html'
@@ -67,6 +68,7 @@ export class SalesRegisterAdvancedComponent implements OnInit {
     private customerService: CustomerService,
     private salesRegisterService: SalesRegisterService,
     public snackBarUtilityService: SnackBarUtilityService,
+    private MCountrService: ModuleCounterService
   ) {
     this.initializeFormControl();
   }
@@ -279,6 +281,8 @@ export class SalesRegisterAdvancedComponent implements OnInit {
           }
           return;
         }
+        // Push the module counter data to the server
+        this.MCountrService.PushModuleCounter();
         Swal.hideLoading();
         setTimeout(() => {
           Swal.close();

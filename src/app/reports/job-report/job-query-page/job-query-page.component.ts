@@ -8,6 +8,7 @@ import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilde
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { ExportService } from 'src/app/Utility/module/export.service';
 import { JobRegisterService, convertToCSV } from 'src/app/Utility/module/reports/job-register.service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { StorageService } from 'src/app/core/service/storage.service';
@@ -503,7 +504,8 @@ export class JobQueryPageComponent implements OnInit {
     private operationService: OperationService,
     private storage: StorageService,
     private jobRegisterService: JobRegisterService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private MCountrService: ModuleCounterService
   ) {
     this.initializeFormControl();
     this.allColumnFilter = this.columnHeader;
@@ -648,7 +650,8 @@ export class JobQueryPageComponent implements OnInit {
       return jobDet && locDet && cnoteno;
     });
     // Assuming you have your selected data in a variable called 'selectedData'
-    // const selectedData = filteredRecords;
+    // Push the module counter data to the server
+    this.MCountrService.PushModuleCounter();
     if (filteredRecords.length === 0) {
       // Display a message or take appropriate action when no records are found
       if (filteredRecords) {

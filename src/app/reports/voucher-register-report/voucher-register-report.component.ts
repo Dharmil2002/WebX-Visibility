@@ -15,6 +15,7 @@ import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/gener
 import { Subject, take, takeUntil } from 'rxjs';
 import moment from 'moment';
 import { ExportService } from 'src/app/Utility/module/export.service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 @Component({
   selector: 'app-voucher-register-report',
   templateUrl: './voucher-register-report.component.html'
@@ -62,7 +63,8 @@ export class VoucherRegisterReportComponent implements OnInit {
     private locationService: LocationService,
     public snackBarUtilityService: SnackBarUtilityService,
     private generalLedgerReportService: GeneralLedgerReportService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private MCountrService: ModuleCounterService
   ) {
     this.initializeFormControl();
   }
@@ -317,6 +319,8 @@ export class VoucherRegisterReportComponent implements OnInit {
           }
           return;
         }
+        // Push the module counter data to the server
+        this.MCountrService.PushModuleCounter();
         Swal.hideLoading();
         setTimeout(() => {
           Swal.close();

@@ -6,7 +6,7 @@ export const environment = {
   production: false,
   appVersion: "1.0.3",
   secretKey: "bRTsuawqfGB5Zd3e",
-  gAnalyticsId: "",
+  gAnalyticsId: "G-JBVSH25Z2P",
   AuthAPIGetway: "http://localhost:3000/v1/auth/",
   localNumberFormat: "en-IN",
   APIBaseURL: "http://localhost:3000/v1/",

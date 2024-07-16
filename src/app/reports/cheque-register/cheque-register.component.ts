@@ -12,6 +12,7 @@ import { LocationService } from 'src/app/Utility/module/masters/location/locatio
 import { VendorService } from 'src/app/Utility/module/masters/vendor-master/vendor.service';
 import { ChequeRegisterService } from 'src/app/Utility/module/reports/cheque-register.service';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { GetAccountDetailFromApi, GetBankDetailFromApi } from 'src/app/finance/Debit Voucher/debitvoucherAPIUtitlity';
@@ -60,7 +61,8 @@ export class ChequeRegisterComponent implements OnInit {
     private snackBarUtilityService: SnackBarUtilityService,
     private generalLedgerReportService: GeneralLedgerReportService,
     private chequeRegisterService: ChequeRegisterService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private MCountrService: ModuleCounterService
   ) { }
 
 
@@ -204,6 +206,10 @@ export class ChequeRegisterComponent implements OnInit {
         setTimeout(() => {
           Swal.close();
         }, 1000);
+
+        // Push the module counter data to the server
+        this.MCountrService.PushModuleCounter();
+
         // Export the record to Excel
         this.exportService.exportAsCSV(data, `Cheque_Register_Report-${timeString}`, this.CSVHeader);
 

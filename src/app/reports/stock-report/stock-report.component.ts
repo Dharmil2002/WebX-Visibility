@@ -16,6 +16,7 @@ import { StockReport } from 'src/assets/FormControls/Reports/stock-report-contro
 import Swal from 'sweetalert2';
 import _, { forEach } from 'lodash';
 import { ConvertToNumber } from 'src/app/Utility/commonFunction/common';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 
 @Component({
   selector: 'app-stock-report',
@@ -60,7 +61,7 @@ export class StockReportComponent implements OnInit {
     PackageType: "PackageType",
     PickupDelivery: "PickupDelivery",
     DocketStatus: "DocketStatus",
-    PrivateMarka : "PrivateMarka"
+    PrivateMarka: "PrivateMarka"
   }
 
   summaryGroup: any[] = [];
@@ -137,7 +138,8 @@ export class StockReportComponent implements OnInit {
     private storage: StorageService,
     private stockReportService: StockReportService,
     private snackBarUtilityService: SnackBarUtilityService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private MCountrService: ModuleCounterService
   ) { }
 
   ngOnInit(): void {
@@ -249,8 +251,8 @@ export class StockReportComponent implements OnInit {
 
         this.filterData = { startDate, endDate, modeList, paybasisList, BookingType, stockType, dateType, locationType, formatType, fromLocation, toLocation, cumulativeLocation: this.cumulativeLocation }
 
-        // console.log(requestbody);
-        console.log(this.filterData);
+        // Push the module counter data to the server
+        this.MCountrService.PushModuleCounter();
         let data = [];
         if (reportType == 'Register') {
           data = await this.stockReportService.getStockData(this.filterData);
@@ -311,10 +313,10 @@ export class StockReportComponent implements OnInit {
 
       var filter = { ...this.filterData };
 
-      if(columnData.StockTypeId)
+      if (columnData.StockTypeId)
         filter.stockType = columnData.StockTypeId;
 
-      if(data.LocationCode && data.LocationCode != "")
+      if (data.LocationCode && data.LocationCode != "")
         filter.cumulativeLocation = [data.LocationCode];
 
       console.log(filter);

@@ -12,6 +12,7 @@ import Swal from 'sweetalert2';
 import { ManifestRegService } from 'src/app/Utility/module/reports/manifest-register-service';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
 import { StorageService } from 'src/app/core/service/storage.service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 
 @Component({
   selector: 'app-manifest-register-report',
@@ -20,7 +21,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
 export class ManifestRegisterReportComponent implements OnInit {
   jsonControlArray: any;
   desName: any;
-  desStatus : any;
+  desStatus: any;
   chargesKeys: any[];
   branchName: any;
   branchStatus: any;
@@ -31,9 +32,9 @@ export class ManifestRegisterReportComponent implements OnInit {
     private exportService: ExportService,
     private ManifestRegServices: ManifestRegService,
     private generalLedgerReportService: GeneralLedgerReportService,
-    private Storage:StorageService
-  )
-    { }
+    private Storage: StorageService,
+    private MCountrService: ModuleCounterService
+  ) { }
 
   ngOnInit(): void {
     this.initializeFormControl()
@@ -59,7 +60,7 @@ export class ManifestRegisterReportComponent implements OnInit {
   ];
   manifestRegisterForm: UntypedFormGroup;
   protected _onDestroy = new Subject<void>();
-  LoadTable=false;
+  LoadTable = false;
   loading = true;
   csvFileName: string; // name of the csv file, when data is downloaded
   source: any;
@@ -137,7 +138,7 @@ export class ManifestRegisterReportComponent implements OnInit {
       const ManifestArray = mFNO ? mFNO.includes(',') ? mFNO.split(',') : [mFNO] : [];
       const branch = this.ReportingBranches;
       const reqBody = {
-        startValue, endValue, mFNO, branch,ManifestArray
+        startValue, endValue, mFNO, branch, ManifestArray
       }
       const result = await this.ManifestRegServices.getManifestRegisterReportDetails(reqBody);
       console.log("data", result);
@@ -149,7 +150,8 @@ export class ManifestRegisterReportComponent implements OnInit {
       this.source = result.data;
       this.LoadTable = true;
       this.showOverlay = true;
-
+      // Push the module counter data to the server
+      this.MCountrService.PushModuleCounter();
       if (this.source.length === 0) {
         if (this.source) {
           Swal.fire({

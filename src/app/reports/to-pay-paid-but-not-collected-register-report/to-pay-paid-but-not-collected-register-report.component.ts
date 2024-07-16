@@ -16,6 +16,7 @@ import { ToPayPaidReportControl } from 'src/assets/FormControls/Reports/To-Pay-P
 import Swal from 'sweetalert2';
 import { ConvertToNumber } from 'src/app/Utility/commonFunction/common';
 import _ from 'lodash';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 
 @Component({
   selector: 'app-to-pay-paid-but-not-collected-register-report',
@@ -53,6 +54,7 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
     private generalLedgerReportService: GeneralLedgerReportService,
     private reportService: ReportService,
     private masterService: MasterService,
+    private MCountrService: ModuleCounterService,
     private nav: NavDataService) { }
 
   ngOnInit(): void {
@@ -178,7 +180,8 @@ export class ToPayPaidButNotCollectedRegisterReportComponent implements OnInit {
         this.summaryData = pivotData.data;
         this.summaryGroup = pivotData.columnGroup;
         this.tableLoad = true;
-
+        // Push the module counter data to the server
+        this.MCountrService.PushModuleCounter();
         // Close the loading Swal after a short delay
         Swal.hideLoading();
         setTimeout(() => {

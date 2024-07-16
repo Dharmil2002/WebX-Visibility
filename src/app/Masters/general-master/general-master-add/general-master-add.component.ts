@@ -52,7 +52,7 @@ export class GeneralMasterAddComponent implements OnInit {
     ];
     this.initializeFormControl();
   }
-  ngOnInit() {}
+  ngOnInit() { }
   initializeFormControl() {
     // Create StateFormControls instance to get form controls for different sections
     this.generalFormControls = new GeneralMasterControl(
@@ -67,9 +67,9 @@ export class GeneralMasterAddComponent implements OnInit {
   }
   cancel() {
     if (this.isUpdate) {
-      this.dialogRef.close(this.generalTableForm);
+      this.dialogRef.close();
     } else {
-      this.dialogRef.close(this.generalTabledata);
+      this.dialogRef.close();
     }
   }
   //#region Save Function
@@ -116,39 +116,39 @@ export class GeneralMasterAddComponent implements OnInit {
             },
           });
         } else {
-        const lastId= await this.getListId();
-        const lastCode = lastId?.codeId || `${this.generalTabledata}0000`;
-             this.newGeneralId = nextKeyCode(lastCode);
-                this.generalTableForm.controls["_id"].setValue(
-                  this.newGeneralId
-                );
-                this.generalTableForm.controls["codeId"].setValue(
-                  this.newGeneralId
-                );
-                this.generalTableForm.controls["codeType"].setValue(
-                  this.generalTabledata
-                );
-                let data=this.generalTableForm.value;
-                data['companyCode']=this.storage.companyCode
-                let req = {
-                  companyCode: this.companyCode,
-                  collectionName: "General_master",
-                  data: this.generalTableForm.value,
-                };
-                this.masterService.masterPost("generic/create", req).subscribe({
-                  next: (res: any) => {
-                    if (res) {
-                      // Display success message
-                      Swal.fire({
-                        icon: "success",
-                        title: "Successful",
-                        text: res.message,
-                        showConfirmButton: true,
-                      });
-                      this.dialogRef.close(this.generalTableForm.value);
-                    }
-                  },
+          const lastId = await this.getListId();
+          const lastCode = lastId?.codeId || `${this.generalTabledata}0000`;
+          this.newGeneralId = nextKeyCode(lastCode);
+          this.generalTableForm.controls["_id"].setValue(
+            this.newGeneralId
+          );
+          this.generalTableForm.controls["codeId"].setValue(
+            this.newGeneralId
+          );
+          this.generalTableForm.controls["codeType"].setValue(
+            this.generalTabledata
+          );
+          let data = this.generalTableForm.value;
+          data['companyCode'] = this.storage.companyCode
+          let req = {
+            companyCode: this.companyCode,
+            collectionName: "General_master",
+            data: this.generalTableForm.value,
+          };
+          this.masterService.masterPost("generic/create", req).subscribe({
+            next: (res: any) => {
+              if (res) {
+                // Display success message
+                Swal.fire({
+                  icon: "success",
+                  title: "Successful",
+                  text: res.message,
+                  showConfirmButton: true,
                 });
+                this.dialogRef.close(this.generalTableForm.value);
+              }
+            },
+          });
         }
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal("error", error.message);
@@ -158,10 +158,9 @@ export class GeneralMasterAddComponent implements OnInit {
   //#endregion
 
   //#region 
-  async getListId() 
-  {
+  async getListId() {
     try {
-      let query = { companyCode: this.companyCode,codeType: this.generalTabledata};
+      let query = { companyCode: this.companyCode, codeType: this.generalTabledata };
       const req = { companyCode: this.companyCode, collectionName: "General_master", filter: query, sorting: { _id: -1 } };
       const response = await firstValueFrom(this.masterService.masterPost("generic/findLastOne", req));
 

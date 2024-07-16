@@ -12,10 +12,11 @@ import Swal from 'sweetalert2';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
 import { DrsService } from 'src/app/Utility/module/reports/drs-register-service';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 
 @Component({
   selector: 'app-drs-register',
-  templateUrl: './drs-register.component.html',  
+  templateUrl: './drs-register.component.html',
 })
 export class DrsRegisterComponent implements OnInit {
   breadScrums = [
@@ -41,20 +42,21 @@ export class DrsRegisterComponent implements OnInit {
   branchStatus: any;
   loading = true; // Loading indicator
   showOverlay = false;
-  
+
   constructor(
     public snackBarUtilityService: SnackBarUtilityService,
     private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private locationService: LocationService,
-    private Storage:StorageService,
+    private Storage: StorageService,
     private masterServices: MasterService,
     private generalLedgerReportService: GeneralLedgerReportService,
     private drsdetails: DrsService,
-  ) {     
-      this.initializeFormControl()  
+    private MCountrService: ModuleCounterService
+  ) {
+    this.initializeFormControl()
   }
-  
+
 
   ngOnInit(): void {
     const now = new Date();
@@ -70,7 +72,7 @@ export class DrsRegisterComponent implements OnInit {
   }
   initializeFormControl() {
     this.drsregisterFormControl = new DrsReportControl();
-    this.jsondrsregisterFormArray = this.drsregisterFormControl.drsReportControlArray;    
+    this.jsondrsregisterFormArray = this.drsregisterFormControl.drsReportControlArray;
     this.drsregisterTableForm = formGroupBuilder(this.fb, [this.jsondrsregisterFormArray]);
     this.drsregisterTableForm.controls["ReportType"].setValue('Cumulative');
     this.drsregisterTableForm.controls['DocumentStatus'].setValue(5);
@@ -82,7 +84,7 @@ export class DrsRegisterComponent implements OnInit {
     )?.additionalData.showNameAndValue;
   }
   functionCallHandler($event) {
-    let functionName = $event.functionName; 
+    let functionName = $event.functionName;
     try {
       this[functionName]($event);
     } catch (error) {
@@ -104,7 +106,7 @@ export class DrsRegisterComponent implements OnInit {
     this.drsregisterTableForm.controls["Location"].setValue(loginBranch);
     this.drsregisterTableForm.get('Individual').setValue("Y");
   }
-  async save(){
+  async save() {
     this.loading = true;
     try {
       this.ReportingBranches = [];
@@ -119,20 +121,21 @@ export class DrsRegisterComponent implements OnInit {
       const startValue = moment(startDate).startOf('day').toDate();
       const endValue = moment(endDate).endOf('day').toDate();
       const status = this.drsregisterTableForm.value.DocumentStatus;
-      const rtype = this.drsregisterTableForm.value.ReportType;      
+      const rtype = this.drsregisterTableForm.value.ReportType;
       const drsNo = this.drsregisterTableForm.value.DocumentNo;
       const DRSArray = drsNo ? drsNo.includes(',') ? drsNo.split(',') : [drsNo] : [];
       const branch = this.ReportingBranches;
       const reqBody = {
-        startValue, endValue,  status, rtype, branch, drsNo, DRSArray
+        startValue, endValue, status, rtype, branch, drsNo, DRSArray
       }
       const result = await this.drsdetails.getdrsReportDetail(reqBody);
-      console.log("data", result);
+      // Push the module counter data to the server
+      this.MCountrService.PushModuleCounter();
       this.columns = result.grid.columns;
-      this.sorting = result.grid.sorting; 
+      this.sorting = result.grid.sorting;
       this.searching = result.grid.searching;
       this.paging = result.grid.paging;
-      
+
       this.source = result.data;
       this.LoadTable = true;
       this.showOverlay = true;
@@ -151,6 +154,6 @@ export class DrsRegisterComponent implements OnInit {
       this.loading = false;
     } catch (error) {
       this.snackBarUtilityService.ShowCommonSwal("error", error.message);
-    }    
+    }
   }
 }

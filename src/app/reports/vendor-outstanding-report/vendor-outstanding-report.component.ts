@@ -16,6 +16,7 @@ import { vendOutControl } from 'src/assets/FormControls/Reports/Vendor-Outstandi
 import moment from 'moment';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { ExportService } from 'src/app/Utility/module/export.service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 
 @Component({
   selector: 'app-vendor-outstanding-report',
@@ -58,7 +59,8 @@ export class VendorOutstandingReportComponent implements OnInit {
     private vendorWiseOutService: VendorWiseOutService,
     private generalService: GeneralService,
     public snackBarUtilityService: SnackBarUtilityService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private MCountrService: ModuleCounterService
   ) {
     this.initializeFormControl()
   }
@@ -121,7 +123,7 @@ export class VendorOutstandingReportComponent implements OnInit {
     "loc": "Location",
     "openingBal": "Opening Balance",
     "totalBill": "Total Bill",
-    "debitNoteAmt":"Debit Note Amount",
+    "debitNoteAmt": "Debit Note Amount",
     "totalBillAmt": "Total Bill Amount From 01 Apr 2023 To 11 Dec 2023",
     "paidAmt": "Paid Amount From 01 Apr 2023 To 11 Dec 2023",
     "finalized": "Finalized",
@@ -252,6 +254,8 @@ export class VendorOutstandingReportComponent implements OnInit {
           }
           return;
         }
+        // Push the module counter data to the server
+        this.MCountrService.PushModuleCounter();
         Swal.hideLoading();
         setTimeout(() => {
           Swal.close();

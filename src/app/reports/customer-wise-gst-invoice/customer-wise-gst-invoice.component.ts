@@ -8,6 +8,7 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { ExportService } from 'src/app/Utility/module/export.service';
 import { StateService } from 'src/app/Utility/module/masters/state/state.service';
 import { CustGSTInvoiceService } from 'src/app/Utility/module/reports/customer-wise-gst-invoice-service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { customerWiseGSTInvControl } from 'src/assets/FormControls/Customer-Wise-GST-Invoice/customer-wise-gst-invoice';
@@ -48,7 +49,8 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
     private masterServices: MasterService,
     private custGSTInvoiceService: CustGSTInvoiceService,
     private objStateService: StateService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private MCountrService: ModuleCounterService
   ) {
     this.initializeFormControl();
   }
@@ -252,7 +254,8 @@ export class CustomerWiseGstInvoiceComponent implements OnInit {
       });
       return;
     }
-
+    // Push the module counter data to the server
+    this.MCountrService.PushModuleCounter();
     // Exporting filtered data to Excel
     this.exportService.exportAsCSV(filteredRecord, `Customer_Wise_GST_Invoice_Register_Report-${timeString}.csv`, this.CSVHeader);
   }

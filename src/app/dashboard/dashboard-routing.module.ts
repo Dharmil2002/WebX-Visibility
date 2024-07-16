@@ -17,10 +17,10 @@ const routes: Routes = [
     redirectTo: "DocketDashboard",
     pathMatch: "full",
   },
-  {
-    path:"DocketDashboard",
-    component:DocketDashboardComponent
-  },
+  // {
+  //   path:"DocketDashboard",
+  //   component:DocketDashboardComponent
+  // },
   {
     path:"Index",
     component:DashboardPageComponent

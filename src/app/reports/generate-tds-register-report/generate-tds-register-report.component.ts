@@ -15,6 +15,7 @@ import { TDSRegisterReportService } from 'src/app/Utility/module/reports/generat
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { autocompleteObjectValidator } from 'src/app/Utility/Validation/AutoComplateValidation';
 import { Subject, take, takeUntil } from 'rxjs';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 
 @Component({
   selector: 'app-generate-tds-register-report',
@@ -63,6 +64,7 @@ export class GenerateTdsRegisterReportComponent implements OnInit {
     private masterService: MasterService,
     private tdsregisterReportService: TDSRegisterReportService,
     public snackBarUtilityService: SnackBarUtilityService,
+    private MCountrService: ModuleCounterService
   ) {
     this.initializeFormControl();
   }
@@ -318,6 +320,8 @@ export class GenerateTdsRegisterReportComponent implements OnInit {
 
       this.source = result.data.data.data;
       this.LoadTable = true;
+      // Push the module counter data to the server
+      this.MCountrService.PushModuleCounter();
       if (this.source.length === 0) {
         if (this.source) {
           Swal.fire({

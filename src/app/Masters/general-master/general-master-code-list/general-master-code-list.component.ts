@@ -15,41 +15,41 @@ export class GeneralMasterCodeListComponent {
   tableLoad = true; // flag , indicates if data is still lodaing or not , used to show loading animation
   companyCode: any = 0;
   addAndEditPath: string;
-  csvFileName:any;
+  csvFileName: any;
   headerCode: string;
-    columnHeader = {
-      srNo: {
-        Title: "Sr No",
-        class: "matcolumncenter",
-        Style: "max-width:200px",
-      },
-      codeId: {
-        Title: "Code ID",
-        class: "matcolumnleft",
-        Style: "max-width:150px",
-        datatype: "string"
-      },
-      codeDesc: {
-        Title: "Description",
-        class: "matcolumnleft",
-        Style: "max-width:150px",
-      },
-      activeFlag: {
-        type: "Activetoggle",
-        Title: "Active",
-        class: "matcolumncenter",
-        Style: "min-width:80px; max-width:80px",
-        functionName: "IsActiveFuntion",
-      },
-      view: {                
-        Title: "Edit",
-        class: "matcolumncenter",
-        Style: "min-width:80px; max-width:80px;",         
-        iconName: "edit",      
-        stickyEnd: true,
-      }
+  columnHeader = {
+    srNo: {
+      Title: "Sr No",
+      class: "matcolumncenter",
+      Style: "max-width:200px",
+    },
+    codeId: {
+      Title: "Code ID",
+      class: "matcolumnleft",
+      Style: "max-width:150px",
+      datatype: "string"
+    },
+    codeDesc: {
+      Title: "Description",
+      class: "matcolumnleft",
+      Style: "max-width:150px",
+    },
+    activeFlag: {
+      type: "Activetoggle",
+      Title: "Active",
+      class: "matcolumncenter",
+      Style: "min-width:80px; max-width:80px",
+      functionName: "IsActiveFuntion",
+    },
+    view: {
+      Title: "Edit",
+      class: "matcolumncenter",
+      Style: "min-width:80px; max-width:80px;",
+      iconName: "edit",
+      stickyEnd: true,
+    }
   };
-  staticField = ["srNo","codeId","codeDesc"];
+  staticField = ["srNo", "codeId", "codeDesc"];
   headerForCsv = {
     srNo: "Sr No",
     codeId: "Code ID",
@@ -72,27 +72,29 @@ export class GeneralMasterCodeListComponent {
   height = '300px';
   width = '600px';
   backPath: string;
-  constructor(private masterService: MasterService, private cdr: ChangeDetectorRef , private route: Router, private storage: StorageService) {
+  constructor(private masterService: MasterService, private cdr: ChangeDetectorRef, private route: Router, private storage: StorageService) {
     this.companyCode = this.storage.companyCode;
     if (this.route.getCurrentNavigation()?.extras?.state?.data != null) {
-  
-    }      this.data = route.getCurrentNavigation().extras.state.data;        
+
+    } this.data = route.getCurrentNavigation().extras.state.data;
   }
-   onDialogClosed(result) {
+  onDialogClosed(result) {
     if (typeof result == 'string') {
-      this.data.headerCode = result;            
-    } else {      
+      this.data.headerCode = result;
+    } else {
       this.data.headerCode = result.codeType;
     }
     this.cdr.detectChanges();
-    this.getGeneralDetails();
+    if (result != undefined) {
+      this.getGeneralDetails();
+    }
   }
   ngOnInit(): void {
     this.getGeneralDetails();
     //this.addAndEditPath = "/Masters/GeneralMaster/AddGeneralMaster";
     this.headerCode = this.data?.headerCode;
     this.viewComponent = GeneralMasterAddComponent;
-    this.csvFileName=`${this.headerCode}.csv`    
+    this.csvFileName = `${this.headerCode}.csv`
   }
   getGeneralDetails() {
     // Assuming tableData contains the array of objects
@@ -121,7 +123,7 @@ export class GeneralMasterCodeListComponent {
     });
   }
 
- async IsActiveFuntion(det) {
+  async IsActiveFuntion(det) {
     let id = det.data._id;
     // Remove the "id" field from the form controls
     delete det.data._id;
@@ -131,7 +133,7 @@ export class GeneralMasterCodeListComponent {
       type: "masters",
       collectionName: "General_master",
       filter: { _id: id },
-      update: {activeFlag:det.data.activeFlag}
+      update: { activeFlag: det.data.activeFlag }
     };
     this.masterService.masterPut('generic/update', req).subscribe({
       next: (res: any) => {

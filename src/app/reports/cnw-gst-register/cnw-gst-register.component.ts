@@ -13,6 +13,7 @@ import { timeString } from 'src/app/Utility/date/date-utils';
 import { CustomerService } from 'src/app/Utility/module/masters/customer/customer.service';
 import Swal from 'sweetalert2';
 import { ExportService } from 'src/app/Utility/module/export.service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 
 @Component({
   selector: 'app-cnw-gst-register',
@@ -112,7 +113,8 @@ export class CnwGstRegisterComponent implements OnInit {
     private pinCodeService: PinCodeService,
     private cnwGstService: CnwGstService,
     private customerService: CustomerService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private MCountrService: ModuleCounterService
   ) {
     this.initializeFormControl();
   }
@@ -290,6 +292,8 @@ export class CnwGstRegisterComponent implements OnInit {
       const { tCT, fCT, oRGN, dEST, cSGNNM, ...rest } = record;
       return rest;
     });
+    // Push the module counter data to the server
+    this.MCountrService.PushModuleCounter();
     // exportAsExcelFile(filteredRecordsWithoutKeys, `Cnote_GST_Wise_Register_Report-${timeString}`, this.CSVHeader);
     this.exportService.exportAsCSV(filteredRecordsWithoutKeys, `Cnote_GST_Wise_Register_Report-${timeString}`, this.CSVHeader);
   }

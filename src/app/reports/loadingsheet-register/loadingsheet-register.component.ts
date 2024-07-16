@@ -9,6 +9,7 @@ import { loadingsheetRegister } from 'src/assets/FormControls/Reports/loadingshe
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import { ReportService } from 'src/app/Utility/module/reports/generic-report.service';
 import { NavDataService } from 'src/app/core/service/navdata.service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 
 @Component({
   selector: 'app-loadingsheet-register',
@@ -54,7 +55,8 @@ export class LoadingsheetRegisterComponent implements OnInit {
     private filter: FilterUtils,
     private reportService: ReportService,
     private router: Router,
-    private nav: NavDataService
+    private nav: NavDataService,
+    private MCountrService: ModuleCounterService
   ) {
   }
 
@@ -148,6 +150,8 @@ export class LoadingsheetRegisterComponent implements OnInit {
         formTitle: 'LoadingSheet Register Report',
         csvFileName: this.csvFileName
       };
+      // Push the module counter data to the server
+      this.MCountrService.PushModuleCounter();
       // Convert the state data to a JSON string and encode it
       const stateString = encodeURIComponent(JSON.stringify(stateData));
       this.nav.setData(stateData);

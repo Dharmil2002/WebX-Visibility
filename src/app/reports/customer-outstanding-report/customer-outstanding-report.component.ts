@@ -9,6 +9,7 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { ExportService } from 'src/app/Utility/module/export.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { CustOutstandingService } from 'src/app/Utility/module/reports/customer-outstanding-service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { custOutControl } from 'src/assets/FormControls/Reports/Customer-Outstanding-report/customer-outstanding-report';
@@ -58,7 +59,8 @@ export class CustomerOutstandingReportComponent implements OnInit {
     private storage: StorageService,
     private masterServices: MasterService,
     public snackBarUtilityService: SnackBarUtilityService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private MCountrService: ModuleCounterService
   ) {
     this.initializeFormControl()
   }
@@ -79,7 +81,7 @@ export class CustomerOutstandingReportComponent implements OnInit {
     "loc": "Location",
     "openingBal": "Opening Balance",
     "billAmt": "Bill Amount",
-    "creditNoteAmt":"Credit Note Amount",
+    "creditNoteAmt": "Credit Note Amount",
     "unsubmittedAmt": "Un Submitted Amount",
     "submittedAmt": "Submitted Amount",
     "collectedAmt": "Collected Amount",
@@ -306,6 +308,8 @@ export class CustomerOutstandingReportComponent implements OnInit {
         setTimeout(() => {
           Swal.close();
         }, 1000);
+        // Push the module counter data to the server
+        this.MCountrService.PushModuleCounter();
         this.exportService.exportAsCSV(data, `Customer_Outstanding_Report-${timeString}`, this.CSVHeader);
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(

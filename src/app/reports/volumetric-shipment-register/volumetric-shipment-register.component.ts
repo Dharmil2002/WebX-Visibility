@@ -14,6 +14,7 @@ import moment from 'moment';
 import Swal from 'sweetalert2';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { ExportService } from 'src/app/Utility/module/export.service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 
 @Component({
   selector: 'app-volumetric-shipment-register',
@@ -58,7 +59,8 @@ export class VolumetricShipmentRegisterComponent implements OnInit {
     public snackBarUtilityService: SnackBarUtilityService,
     private generalLedgerReportService: GeneralLedgerReportService,
     private volumetricShipmentReportService: VolumetricShipmentReportService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private MCountrService: ModuleCounterService
   ) {
     this.initializeFormControl();
   }
@@ -95,7 +97,7 @@ export class VolumetricShipmentRegisterComponent implements OnInit {
   //   "ctn": "Contents"
   // }
 
-   //#region  initializeFormControl
+  //#region  initializeFormControl
   initializeFormControl() {
     this.volumetricShipmentFormControls = new volumetricShipmentRegisterControl();
     this.jsonVolumetricShipRegisterFormArray = this.volumetricShipmentFormControls.volumetricShipmentRegisterControlArray;
@@ -220,6 +222,8 @@ export class VolumetricShipmentRegisterComponent implements OnInit {
         return;
       }
       this.loading = false;
+      // Push the module counter data to the server
+      this.MCountrService.PushModuleCounter();
     } catch (error) {
       this.snackBarUtilityService.ShowCommonSwal("error", error.message);
     }

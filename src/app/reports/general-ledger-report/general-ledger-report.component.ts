@@ -11,6 +11,7 @@ import { ExportService } from 'src/app/Utility/module/export.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
 import { voucherRegService } from 'src/app/Utility/module/reports/voucherRegister.service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { GeneralLedgerReport } from 'src/assets/FormControls/Reports/General-Ledger-Report/general-ledger-report';
@@ -172,6 +173,7 @@ export class GeneralLedgerReportComponent implements OnInit {
     private generalLedgerReportService: GeneralLedgerReportService,
     private exportService: ExportService,
     private voucherRegService: voucherRegService,
+    private MCountrService: ModuleCounterService
   ) { }
 
   ngOnInit(): void {
@@ -454,7 +456,8 @@ export class GeneralLedgerReportComponent implements OnInit {
         this.tableLoad = false;
         const reqBody = await this.getRequestData();
         this.drillDownData = await this.generalLedgerReportService.getGeneralLedger(reqBody)
-        // console.log(this.drillDownData)
+        // Push the module counter data to the server
+        this.MCountrService.PushModuleCounter();
         if (this.drillDownData.length === 0) {
           Swal.hideLoading();
           setTimeout(() => {

@@ -19,6 +19,7 @@ import { StorageService } from "src/app/core/service/storage.service";
 import { GeneralLedgerReportService } from "src/app/Utility/module/reports/general-ledger-report.service";
 import { firstValueFrom } from 'rxjs';
 import { WINDOW } from "src/app/core/service/window.service";
+import { ModuleCounterService } from "src/app/core/service/Logger/module-counter-service.service";
 
 @Component({
   selector: "app-customer-invoice-register",
@@ -73,7 +74,7 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
     private billdetails: CustInvoiceRegService,
     private locationService: LocationService,
     private generalLedgerReportService: GeneralLedgerReportService,
-
+    private MCountrService: ModuleCounterService
   ) {
     this.initializeFormControl();
   }
@@ -230,6 +231,8 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
         }
         return;
       }
+      // Push the module counter data to the server
+      this.MCountrService.PushModuleCounter();
       this.loading = false;
     } catch (error) {
       this.snackBarUtilityService.ShowCommonSwal("error", error.message);

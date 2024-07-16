@@ -12,6 +12,7 @@ import { GeneralService } from 'src/app/Utility/module/masters/general-master/ge
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { CnoteBillMRService } from 'src/app/Utility/module/reports/cnote-bill-mr.service';
 import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { StorageService } from 'src/app/core/service/storage.service';
@@ -202,7 +203,8 @@ export class CnoteBillMrReportComponent implements OnInit {
     private operationService: OperationService,
     private masterServices: MasterService,
     public snackBarUtilityService: SnackBarUtilityService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private MCountrService: ModuleCounterService
   ) {
     this.initializeFormControl();
   }
@@ -394,6 +396,8 @@ export class CnoteBillMrReportComponent implements OnInit {
         setTimeout(() => {
           Swal.close();
         }, 1000);
+        // Push the module counter data to the server
+        this.MCountrService.PushModuleCounter();
         this.exportService.exportAsCSV(data, `Cnote_Bill_MR_Report-${timeString}`, this.CSVHeader);
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(

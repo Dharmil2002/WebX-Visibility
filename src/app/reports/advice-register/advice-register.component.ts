@@ -7,6 +7,7 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
 import { ReportService } from 'src/app/Utility/module/reports/generic-report.service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 import { NavDataService } from 'src/app/core/service/navdata.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { AdviceRegisterControl } from 'src/assets/FormControls/Reports/Advice-Register/advice-register-control';
@@ -48,6 +49,7 @@ export class AdviceRegisterComponent implements OnInit {
     private storage: StorageService,
     private generalLedgerReportService: GeneralLedgerReportService,
     private reportService: ReportService,
+    private MCountrService: ModuleCounterService,
     private nav: NavDataService) { }
 
   ngOnInit(): void {
@@ -170,6 +172,8 @@ export class AdviceRegisterComponent implements OnInit {
           formTitle: 'Advice Register Report',
           csvFileName: this.csvFileName
         };
+        // Push the module counter data to the server
+        this.MCountrService.PushModuleCounter();
         // Convert the state data to a JSON string and encode it        
         this.nav.setData(stateData);
         // Create the new URL with the state data as a query parameter

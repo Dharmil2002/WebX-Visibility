@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormGroup,UntypedFormBuilder } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { OpeningClosingStockReport } from 'src/assets/FormControls/Reports/Opening-Closing-Stock-Report/openingClosing-stock-report';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
@@ -8,6 +8,7 @@ import moment from 'moment';
 import { NavDataService } from 'src/app/core/service/navdata.service';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { ReportService } from 'src/app/Utility/module/reports/generic-report.service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 @Component({
   selector: 'app-opening-closing-stock-report',
   templateUrl: './opening-closing-stock-report.component.html'
@@ -21,12 +22,13 @@ export class OpeningClosingStockReportComponent implements OnInit {
   columnMenu: any;
   searching: any;
   theme: "MATERIAL"
-  constructor( private fb: UntypedFormBuilder,
+  constructor(private fb: UntypedFormBuilder,
     private locationService: LocationService,
     private filter: FilterUtils,
     public snackBarUtilityService: SnackBarUtilityService,
     private nav: NavDataService,
     private reportService: ReportService,
+    private MCountrService: ModuleCounterService
   ) { }
 
   ngOnInit(): void {
@@ -47,15 +49,14 @@ export class OpeningClosingStockReportComponent implements OnInit {
   ];
   OpeningClosingStockReportForm: UntypedFormGroup;
   jsonControlArray: any;
-  initializeFormControl()
-  {
+  initializeFormControl() {
     const controls = new OpeningClosingStockReport();
     this.jsonControlArray = controls.OpeningClosingStockReportForm;
     this.OpeningClosingStockReportForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
   }
 
   functionCallHandler($event) {
-    let functionName = $event.functionName;    
+    let functionName = $event.functionName;
     try {
       this[functionName]($event);
     } catch (error) {
@@ -95,22 +96,23 @@ export class OpeningClosingStockReportComponent implements OnInit {
         csvFileName: this.csvFileName
       };
       this.nav.setData(stateData);
+      // Push the module counter data to the server
+      this.MCountrService.PushModuleCounter();
       const url = `/#/Reports/generic-report-view`;
       window.open(url, '_blank');
     } catch (error) {
       this.snackBarUtilityService.ShowCommonSwal("error", error.message);
     }
-  }  
+  }
 
   // Get Opening and closing Stock Details
-  async getOpeningClosingStockDetails(data)
-  {
+  async getOpeningClosingStockDetails(data) {
     let matchQuery = {
       ...(data.DocNO != "" ? { sKU: { D$in: data.DocumentArray } } :
         {
           D$and: [
-            { eNTDT: { D$gte: data.startValue } }, 
-            { eNTDT: { D$lte: data.endValue } }, 
+            { eNTDT: { D$gte: data.startValue } },
+            { eNTDT: { D$lte: data.endValue } },
             ...(data.DocNO != "" ? [{ sKU: { D$in: data.DocumentArray } }] : []),
             ...(data.Location && data.Location != ""
               ? [{ lOC: { D$eq: data.Location } }]

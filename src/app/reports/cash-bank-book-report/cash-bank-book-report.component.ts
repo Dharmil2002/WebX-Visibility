@@ -14,6 +14,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { ExportService } from 'src/app/Utility/module/export.service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 @Component({
   selector: 'app-cash-bank-book-report',
   templateUrl: './cash-bank-book-report.component.html'
@@ -59,7 +60,8 @@ export class CashBankBookReportComponent implements OnInit {
     private filter: FilterUtils,
     private storage: StorageService,
     private masterServices: MasterService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private MCountrService: ModuleCounterService
   ) {
     this.initializeFormControl();
   }
@@ -312,6 +314,8 @@ export class CashBankBookReportComponent implements OnInit {
         }, 1000);
         this.tableData = data
         this.tableLoad = false
+        // Push the module counter data to the server
+        this.MCountrService.PushModuleCounter();
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(
           "error",

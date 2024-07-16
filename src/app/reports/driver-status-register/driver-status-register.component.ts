@@ -10,6 +10,7 @@ import { LocationService } from 'src/app/Utility/module/masters/location/locatio
 import { VehicleStatusService } from 'src/app/Utility/module/operation/vehicleStatus/vehicle.service';
 import { DriverStatusRegisterService } from 'src/app/Utility/module/reports/driver-status-report-service';
 import { ReportService } from 'src/app/Utility/module/reports/generic-report.service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { NavDataService } from 'src/app/core/service/navdata.service';
 import { StorageService } from 'src/app/core/service/storage.service';
@@ -59,6 +60,7 @@ export class DriverStatusRegisterComponent implements OnInit {
     public snackBarUtilityService: SnackBarUtilityService,
     private nav: NavDataService,
     private driverStatusRegisterService: DriverStatusRegisterService,
+    private MCountrService: ModuleCounterService
   ) {
     this.initializeFormControl();
   }
@@ -191,7 +193,7 @@ export class DriverStatusRegisterComponent implements OnInit {
   // }
 
   async save() {
-    
+
     this.loading = true;
     try {
       const driverNm = Array.isArray(this.driverstatusRegisterForm.value.driverNMHandler)
@@ -200,7 +202,7 @@ export class DriverStatusRegisterComponent implements OnInit {
       const vehicle = Array.isArray(this.driverstatusRegisterForm.value.vehNoHandler)
         ? this.driverstatusRegisterForm.value.vehNoHandler.map(x => x.name)
         : [];
-      const status = Array.isArray(this.driverstatusRegisterForm.value.sts) ? "": this.driverstatusRegisterForm.value.sts;
+      const status = Array.isArray(this.driverstatusRegisterForm.value.sts) ? "" : this.driverstatusRegisterForm.value.sts;
       const driverLoc = Array.isArray(this.driverstatusRegisterForm.value.driverLocHandler)
         ? this.driverstatusRegisterForm.value.driverLocHandler.map(x => x.name)
         : [];
@@ -223,6 +225,9 @@ export class DriverStatusRegisterComponent implements OnInit {
       // Convert the state data to a JSON string and encode it
       const stateString = encodeURIComponent(JSON.stringify(stateData));
       this.nav.setData(stateData);
+
+      // Push the module counter data to the server
+      this.MCountrService.PushModuleCounter();
       // Create the new URL with the state data as a query parameter
       const url = `/#/Reports/generic-report-view`;
       // Open the URL in a new tab

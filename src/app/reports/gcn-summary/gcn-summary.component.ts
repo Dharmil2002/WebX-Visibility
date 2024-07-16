@@ -3,6 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import _ from 'lodash';
 import moment from 'moment';
 import { firstValueFrom, Subject, take, takeUntil } from 'rxjs';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { NavDataService } from 'src/app/core/service/navdata.service';
 import { StorageService } from 'src/app/core/service/storage.service';
@@ -53,6 +54,7 @@ export class GCNSummaryComponent implements OnInit {
     private generalLedgerReportService: GeneralLedgerReportService,
     private reportService: ReportService,
     private masterService: MasterService,
+    private MCountrService: ModuleCounterService,
     private nav: NavDataService) { }
 
   ngOnInit(): void {
@@ -167,7 +169,8 @@ export class GCNSummaryComponent implements OnInit {
 
         this.filterData = { startValue, endValue, location, modeList, service, payBasis };
         const data = await this.gcnSummaryReport(this.filterData);
-
+        // Push the module counter data to the server
+        this.MCountrService.PushModuleCounter();
         if (data.length === 0) {
           if (data) {
             Swal.fire({

@@ -1,9 +1,9 @@
-import {  Component, OnInit } from '@angular/core';
-import { UntypedFormGroup,UntypedFormBuilder } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { UntypedFormGroup, UntypedFormBuilder } from '@angular/forms';
 import { vendorWiseOutstandingRegister } from 'src/assets/FormControls/Reports/Vendor-Wise-Outstanding-Register/Vendor-Wise-Outstanding-Register';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { StorageService } from 'src/app/core/service/storage.service';
-import { Subject,firstValueFrom, take, takeUntil } from 'rxjs';
+import { Subject, firstValueFrom, take, takeUntil } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
@@ -11,6 +11,7 @@ import moment from 'moment';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { NavDataService } from 'src/app/core/service/navdata.service';
 import { ReportService } from 'src/app/Utility/module/reports/generic-report.service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 @Component({
   selector: 'app-vendor-wise-outstanding-register-report',
   templateUrl: './vendor-wise-outstanding-register-report.component.html',
@@ -44,6 +45,7 @@ export class VendorWiseOutstandingRegisterReportComponent implements OnInit {
     public snackBarUtilityService: SnackBarUtilityService,
     private nav: NavDataService,
     private reportService: ReportService,
+    private MCountrService: ModuleCounterService
   ) { }
 
   ngOnInit(): void {
@@ -59,11 +61,11 @@ export class VendorWiseOutstandingRegisterReportComponent implements OnInit {
     const controls = new vendorWiseOutstandingRegister();
     this.jsonControlArray = controls.vendorOutstandingControlArray;
     this.VendorOutstandingRegisterForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
-    
+
   }
-  
+
   functionCallHandler($event) {
-    let functionName = $event.functionName;     
+    let functionName = $event.functionName;
     try {
       this[functionName]($event);
     } catch (error) {
@@ -73,22 +75,22 @@ export class VendorWiseOutstandingRegisterReportComponent implements OnInit {
   async getDropDownList() {
     let venNameReq = {
       "companyCode": this.storage.companyCode,
-      "filter": { },
+      "filter": {},
       "collectionName": "vendor_detail"
     };
     const venNameRes = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", venNameReq));
-    const venNameData = venNameRes?.data; 
-    const venNameDet = Array.isArray(venNameData) ? 
-      venNameData.map(element => ({ 
+    const venNameData = venNameRes?.data;
+    const venNameDet = Array.isArray(venNameData) ?
+      venNameData.map(element => ({
         name: element.vendorName.toString(),
         value: element.vendorCode.toString(),
       })) : [];
-    this.venNameDet = venNameDet; 
+    this.venNameDet = venNameDet;
     this.filter.Filter(
       this.jsonControlArray,
       this.VendorOutstandingRegisterForm,
-      venNameDet, 
-     "vennmcd",
+      venNameDet,
+      "vennmcd",
       false
     );
     const branchList = await this.locationService.locationFromApi();
@@ -106,7 +108,7 @@ export class VendorWiseOutstandingRegisterReportComponent implements OnInit {
     this.VendorOutstandingRegisterForm.controls['locHandler'].setValue(selectedStatusData);
     const statusList = [
       { name: "All", value: "All" },
-      { name: "Pending", value: "2"},
+      { name: "Pending", value: "2" },
       { name: "Partially ", value: "4" }
     ]
     this.filter.Filter(
@@ -140,14 +142,14 @@ export class VendorWiseOutstandingRegisterReportComponent implements OnInit {
       const startValue = moment(startDate).startOf('day').toDate();
       const endValue = moment(endDate).endOf('day').toDate();
       const Branch = Array.isArray(this.VendorOutstandingRegisterForm.value.locHandler)
-      ? this.VendorOutstandingRegisterForm.value.locHandler.map(x => { return { locCD: x.value, locNm: x.name }; })
-      : [];
-      const DocStatus=this.VendorOutstandingRegisterForm.value.documnetstatus.value;
+        ? this.VendorOutstandingRegisterForm.value.locHandler.map(x => { return { locCD: x.value, locNm: x.name }; })
+        : [];
+      const DocStatus = this.VendorOutstandingRegisterForm.value.documnetstatus.value;
       const vendData = Array.isArray(this.VendorOutstandingRegisterForm.value.vendnmcdHandler)
-      ? this.VendorOutstandingRegisterForm.value.vendnmcdHandler.map(x => { return { vCD: x.value, vNM: x.name }; })
-      : [];
+        ? this.VendorOutstandingRegisterForm.value.vendnmcdHandler.map(x => { return { vCD: x.value, vNM: x.name }; })
+        : [];
       const reqBody = {
-        startValue, endValue,Branch,DocStatus,vendData
+        startValue, endValue, Branch, DocStatus, vendData
       };
       const result = await this.getVendorOustandingDetails(reqBody);
       this.columns = result.grid.columns;
@@ -155,6 +157,8 @@ export class VendorWiseOutstandingRegisterReportComponent implements OnInit {
       this.searching = result.grid.searching;
       this.paging = result.grid.paging;
 
+      // Push the module counter data to the server
+      this.MCountrService.PushModuleCounter();
       const stateData = {
         data: result,
         formTitle: 'Vendor Outstanding Register Details',
@@ -166,32 +170,31 @@ export class VendorWiseOutstandingRegisterReportComponent implements OnInit {
     } catch (error) {
       this.snackBarUtilityService.ShowCommonSwal("error", error.message);
     }
-  }  
-  async getVendorOustandingDetails(data)
-  {
+  }
+  async getVendorOustandingDetails(data) {
     const loc = data.Branch ? data.Branch.map(x => x.locCD) || [] : [];
     let matchQuery = {
       'D$and': [
-        { bDT: { 'D$gte': data.startValue  } }, 
-        { bDT: { 'D$lte': data.endValue  } }, 
+        { bDT: { 'D$gte': data.startValue } },
+        { bDT: { 'D$lte': data.endValue } },
         ...(data.vendData && data.vendData.length > 0
           ? [{ D$expr: { D$in: ["$vND.cD", data.vendData.map(v => v.vCD)] } }]
           : []),
         ...(loc.length > 0 ? [{ eNTLOC: { 'D$in': loc } }] : []),
         ...(data.DocStatus !== 'All' ? [{ bSTAT: { 'D$eq': data.DocStatus } }] : []),
-        { bSTAT: { 'D$nin': [3,7] } }
-       ],
+        { bSTAT: { 'D$nin': [3, 7] } }
+      ],
     };
     const res = await this.reportService.fetchReportData("VendorWiseOutstandingReport", matchQuery);
     const mapResponseValues = (item) => {
-    if (item.dOCTYP === "Upload") {
-      item.dOCTYP = "General";
-    }
-    if (["Awaiting Approval", "Approved"].includes(item.bSTATNM)) {
-      item.bSTATNM = "Pending";
-    }
-    return item;
-  };
+      if (item.dOCTYP === "Upload") {
+        item.dOCTYP = "General";
+      }
+      if (["Awaiting Approval", "Approved"].includes(item.bSTATNM)) {
+        item.bSTATNM = "Pending";
+      }
+      return item;
+    };
     const mappedData = res.data.data.map(mapResponseValues);
     return {
       data: mappedData,

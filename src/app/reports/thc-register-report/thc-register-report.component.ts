@@ -6,6 +6,7 @@ import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { thcreportService } from 'src/app/Utility/module/reports/thc-register-service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { thcReportControl } from 'src/assets/FormControls/Reports/thc-register/thc-register';
 import Swal from 'sweetalert2';
@@ -26,18 +27,18 @@ export class ThcRegisterReportComponent implements OnInit {
   jsonthcregisterFormArray: any;
   thcregisterTableForm: UntypedFormGroup
   source: any[] = []; // Array to hold data
-  loading:boolean = true // Loading indicator
-  LoadTable:boolean=false; 
+  loading: boolean = true // Loading indicator
+  LoadTable: boolean = false;
   //#region Table 
   columns = [];
   csvFileName: string;
-  showOverlay:boolean = false;
+  showOverlay: boolean = false;
   //#endregion
 
-  paging: any ;
-  sorting: any ;
-  searching: any ;
-  columnMenu: any ;
+  paging: any;
+  sorting: any;
+  searching: any;
+  columnMenu: any;
   theme: "MATERIAL"
   constructor(private fb: UntypedFormBuilder,
     private filter: FilterUtils,
@@ -45,8 +46,8 @@ export class ThcRegisterReportComponent implements OnInit {
     private thcreportservice: thcreportService,
     private storage: StorageService,
     public snackBarUtilityService: SnackBarUtilityService,
-  )
-    {this.initializeFormControl() }
+    private MCountrService: ModuleCounterService
+  ) { this.initializeFormControl() }
 
   ngOnInit(): void {
     const now = new Date();
@@ -72,33 +73,32 @@ export class ThcRegisterReportComponent implements OnInit {
     this.thcregisterTableForm.controls["DocumentStatus"].setValue(0);
   }
   async save() {
-    try
-    {
-    const startValue = new Date(this.thcregisterTableForm.controls.start.value);
-    const endValue = new Date(this.thcregisterTableForm.controls.end.value);
-    const THCNo = this.thcregisterTableForm.value.DocumentNo;
-    const THCArray = THCNo ? THCNo.includes(',') ? THCNo.split(',') : [THCNo] : [];
-    const DocumentStatus = this.thcregisterTableForm.value.DocumentStatus;
-    //.map(m => m.value);
-    const ReportType = this.thcregisterTableForm.value.ReportType;
-    const Location = this.thcregisterTableForm.value.Location.value || this.storage.branch;
+    try {
+      const startValue = new Date(this.thcregisterTableForm.controls.start.value);
+      const endValue = new Date(this.thcregisterTableForm.controls.end.value);
+      const THCNo = this.thcregisterTableForm.value.DocumentNo;
+      const THCArray = THCNo ? THCNo.includes(',') ? THCNo.split(',') : [THCNo] : [];
+      const DocumentStatus = this.thcregisterTableForm.value.DocumentStatus;
+      //.map(m => m.value);
+      const ReportType = this.thcregisterTableForm.value.ReportType;
+      const Location = this.thcregisterTableForm.value.Location.value || this.storage.branch;
 
-    let cumulativeLocation = [];
-    if(ReportType == "C") {
-      let locations = await this.locationService.findAllDescendants(Location);
+      let cumulativeLocation = [];
+      if (ReportType == "C") {
+        let locations = await this.locationService.findAllDescendants(Location);
 
-      cumulativeLocation = locations.filter(f => f.activeFlag == true).map(x => x.locCode);
-      if (cumulativeLocation.length == 0) { cumulativeLocation.push(Location) }
-    } else {
-      cumulativeLocation.push(Location);
-    } 
+        cumulativeLocation = locations.filter(f => f.activeFlag == true).map(x => x.locCode);
+        if (cumulativeLocation.length == 0) { cumulativeLocation.push(Location) }
+      } else {
+        cumulativeLocation.push(Location);
+      }
 
-    const reqBody = {
-      startValue, endValue, THCArray, DocumentStatus, Location: cumulativeLocation
-    }
-    const result = await this.thcreportservice.getthcReportDetail(reqBody)
+      const reqBody = {
+        startValue, endValue, THCArray, DocumentStatus, Location: cumulativeLocation
+      }
+      const result = await this.thcreportservice.getthcReportDetail(reqBody)
       this.columns = result.grid.columns;
-      this.sorting = result.grid.sorting; 
+      this.sorting = result.grid.sorting;
       this.searching = result.grid.searching;
       this.paging = result.grid.paging;
       this.showOverlay = true;
@@ -115,6 +115,8 @@ export class ThcRegisterReportComponent implements OnInit {
         }
         return;
       }
+      // Push the module counter data to the server
+      this.MCountrService.PushModuleCounter();
       this.loading = false;
     } catch (error) {
       this.snackBarUtilityService.ShowCommonSwal("error", error.message);

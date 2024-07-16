@@ -7,6 +7,7 @@ import { timeString } from 'src/app/Utility/date/date-utils';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { StateService } from 'src/app/Utility/module/masters/state/state.service';
 import { VendorGSTInvoiceService } from 'src/app/Utility/module/reports/vendor-gst-invoice';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { vendorWiseGSTControl } from 'src/assets/FormControls/Vendor-Wise-GST-Register-Report/vendor-wise-gst-register';
@@ -63,6 +64,7 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private vendorGSTInvoiceService: VendorGSTInvoiceService,
     private objStateService: StateService,
+    private MCountrService: ModuleCounterService
   ) {
     this.initializeFormControl()
   }
@@ -240,7 +242,8 @@ export class VendorWiseGstInvoiceRegisterComponent implements OnInit {
         return;
       }
       this.loading = false;
-
+      // Push the module counter data to the server
+      this.MCountrService.PushModuleCounter();
     } catch (error) {
       console.error('Error fetching data:', error);
     }

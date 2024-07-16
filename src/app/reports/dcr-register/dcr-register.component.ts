@@ -10,6 +10,7 @@ import moment from "moment";
 import { MatDialog } from "@angular/material/dialog";
 import Swal from "sweetalert2";
 import { StorageService } from "src/app/core/service/storage.service";
+import { ModuleCounterService } from "src/app/core/service/Logger/module-counter-service.service";
 
 @Component({
   selector: "app-dcr-register",
@@ -242,7 +243,8 @@ export class DcrRegisterComponent implements OnInit {
     private masterService: MasterService,
     private filter: FilterUtils,
     public dialog: MatDialog,
-    private storage: StorageService
+    private storage: StorageService,
+    private MCountrService: ModuleCounterService
   ) {
     this.companyCode = this.storage.companyCode;
     // this.allColumnFilter = this.CSVHeader;
@@ -332,12 +334,12 @@ export class DcrRegisterComponent implements OnInit {
   //#endregion
 
   //#region   cancel
-  cancel() {}
+  cancel() { }
   //#endregion
 
   //#region  Save Details
   async save() {
-    const form=this.dCRRegisterTableForm.value;
+    const form = this.dCRRegisterTableForm.value;
     try {
       const startDate = new Date(
         this.dCRRegisterTableForm.controls.start.value
@@ -355,22 +357,24 @@ export class DcrRegisterComponent implements OnInit {
       const bCODE = this.dCRRegisterTableForm.value.bCODE;
       const isValidString = typeof bCODE === 'string';
       const bCodeValue = isValidString ? bCODE : undefined;
-      const series=form.sRICENO;
+      const series = form.sRICENO;
       let data = await this.dcrService.getDCRregisterReportDetail(
         startValue,
         endValue,
-        ( cust ? [cust] : []),
-        ( loc ? [loc] : []),
-        ( emp ? [emp] : []),
-        ( busiAss ? [busiAss] : []),
+        (cust ? [cust] : []),
+        (loc ? [loc] : []),
+        (emp ? [emp] : []),
+        (busiAss ? [busiAss] : []),
         sTSCode,
         bCodeValue || "",
         series || ""
       );
-       let tableData=data.map((x)=>{
-        x.aCUSTNM=x.aLOTO=="C"?x.aLONM:""
-        x.aLOCD=x.aLOTO!="C"?x.aLOCD:""
-        x.aLONM=x.aLOTO!="C"?x.aLONM:""
+      // Push the module counter data to the server
+      this.MCountrService.PushModuleCounter();
+      let tableData = data.map((x) => {
+        x.aCUSTNM = x.aLOTO == "C" ? x.aLONM : ""
+        x.aLOCD = x.aLOTO != "C" ? x.aLOCD : ""
+        x.aLONM = x.aLOTO != "C" ? x.aLONM : ""
         return x
       })
       if (data.length === 0) {

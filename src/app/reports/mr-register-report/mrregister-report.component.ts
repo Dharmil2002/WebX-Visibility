@@ -10,6 +10,7 @@ import { ExportService } from 'src/app/Utility/module/export.service';
 import { CustomerService } from 'src/app/Utility/module/masters/customer/customer.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { MrRegisterService } from 'src/app/Utility/module/reports/mr-register.service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { MRRegister } from 'src/assets/FormControls/Reports/MR-Register/mr-register';
@@ -96,6 +97,7 @@ export class MRRegisterReportComponent implements OnInit {
     private snackBarUtilityService: SnackBarUtilityService,
     private mrRegisterService: MrRegisterService,
     private storage: StorageService,
+    private MCountrService: ModuleCounterService
 
   ) { }
 
@@ -226,7 +228,8 @@ export class MRRegisterReportComponent implements OnInit {
         setTimeout(() => {
           Swal.close();
         }, 1000);
-
+        // Push the module counter data to the server
+        this.MCountrService.PushModuleCounter();
         const transformedHeader = this.setcharges(data, this.CSVHeader); // Set the header for the CSV file
         const finalData = this.setCsvData(data); // Set the data for the CSV file
 

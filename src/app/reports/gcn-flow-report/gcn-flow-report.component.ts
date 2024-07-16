@@ -12,6 +12,7 @@ import { LocationService } from 'src/app/Utility/module/masters/location/locatio
 import { GCNFlowRegService } from 'src/app/Utility/module/reports/gcn-flow-register-service';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
 import { AutoComplateCommon } from 'src/app/core/models/AutoComplateCommon';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { GCNFlow } from 'src/assets/FormControls/Reports/gcn-flow-Report/gcn-flow-Report';
 import Swal from 'sweetalert2';
@@ -24,7 +25,7 @@ export class GcnFlowReportComponent implements OnInit {
   jsonControlArray: any;
   desName: any;
   GcnFlowFormControls: GCNFlow;
-  desStatus : any;
+  desStatus: any;
   chargesKeys: any[];
   branchName: any;
   tranName: any;
@@ -38,8 +39,8 @@ export class GcnFlowReportComponent implements OnInit {
     private generalService: GeneralService,
     public snackBarUtilityService: SnackBarUtilityService,
     private GCNFlowRegServices: GCNFlowRegService,
-  )
-    { }
+    private MCountrService: ModuleCounterService
+  ) { }
 
   ngOnInit(): void {
     this.initializeFormControl()
@@ -60,7 +61,7 @@ export class GcnFlowReportComponent implements OnInit {
 
   GcnFlowFormRegisterForm: UntypedFormGroup;
   protected _onDestroy = new Subject<void>();
-  LoadTable=false;
+  LoadTable = false;
   loading = true;
   csvFileName: string; // name of the csv file, when data is downloaded
   source: any;
@@ -68,12 +69,12 @@ export class GcnFlowReportComponent implements OnInit {
   columns: any;
   sorting: any;
   searching: any;
-  movName : any;
-  movStatus : any;
+  movName: any;
+  movStatus: any;
   paging: any;
   showOverlay = false;
   formTitle: "GCN Flow Report";
-  
+
 
   initializeFormControl() {
     this.GcnFlowFormControls = new GCNFlow();
@@ -166,26 +167,26 @@ export class GcnFlowReportComponent implements OnInit {
     this.loading = true;
     try {
       const startValue = new Date(this.GcnFlowFormRegisterForm.controls.start.value);
-        const endValue = new Date(this.GcnFlowFormRegisterForm.controls.end.value);
-        const startDate = moment(startValue).startOf('day').toDate();
-        const endDate = moment(endValue).endOf('day').toDate();
-        const fromloc = Array.isArray(this.GcnFlowFormRegisterForm.value.fromlocHandler)
-          ? this.GcnFlowFormRegisterForm.value.fromlocHandler.map(x => { return { locCD: x.value, locNm: x.name }; })
-          : [];
-        const payment = Array.isArray(this.GcnFlowFormRegisterForm.value.payTypeHandler)
-          ? this.GcnFlowFormRegisterForm.value.payTypeHandler.map(x => { return { payCD: x.value, payNM: x.name }; })
-          : [];
-        const transitmode = Array.isArray(this.GcnFlowFormRegisterForm.value.transitHandler)
-          ? this.GcnFlowFormRegisterForm.value.transitHandler.map(x => { return { tranCD: x.value, tranNM: x.name }; })
-          : [];
-        const loadtype = this.GcnFlowFormRegisterForm.value.loadType;
-        
-        const ReportType = this.GcnFlowFormRegisterForm.value.ReportType;
+      const endValue = new Date(this.GcnFlowFormRegisterForm.controls.end.value);
+      const startDate = moment(startValue).startOf('day').toDate();
+      const endDate = moment(endValue).endOf('day').toDate();
+      const fromloc = Array.isArray(this.GcnFlowFormRegisterForm.value.fromlocHandler)
+        ? this.GcnFlowFormRegisterForm.value.fromlocHandler.map(x => { return { locCD: x.value, locNm: x.name }; })
+        : [];
+      const payment = Array.isArray(this.GcnFlowFormRegisterForm.value.payTypeHandler)
+        ? this.GcnFlowFormRegisterForm.value.payTypeHandler.map(x => { return { payCD: x.value, payNM: x.name }; })
+        : [];
+      const transitmode = Array.isArray(this.GcnFlowFormRegisterForm.value.transitHandler)
+        ? this.GcnFlowFormRegisterForm.value.transitHandler.map(x => { return { tranCD: x.value, tranNM: x.name }; })
+        : [];
+      const loadtype = this.GcnFlowFormRegisterForm.value.loadType;
+
+      const ReportType = this.GcnFlowFormRegisterForm.value.ReportType;
       const reqBody = {
-        startDate, endDate, fromloc, payment,transitmode,loadtype,ReportType
+        startDate, endDate, fromloc, payment, transitmode, loadtype, ReportType
       }
       const result = await this.GCNFlowRegServices.getGCNRegisterReportDetails(reqBody)
- 
+
       this.columns = result.grid.columns;
       this.sorting = result.grid.sorting;
       this.searching = result.grid.searching;
@@ -195,6 +196,8 @@ export class GcnFlowReportComponent implements OnInit {
       this.LoadTable = true;
       this.showOverlay = true;
 
+      // Push the module counter data to the server
+      this.MCountrService.PushModuleCounter();
       if (this.source.length === 0) {
         if (this.source) {
           Swal.fire({

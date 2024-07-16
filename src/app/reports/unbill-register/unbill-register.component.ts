@@ -9,6 +9,7 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { ExportService } from 'src/app/Utility/module/export.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { UnbillRegisterService, convertToCSV } from 'src/app/Utility/module/reports/unbill-register.service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 import { billRegControl } from 'src/assets/FormControls/Reports/Unbill-Register/unbill-register';
 // import { billRegControl } from 'src/assets/FormControls/Unbill-Register/unbill-register';
 import Swal from 'sweetalert2';
@@ -38,7 +39,8 @@ export class UnbillRegisterComponent implements OnInit {
     private filter: FilterUtils,
     private unbillRegisterService: UnbillRegisterService,
     public snackBarUtilityService: SnackBarUtilityService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private MCountrService: ModuleCounterService
   ) {
     this.initializeFormControl();
   }
@@ -172,10 +174,8 @@ export class UnbillRegisterComponent implements OnInit {
         setTimeout(() => {
           Swal.close();
         }, 1000);
-        // const filteredRecordsWithoutKeys = filteredRecords.map((record) => {
-        //   const { odKTDT, ...rest } = record;
-        //   return rest;
-        // });
+        // Push the module counter data to the server
+        this.MCountrService.PushModuleCounter();
         this.exportService.exportAsCSV(filteredRecords, `Unbilled_Register_Report-${timeString}`, this.CSVHeader);
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(

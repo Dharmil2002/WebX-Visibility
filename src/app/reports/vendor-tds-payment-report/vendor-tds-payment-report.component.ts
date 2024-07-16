@@ -9,6 +9,7 @@ import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { GeneralLedgerReportService } from 'src/app/Utility/module/reports/general-ledger-report.service';
 import { VendorTdsPaymentService } from 'src/app/Utility/module/reports/vendor-tds-payment-register-service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { NavDataService } from 'src/app/core/service/navdata.service';
 import { StorageService } from 'src/app/core/service/storage.service';
@@ -57,6 +58,7 @@ export class VendorTdsPaymentReportComponent implements OnInit {
     public snackBarUtilityService: SnackBarUtilityService,
     private masterServices: MasterService,
     private nav: NavDataService,
+    private MCountrService: ModuleCounterService
   ) {
     this.initializeFormControl();
   }
@@ -131,7 +133,7 @@ export class VendorTdsPaymentReportComponent implements OnInit {
     );
     const loginBranch = branchList.find(x => x.value === this.Storage.branch);
     this.tdspaymentregisterTableForm.controls["Location"].setValue(loginBranch);
-    
+
     const financialYearlist = this.generalLedgerReportService.getFinancialYear();
     this.filter.Filter(
       this.jsontdspayregisterFormArray,
@@ -147,7 +149,7 @@ export class VendorTdsPaymentReportComponent implements OnInit {
       "collectionName": "vendor_detail"
     };
     const venNameRes = await firstValueFrom(this.masterServices.masterMongoPost("generic/get", venNameReq));
-    
+
     const venNameDet = venNameRes.data
       .map(element => ({
         name: element.vendorName.toString(),
@@ -164,7 +166,7 @@ export class VendorTdsPaymentReportComponent implements OnInit {
 
     const selectedFinancialYear = financialYearlist.find(x => x.value === financialYear);
     this.tdspaymentregisterTableForm.controls["Fyear"].setValue(selectedFinancialYear);
-    
+
   }
 
   //#region to reset date range
@@ -206,11 +208,11 @@ export class VendorTdsPaymentReportComponent implements OnInit {
       const vouchernoArray = voucherNo ? voucherNo.includes(',') ? voucherNo.split(',') : [voucherNo] : [];
       const branch = this.ReportingBranches;
       const vendrnm = Array.isArray(this.tdspaymentregisterTableForm.value.vennmcdHandler)
-      ? this.tdspaymentregisterTableForm.value.vennmcdHandler.map(x => { return { vCD: x.value, vNM: x.name }; })
-      : [];
-      
+        ? this.tdspaymentregisterTableForm.value.vennmcdHandler.map(x => { return { vCD: x.value, vNM: x.name }; })
+        : [];
+
       const reqBody = {
-        startValue, endValue, status, rtype, branch,vendrnm, tpsNo, TdsnoArray,vouchernoArray
+        startValue, endValue, status, rtype, branch, vendrnm, tpsNo, TdsnoArray, vouchernoArray
       }
       const result = await this.tdsdetails.getVendorTdsPayReportDetail(reqBody);
       console.log("data", result);
@@ -225,6 +227,8 @@ export class VendorTdsPaymentReportComponent implements OnInit {
         csvFileName: this.csvFileName
       };
       this.nav.setData(stateData);
+      // Push the module counter data to the server
+      this.MCountrService.PushModuleCounter();
       const url = `/#/Reports/generic-report-view`;
       window.open(url, '_blank');
     } catch (error) {

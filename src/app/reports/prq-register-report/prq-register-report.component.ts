@@ -10,6 +10,7 @@ import { prqreportService } from 'src/app/Utility/module/reports/prq-register-se
 import Swal from 'sweetalert2';
 import { timeString } from 'src/app/Utility/date/date-utils';
 import { ExportService } from 'src/app/Utility/module/export.service';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 @Component({
   selector: 'app-prq-register-report',
   templateUrl: './prq-register-report.component.html'
@@ -42,7 +43,8 @@ export class PrqRegisterReportComponent implements OnInit {
     private masterServices: MasterService,
     private filter: FilterUtils,
     private prqreportservice: prqreportService,
-    private exportService: ExportService
+    private exportService: ExportService,
+    private MCountrService: ModuleCounterService
   ) {
     this.initializeFormControl()
   }
@@ -152,6 +154,8 @@ export class PrqRegisterReportComponent implements OnInit {
       }
       return;
     }
+    // Push the module counter data to the server
+    this.MCountrService.PushModuleCounter();
     // Assuming exportAsExcelFile is a function that exports data to Excel
     this.exportService.exportAsCSV(data, `PRQ_Register_Report-${timeString}`, this.CSVHeader);
   }

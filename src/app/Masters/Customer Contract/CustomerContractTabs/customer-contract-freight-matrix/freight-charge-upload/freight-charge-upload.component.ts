@@ -485,6 +485,7 @@ export class FreightChargeUploadComponent implements OnInit {
     // Add processed rate type information if available
     if (updaterateType) {
       processedData.rTYP = updaterateType.name;
+      processedData.rTYPCD = updaterateType?.value || null;
     }
 
     // Add processed rate type information if available

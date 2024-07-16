@@ -39,13 +39,17 @@
 </generic-table-webxpress>
 </div>
 <div *ngIf="!isScan">
-    <!-- (selectAllClicked)="onSelectAllClicked($event)" -->
+    <!-- (selectAllClicked)="onSelectAllClicked($event)"  -->
 <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="definition.columnHeader"
 [tableData]="loadingTableData" [metaData]="metaData" 
-[menuItems]="definition.menuItems"  [columnGroup]="definition.summaryGroup"[staticField]="definition.staticField" [Link]="linkArray" 
+[menuItemFlag]="menuItemflag"
+[menuItems]="definition.menuItems"
+[columnGroup]="definition.summaryGroup"[staticField]="definition.staticField" [Link]="linkArray" 
 [stickyHeader]="true" [TableContainerStyle]="TableContainerStyle"
 [maxWidth]="maxWidth"(dialogClosed)="onDailogClose($event)" (functionCallEmitter)="functionCallHandler($event)" (menuItemClicked)="handleMenuItemClick($event)" [addAndEditPath]="addAndEditPath"
-[menuItemFlag]="menuItemflag"
+
+(selectAllClicked) = "onSelectAllClicked($event)"
+(onFlagChange) = "onSelectClicked($event)"
  [selectAllRequired]="selectAllRequired" [uploadComponent]= true  (uploadEvent)="upload()" [filterColumn]="filterColumn" [allColumnFilter]="allColumnFilter">
 </app-generic-table-v2>
 </div>

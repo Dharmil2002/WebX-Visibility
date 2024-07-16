@@ -3,6 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import _ from 'lodash';
 import { UpdateloadingControl } from 'src/assets/FormControls/updateLoadingSheet';
 import { formGroupBuilder } from 'src/app/Utility/Form Utilities/formGroupBuilder';
 import { vehicleLoadingScan } from './packageUtilsvehiceLoading';
@@ -16,6 +17,8 @@ import { Manifest } from 'src/app/Models/vehicle-loading/manifest';
 import { showAlert } from 'src/app/Utility/message/sweet-alert';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { DepsService } from 'src/app/Utility/module/operation/deps/deps-service';
+import { DocCalledAsModel } from 'src/app/shared/constants/docCalledAs';
+import { EditShipmentDetailsComponent } from './edit-shipment-details/edit-shipment-details.component';
 
 @Component({
   selector: 'app-vehicle-update-upload',
@@ -38,6 +41,8 @@ export class VehicleUpdateUploadComponent implements OnInit {
   currentBranch: string = '';
   companyCode: number = 0;
   userName: string = '';
+  DocCalledAs: DocCalledAsModel;
+  
   //isDisbled:boolean=false;
   columnHeader = {
     "Shipment": "Shipment",
@@ -103,7 +108,9 @@ export class VehicleUpdateUploadComponent implements OnInit {
   ]
   toggleArray = []
 
-  linkArray = []
+  linkArray = [
+    { Row: 'Action', Path: ''}
+  ]
   dynamicControls = {
     add: false,
     edit: false,
@@ -111,7 +118,6 @@ export class VehicleUpdateUploadComponent implements OnInit {
   }
   loadingData: any;
   formdata: any;
-  arrivalData: any;
   boxData: { count: any; title: any; class: string; }[];
   updateListData: any;
   Scan: any;
@@ -124,7 +130,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
   packageData: any;
   dktList: any;
   scanMessage: string = '';
-  menuItemflag = true;
+  menuItemflag = false;
   @ViewChild('scanPackageInput') scanPackageInput: ElementRef;
   rules: any;
   selectAllRequired: boolean = true;
@@ -143,7 +149,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private operationService: OperationService,
     private storage: StorageService,
-    public snackBarUtilityService: SnackBarUtilityService
+    public snackBarUtilityService: SnackBarUtilityService    
   ) {
     this.metaData = {
       checkBoxRequired: true,
@@ -152,6 +158,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
     this.companyCode = this.storage.companyCode;
     this.currentBranch = this.storage.branch;
     this.userName = this.storage.userName;
+    this.DocCalledAs = this.controlPanel.DocCalledAs;
     if (item.LoadingSheet) {
 
       this.shipmentStatus = 'Loaded'
@@ -226,7 +233,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
             "Leg": lsDetails?.lEG.replace(" ", "") || '',
             "extraDetails":element,
             "Type":"Manifest",
-            "actions": ["Edit"]
+            "Action": "Update"
           };
           if (this.isScan == true) {
             json.loaded = 0;
@@ -246,7 +253,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
         this.loadingTableData = docketData;
       }
       this.tableload = false;
-      this.kpiData("")
+      this.kpiData({})
     }
     this.getPackagesData();
     this.autoBindData();
@@ -372,13 +379,77 @@ export class VehicleUpdateUploadComponent implements OnInit {
       console.log("failed");
     }
   }
+
+  onSelectAllClicked(event) {
+    this.loadingTableData.forEach((e) => {
+      let loadedPkg = e.loadedPkg;
+      let loadedWT = e.loadedWT;
+      let loadedCWT = e.loadedCWT;
+
+      if(e.isSelected && loadedPkg <= 0) {
+        loadedPkg = e.Packages;
+        loadedWT = e.weight.toFixed(2);
+        loadedCWT = e.cWeight.toFixed(2);
+      } 
+      else if(!e.isSelected && loadedPkg == e.Packages) {
+        loadedPkg = 0;
+        loadedWT = 0;
+        loadedCWT = 0;
+      }
+
+      const pendPkg = e.Packages - loadedPkg;
+      const pendWt = (e.weight - parseFloat(loadedWT)).toFixed(2);
+      const pendCwt = (e.cWeight - parseFloat(loadedCWT)).toFixed(2);
+      
+      e.loadedPkg = loadedPkg;
+      e.loadedWT = loadedWT;
+      e.loadedCWT = loadedCWT;
+      e.pendPkg = pendPkg;
+      e.pendWt = pendWt;
+      e.pendCwt = pendCwt;
+
+      this.cdr.detectChanges();
+      this.kpiData(e);
+    });    
+  }
+
+  onSelectClicked(e){
+    const data = this.loadingTableData.find(x => x.Shipment === e.shipment && x.Suffix === e.suffix);
+    if (data) {
+      let loadedPkg = e.loadedPkg;
+      let loadedWT = e.loadedWT;
+      let loadedCWT = e.loadedCWT;
+
+      if(e.isSelected) {
+        loadedPkg = e.Packages;
+        loadedWT = e.weight.toFixed(2);
+        loadedCWT = e.cWeight.toFixed(2);
+      }
+
+      const pendPkg = e.Packages - loadedPkg;
+      const pendWt = (e.weight - parseFloat(loadedWT)).toFixed(2);
+      const pendCwt = (e.cWeight - parseFloat(loadedCWT)).toFixed(2);
+      
+      e.loadedPkg = loadedPkg;
+      e.loadedWT = loadedWT;
+      e.loadedCWT = loadedCWT;
+      e.pendPkg = pendPkg;
+      e.pendWt = pendWt;
+      e.pendCwt = pendCwt;
+      
+      this.cdr.detectChanges();
+      this.kpiData(data);
+    }
+  }
+
   onDailogClose(event) {
     this.shipmentsEdit(event)
   }
+
   shipmentsEdit(event) {
     const data = this.loadingTableData.find(x => x.Shipment === event.shipment && x.Suffix === event.suffix);
-    if (data) {
-      const loadedPkg = parseInt(event.noofPkts, 10);
+    if (data) {      
+      const loadedPkg = parseInt(event.noofPkts);
       const loadedWT = parseFloat(event.actualWeight).toFixed(2);
       const loadedCWT = parseFloat(event.ctWeight).toFixed(2);
       const pendPkg = data.Packages - loadedPkg;
@@ -386,38 +457,36 @@ export class VehicleUpdateUploadComponent implements OnInit {
       const pendCwt = (data.cWeight - parseFloat(event.ctWeight)).toFixed(2);
       const depsType = event.depsOptions||'';
       const isDeps = event.isDeps||'';
-      const extra=event;
+      const extra = event;
+      const isSelected = loadedPkg > 0;
+      
       // Update the data object directly
-      Object.assign(data, { loadedPkg, loadedWT, loadedCWT, pendPkg, pendWt, pendCwt,depsType,extra,isDeps });
+      Object.assign(data, { isSelected, loadedPkg, loadedWT, loadedCWT, pendPkg, pendWt, pendCwt,depsType,extra,isDeps });
 
       this.cdr.detectChanges();
       this.kpiData(data);
     }
   }
-  getMFGrouping(selectedData) {
-    let groupedDataWithoutKey;
-    const groupedData = selectedData.reduce((acc, element) => {
-      const leg = `${element.oRGN}-${element.dEST}`;
-      if (!acc[leg]) {
-        acc[leg] = {
-          Leg: leg,
-          WeightKg: 0,
-          VolumeCFT: 0,
-          Packages: 0,
-          ShipmentCount: 0,
-          Data: []
-        };
-      }
-      acc[leg].WeightKg += parseFloat(element.lDWT);
-      acc[leg].VolumeCFT += parseFloat(element.lDVOL);
-      acc[leg].Packages += parseFloat(element.lDPKG);
-      acc[leg].ShipmentCount++;
-      acc[leg].Data.push(element);
-      return acc;
-    }, {});
-    groupedDataWithoutKey = Object.values(groupedData);
+
+  getMFGrouping(selectedData: any[]) {
+    const groupedDataWithoutKey = _(selectedData)
+        .groupBy(g => `${g.oRGN}-${g.dEST}`)
+        .map((items, leg) => ({
+            Leg: leg,
+            ShipmentCount: items.length,
+            TotalPackages: _.sumBy(items, e => parseInt(e.pKGS)),    
+            TotalWeightKg: _.sumBy(items, e => parseFloat(e.wT)),
+            TotalVolumeCFT: _.sumBy(items, e => parseFloat(e.vOL)),            
+            Packages: _.sumBy(items, e => parseInt(e.lDPKG)),
+            WeightKg: _.sumBy(items, e => parseFloat(e.lDWT)),
+            VolumeCFT: _.sumBy(items, e => parseFloat(e.lDVOL)),
+            Data: items
+        }))
+        .value();
+
     return groupedDataWithoutKey;
-  }
+}
+
   async CompleteScan() {
     let menifest = []
     let resMf = ""
@@ -440,21 +509,25 @@ export class VehicleUpdateUploadComponent implements OnInit {
     }
     else {
       let selectedData = this.loadingTableData.filter((x) => x.hasOwnProperty('isSelected') && x.isSelected);
-      let checkPend = selectedData.filter((x) => x.pendPkg == x.Packages);
+      let checkPend = selectedData.filter((x) => x.loadedPkg > 0);
+      
       if (selectedData.length == 0) {
         showAlert("warning", "Action Needed", "Please select at least one item to proceed.");
         return false;
-      } else if (selectedData.length == checkPend.length) {
-        showAlert("warning", "Action Needed", "Your selected docket needs to be unloaded to proceed.");
+      } 
+      else if (selectedData.length != checkPend.length) {
+        showAlert("warning", "Action Needed", `Your selected ${this.DocCalledAs.Docket} needs to be loaded to proceed.`);
         return false;
       }
+
       this.isDisble=true;
       let notSelectedData = this.loadingTableData.filter((x) => !x.hasOwnProperty('isSelected') || !x.isSelected);
-      const requestBody=await this.depsService.fieldArrivalDeps(selectedData); 
+      const requestBody = await this.depsService.fieldArrivalDeps(selectedData); 
       const fieldMapping = await this.mfService.mapFieldsWithoutScanning(selectedData, this.shipingDataTable, this.vehicelLoadData, this.isScan, notSelectedData);
       menifest = await this.getMFGrouping(fieldMapping.filteredMfDetails);
       resMf = await this.mfService.createMfDetails(fieldMapping);
-      this.shipingDataTable = selectedData
+      this.shipingDataTable = selectedData;
+
       if(requestBody){
         const res = await this.depsService.createDeps(requestBody);
         try {
@@ -497,7 +570,7 @@ export class VehicleUpdateUploadComponent implements OnInit {
          this.snackBarUtilityService.ShowCommonSwalSuccess('Manifest Generated Successfully');
         const dialogRef: MatDialogRef<ManifestGeneratedComponent> = this.dialog.open(ManifestGeneratedComponent, {
           width: '100%', // Set the desired width
-          data: { arrivalData: this.arrivalData, loadingSheetData: menifest ? menifest : this.shipingDataTable, mfNo: resMf } // Pass the data object
+          data: { loadingSheetData: menifest || [], mfNo: resMf } // Pass the data object
         });
 
         dialogRef.afterClosed().subscribe(result => {

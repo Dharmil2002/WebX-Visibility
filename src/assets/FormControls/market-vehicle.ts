@@ -60,7 +60,7 @@ export class marketVehicleControls {
         name: "vehicleSize",
         label: "Vehicle Capacity(MT)",
         placeholder: "Vehicle Size",
-        type: "text",
+        type: "number",
         value: [
           // { value: "1", name: "1-MT" },
           // { value: "9", name: "9-MT" },
@@ -89,7 +89,7 @@ export class marketVehicleControls {
         name: "vehicleSizeVol",
         label: "Capacity Vol [CFT]",
         placeholder: "Vehicle Size",
-        type: "text",
+        type: "number",
         value: [
           // { value: "1", name: "1-MT" },
           // { value: "9", name: "9-MT" },

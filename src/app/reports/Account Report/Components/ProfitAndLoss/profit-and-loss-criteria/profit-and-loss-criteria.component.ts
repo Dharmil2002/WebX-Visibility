@@ -15,6 +15,7 @@ import { AccountReportService } from 'src/app/Utility/module/reports/accountrepo
 import { ProfitAndLossReport } from '../../../../../../assets/FormControls/Reports/Account Reports/ProfitAndLossReport';
 import { Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 @Component({
   selector: 'app-profit-and-loss-criteria',
   templateUrl: './profit-and-loss-criteria.component.html'
@@ -111,7 +112,8 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
     private filter: FilterUtils,
     private router: Router,
     private storage: StorageService,
-    private masterServices: MasterService
+    private masterServices: MasterService,
+    private MCountrService: ModuleCounterService
   ) {
     this.initializeFormControl();
   }
@@ -390,6 +392,7 @@ export class ProfitAndLossCriteriaComponent implements OnInit {
           "Schedule": "Schedule III Compliant",
           "ProfitAndLossDetails": UpdatedData
         }
+        this.MCountrService.PushModuleCounter();
         this.accountReportService.setData(RequestData);
         this.accountReportService.setRequestData(this.reqBody);
         window.open('/#/Reports/AccountReport/ProfitAndLossview', '_blank');

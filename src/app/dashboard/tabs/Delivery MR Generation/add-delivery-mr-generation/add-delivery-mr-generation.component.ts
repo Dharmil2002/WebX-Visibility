@@ -16,7 +16,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { financialYear } from 'src/app/Utility/date/date-utils';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
-import { SACInfo, VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
+import { GSTTypeMapping, SACInfo, VoucherDataRequestModel, VoucherInstanceType, VoucherRequestModel, VoucherType, ledgerInfo } from 'src/app/Models/Finance/Finance';
 import { VoucherServicesService } from 'src/app/core/service/Finance/voucher-services.service';
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
 import { GenericActions, StoreKeys } from 'src/app/config/myconstants';
@@ -1719,12 +1719,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       response.push(createVoucher(LeadgerDetails.LeadgerCode, LeadgerDetails.LeadgerName, LeadgerDetails.LeadgerCategory, 0, DocketAmount));
     }
 
-    const gstTypeMapping = {
-      UGST: { accCode: ledgerInfo['LIA002002'].LeadgerCode, accName: ledgerInfo['LIA002002'].LeadgerName, accCategory: ledgerInfo['LIA002002'].LeadgerCategory, prop: "uGST" },
-      cGST: { accCode: ledgerInfo['LIA002003'].LeadgerCode, accName: ledgerInfo['LIA002003'].LeadgerName, accCategory: ledgerInfo['LIA002003'].LeadgerCategory, prop: "cGST" },
-      IGST: { accCode: ledgerInfo['LIA002004'].LeadgerCode, accName: ledgerInfo['LIA002004'].LeadgerName, accCategory: ledgerInfo['LIA002004'].LeadgerCategory, prop: "iGST" },
-      SGST: { accCode: ledgerInfo['LIA002001'].LeadgerCode, accName: ledgerInfo['LIA002001'].LeadgerName, accCategory: ledgerInfo['LIA002001'].LeadgerCategory, prop: "sGST" },
-    };
+    const gstTypeMapping = GSTTypeMapping
 
     const gstType = billData?.gST?.tYP;
     const GSTTypeList = [gstType]

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import Swal from 'sweetalert2';
@@ -27,6 +27,7 @@ export class GeneralMasterCodeListComponent {
         Title: "Code ID",
         class: "matcolumnleft",
         Style: "max-width:150px",
+        datatype: "string"
       },
       codeDesc: {
         Title: "Description",
@@ -71,18 +72,19 @@ export class GeneralMasterCodeListComponent {
   height = '300px';
   width = '600px';
   backPath: string;
-  constructor(private masterService: MasterService, private route: Router, private storage: StorageService) {
+  constructor(private masterService: MasterService, private cdr: ChangeDetectorRef , private route: Router, private storage: StorageService) {
     this.companyCode = this.storage.companyCode;
     if (this.route.getCurrentNavigation()?.extras?.state?.data != null) {
   
     }      this.data = route.getCurrentNavigation().extras.state.data;        
   }
-  public onDialogClosed(result: any): void {    
-    if (typeof result === 'string') {
+   onDialogClosed(result) {
+    if (typeof result == 'string') {
       this.data.headerCode = result;            
     } else {      
-      this.data.headerCode = result.value.codeType;
+      this.data.headerCode = result.codeType;
     }
+    this.cdr.detectChanges();
     this.getGeneralDetails();
   }
   ngOnInit(): void {
@@ -154,4 +156,5 @@ export class GeneralMasterCodeListComponent {
       console.log("failed");
     }
   }
+
 }

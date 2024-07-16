@@ -13,10 +13,10 @@ export class RouteLocationService {
     "Air": "R7777"
 
   }
-  routeCodeMaster={
-      "ROAD": "R0000",
-      "RAIL": "T0000",
-      "AIR":"A0000"
+  routeCodeMaster = {
+    "ROAD": "R0000",
+    "RAIL": "T0000",
+    "AIR": "A0000"
   }
   constructor(private masterService: MasterService, private storage: StorageService) { }
   //#region to get route dropdown
@@ -54,48 +54,47 @@ export class RouteLocationService {
   async getRouteOne(filter) {
     const companyCode = this.storage.companyCode;
     const getRequest = async (collectionName) => {
-        const response = await this.masterService.masterPost('generic/getOne', { companyCode, collectionName, filter });
-        return firstValueFrom(response);
+      const response = await this.masterService.masterPost('generic/getOne', { companyCode, collectionName, filter });
+      return firstValueFrom(response);
     };
     try {
-        const resRoute = await getRequest("routeMasterLocWise");
-        const resAdHoc = await getRequest("adhoc_routes");
-        const merge = { ...resRoute?.data, ...resAdHoc?.data };
-        return Object.keys(merge).length > 0 ? merge : null;
+      const resRoute = await getRequest("routeMasterLocWise");
+      const resAdHoc = await getRequest("adhoc_routes");
+      const merge = { ...resRoute?.data, ...resAdHoc?.data };
+      return Object.keys(merge).length > 0 ? merge : null;
     } catch (error) {
-        console.error("Error fetching route data:", error);
-        return null;
+      console.error("Error fetching route data:", error);
+      return null;
     }
-}
+  }
   //#region to below function is used for the save the route
-  async addRouteLocation(data,tableData) {
-    debugger
-    const routeDetails=[]
-    if(tableData && tableData.length>0){
+  async addRouteLocation(data, tableData) {
+    const routeDetails = []
+    if (tableData && tableData.length > 0) {
       tableData.forEach(element => {
         routeDetails.push({
-          "lOCCD": element?.loc||"",
-          "dTKM":element?.distance||"",
-          "tRNHR":element?.transitHrs||0,
-          "sTHR":0 ,
+          "lOCCD": element?.loc || "",
+          "dTKM": element?.distance || "",
+          "tRNHR": element?.transitHrs || 0,
+          "sTHR": 0,
           "sPHVEH": 0,
-          "SPLVEH":0,
-          "nGTRES":0,
-          "rHRFRM":0,
+          "SPLVEH": 0,
+          "nGTRES": 0,
+          "rHRFRM": 0,
           "rHRTO": 0
         })
       });
-     
+
     }
-          // Summing the dTKM and tRNHR values, converting to numbers if necessary
-      const totals = routeDetails.reduce((acc, route) => {
-        const distance = parseFloat(route.dTKM) || 0; // Convert to number or use 0 if NaN
-        const transitHours = parseFloat(route.tRNHR) || 0; // Convert to number or use 0 if NaN
-        return {
-          totalDistance: acc.totalDistance + distance,
-          totalTransitHours: acc.totalTransitHours + transitHours
-        };
-      }, { totalDistance: 0, totalTransitHours: 0 });
+    // Summing the dTKM and tRNHR values, converting to numbers if necessary
+    const totals = routeDetails.reduce((acc, route) => {
+      const distance = parseFloat(route.dTKM) || 0; // Convert to number or use 0 if NaN
+      const transitHours = parseFloat(route.tRNHR) || 0; // Convert to number or use 0 if NaN
+      return {
+        totalDistance: acc.totalDistance + distance,
+        totalTransitHours: acc.totalTransitHours + transitHours
+      };
+    }, { totalDistance: 0, totalTransitHours: 0 });
 
     try {
       const dataRoute =

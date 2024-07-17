@@ -91,6 +91,7 @@ export class GenericTableV2Component
   @Input() activeFunction: Function;
   tableLoad: boolean = true;
   @Output() onFlagChange: EventEmitter<any> = new EventEmitter();
+  @Output() onSelectionChange: EventEmitter<any> = new EventEmitter();
   @Output() dialogClosed = new EventEmitter<any>();
   @Output() addEmitter = new EventEmitter<any>();
   selectedItems: any[] = [];
@@ -390,18 +391,16 @@ export class GenericTableV2Component
       (item) => item["isSelected"] == true
     );
   }
-  getCheckData(data) {
+  getCheckData(data, item) {
     //this.onFlagChange.emit(data)
     this.AllChack = this.dataSource.filteredData.every((t) => t.isSelected)
     if (this.onFlagChangeGetAll) {
       this.onFlagChange.emit(this.dataSource.filteredData);
     } else {
       this.onFlagChange.emit(this.getSelecteditems());
-    }
-
+    }    
+    this.onSelectionChange.emit(item);
     this.selectAllClicked.emit(this.dataSource.filteredData);
-    // console.log(this.getSelecteditems());
-    //get data on single selection
   }
   handleMenuItemClick(item, element) {
     let functionName = item.function;

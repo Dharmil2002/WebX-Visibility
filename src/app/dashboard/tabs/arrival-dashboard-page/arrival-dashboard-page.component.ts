@@ -165,7 +165,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
   menuItems = [
     { label: 'Vehicle Arrival', componentDetails: MarkArrivalComponent, function: "GeneralMultipleView" },
     { label: 'Arrival Scan', componentDetails: UpdateLoadingSheetComponent, function: "GeneralMultipleView" },
-    {label: 'Cancel THC'}
+    { label: 'Cancel THC' }
   ];
 
   IscheckBoxRequired: boolean;
@@ -271,7 +271,7 @@ export class ArrivalDashboardPageComponent extends UnsubscribeOnDestroyAdapter i
                 "Hrs": timeDifferenceInHours.toFixed(2),                
                 "cLOC": element?.cLOC,
                 "nXTLOC": element?.nXTLOC,
-                 "actions": actions
+                "actions": actions
                 // "actions": ["Vehicle Arrival", "Arrival Scan"]
               };
               tableData.push(arrivalData);

@@ -1,12 +1,13 @@
 import { Component, OnInit, Inject, HostListener } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { GenericTableComponent } from '../../shared-components/Generic Table/generic-table.component';
-import { CnoteService } from '../../core/service/Masters/CnoteService/cnote.service';
 import { OperationService } from 'src/app/core/service/operations/operation.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { DocketStatus } from 'src/app/Models/docStatus';
 import { firstValueFrom } from 'rxjs';
 import moment from 'moment';
+import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
+import { DocCalledAsModel } from 'src/app/shared/constants/docCalledAs';
 
 @Component({
   selector: 'app-loading-sheet-view',
@@ -42,9 +43,10 @@ Currently, all flows are working together without proper separation.
   IscheckBoxRequired: boolean;
   menuItemflag: boolean;
   companyCode = 0;
+  DocCalledAs: DocCalledAsModel;
   menuItems = [
   ];
-  columnHeader = {
+  columnHeader: any = {
     "checkBoxRequired": "",
     "dKTNO": "Shipment",
     "sFX": "Suffix",
@@ -62,7 +64,7 @@ Currently, all flows are working together without proper separation.
   centerAlignedData = ['Shipment','Suffix', 'Packages', 'KgWeight', 'CftVolume'];
 
   //#region declaring Csv File's Header as key and value Pair
-  headerForCsv = {
+  headerForCsv:any = {
     "dKTNO": "Shipment",
     "sFX": "Suffix",
     "cLOC": "Current Location",
@@ -85,10 +87,18 @@ Currently, all flows are working together without proper separation.
   constructor(
     private storage: StorageService,
     private operationService: OperationService,
+    private controlPanelService: ControlPanelService,
     public dialogRef: MatDialogRef<GenericTableComponent>,
     @Inject(MAT_DIALOG_DATA) public item: any
   ) {
      this.companyCode = this.storage.companyCode;
+     this.DocCalledAs = this.controlPanelService.DocCalledAs;
+
+     this.columnHeader.dKTNO = `${this.DocCalledAs.Docket} No`;
+     this.headerForCsv.dKTNO = `${this.DocCalledAs.Docket} No`;
+     this.centerAlignedData = [`${this.DocCalledAs.Docket} No`,'Suffix', 'Packages', 'KgWeight', 'CftVolume'];
+
+
     if (item) {
       this.loadingSheet = item;
       this.IscheckBoxRequired = true;

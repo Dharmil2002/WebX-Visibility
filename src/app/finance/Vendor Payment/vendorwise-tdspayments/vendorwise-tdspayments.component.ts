@@ -528,7 +528,7 @@ export class VendorwiseTdspaymentsComponent implements OnInit {
     }
   }
 
-  // Approval Tds Payment 
+  // Approval Tds Payment Slip 
   async approval(Data, Tpsno) {
     const firstSelectedRecord = Data.find(tdsData => tdsData.isSelected);
 

@@ -15,7 +15,7 @@ export class SalesRegisterService {
      ) { }
 
      async getsalesRegisterReportDetail(start, end, loct, toloc, payment, bookingtype, cnote, customer, mode, flowType, status) {
- 
+
           const loc = loct ? loct.map(x => x.locCD) || [] : [];
           const location = toloc ? toloc.map(x => x.locCD) || [] : [];
           const paymentBasis = payment ? payment.map(x => x.payNm) || [] : [];
@@ -23,15 +23,15 @@ export class SalesRegisterService {
           const cust = customer ? customer.map(x => x.custCD) || [] : [];
           const transitMode = mode ? mode.map(x => x.mdCD) || [] : [];
 
-          const flowTypeMatch = flowType === "O" ? [2] : flowType == "I" ? [3, 4] : undefined;
+          // const flowTypeMatch = flowType === "O" ? [2] : flowType == "I" ? [3, 4] : undefined;
 
-          const stsFin = status == "true" ? ["$isBILLED", true]
-               : status == "false" ? ["$isBILLED", false] : "";
+          // const stsFin = status == "true" ? ["$isBILLED", true]
+          //      : status == "false" ? ["$isBILLED", false] : "";
 
-          const stsOps = status == 3 ? ["$sTS", 3]
-               : status == 5 ? ["$sTS", 5] : "";
+          // const stsOps = status == 3 ? ["$sTS", 3]
+          //      : status == 5 ? ["$sTS", 5] : "";
 
-          const locFlow = flowType == "I" ? ["$dEST", this.storage.branch] : ["$oRGN", this.storage.branch]
+          // const locFlow = flowType == "I" ? ["$dEST", this.storage.branch] : ["$oRGN", this.storage.branch]
 
           const filter = {
 
@@ -61,32 +61,32 @@ export class SalesRegisterService {
                          ...filter,
 
                     },
-                    joinFilters: [
-                         {
-                              "collectionName": "docket_ops_det",
-                              "filter": {
-                                   ...(flowTypeMatch ? { 'D$in': ["$sTS", flowTypeMatch] } : {}),
-                              }
-                         },
-                         {
-                              "collectionName": "docket_ops_det",
-                              "filter": {
-                                   ...(locFlow ? { 'D$eq': locFlow } : {})
-                              }
-                         },
-                         {
-                              "collectionName": "docket_fin_det",
-                              "filter": {
-                                   ...(stsFin ? { D$eq: stsFin } : {})
-                              }
-                         },
-                         {
-                              "collectionName": "docket_fin_det",
-                              "filter": {
-                                   ...(stsOps ? { D$eq: stsOps } : {})
-                              }
-                         },
-                    ]
+                    // joinFilters: [
+                    //      {
+                    //           "collectionName": "docket_ops_det",
+                    //           "filter": {
+                    //                ...(flowTypeMatch ? { 'D$in': ["$sTS", flowTypeMatch] } : {}),
+                    //           }
+                    //      },
+                    //      {
+                    //           "collectionName": "docket_ops_det",
+                    //           "filter": {
+                    //                ...(locFlow ? { 'D$eq': locFlow } : {})
+                    //           }
+                    //      },
+                    //      {
+                    //           "collectionName": "docket_fin_det",
+                    //           "filter": {
+                    //                ...(stsFin ? { D$eq: stsFin } : {})
+                    //           }
+                    //      },
+                    //      {
+                    //           "collectionName": "docket_fin_det",
+                    //           "filter": {
+                    //                ...(stsOps ? { D$eq: stsOps } : {})
+                    //           }
+                    //      },
+                    // ]
                }
           }
 
@@ -100,33 +100,33 @@ export class SalesRegisterService {
                     filter: {
                          ...filter,
                     },
-                    joinFilters: [
-                         {
-                              "collectionName": "docket_ops_det_ltl",
-                              "filter": {
-                                   ...(flowTypeMatch ? { 'D$in': ["$sTS", flowTypeMatch] } : {}),
-                              }
-                         },
-                         {
-                              "collectionName": "docket_ops_det_ltl",
-                              "filter": {
-                                   ...(locFlow ? { D$eq: locFlow } : {})
-                              }
-                         },
-                         {
-                              "collectionName": "docket_fin_det_ltl",
-                              "filter": {
-                                   ...(stsFin ? { D$eq: stsFin } : {})
-                              }
-                         },
-                         {
-                              "collectionName": "docket_fin_det_ltl",
-                              "filter": {
-                                   ...(stsOps ? { D$eq: stsOps } : {})
-                              }
-                         }
+                    // joinFilters: [
+                    //      {
+                    //           "collectionName": "docket_ops_det_ltl",
+                    //           "filter": {
+                    //                ...(flowTypeMatch ? { 'D$in': ["$sTS", flowTypeMatch] } : {}),
+                    //           }
+                    //      },
+                    //      {
+                    //           "collectionName": "docket_ops_det_ltl",
+                    //           "filter": {
+                    //                ...(locFlow ? { D$eq: locFlow } : {})
+                    //           }
+                    //      },
+                    //      {
+                    //           "collectionName": "docket_fin_det_ltl",
+                    //           "filter": {
+                    //                ...(stsFin ? { D$eq: stsFin } : {})
+                    //           }
+                    //      },
+                    //      {
+                    //           "collectionName": "docket_fin_det_ltl",
+                    //           "filter": {
+                    //                ...(stsOps ? { D$eq: stsOps } : {})
+                    //           }
+                    //      }
 
-                    ]
+                    // ]
 
                }
           }

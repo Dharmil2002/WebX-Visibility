@@ -12,7 +12,7 @@ import { SalesRegisterService } from 'src/app/Utility/module/reports/sales-regis
 import { salesRegisterControl } from 'src/assets/FormControls/Reports/sales-register/sales-register-advance';
 import Swal from 'sweetalert2';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
-import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
+import { NavDataService } from 'src/app/core/service/navdata.service';
 @Component({
   selector: 'app-sales-register-advanced',
   templateUrl: './sales-register-advanced.component.html'
@@ -49,17 +49,8 @@ export class SalesRegisterAdvancedComponent implements OnInit {
   billAtStatus: any;
   chargesKeys: any[];
   formTitle = "Sales Register Advance Data"
-  csvFileName: string; // name of the csv file, when data is downloaded
-  source: any[] = []; // Array to hold data
-  loading = true // Loading indicator
-  LoadTable = false;
-  columns = [];
+  csvFileName: string; // name of the csv file, when data is downloaded  
 
-  paging: any;
-  sorting: any;
-  searching: any;
-  columnMenu: any;
-  theme: "MATERIAL"
   constructor(
     private fb: UntypedFormBuilder,
     private locationService: LocationService,
@@ -68,7 +59,7 @@ export class SalesRegisterAdvancedComponent implements OnInit {
     private customerService: CustomerService,
     private salesRegisterService: SalesRegisterService,
     public snackBarUtilityService: SnackBarUtilityService,
-    private MCountrService: ModuleCounterService
+    private nav: NavDataService
   ) {
     this.initializeFormControl();
   }
@@ -260,17 +251,7 @@ export class SalesRegisterAdvancedComponent implements OnInit {
         const transformedHeader = this.addChargesToColumns(data.data, data.grid.columns);
         const newdata = this.setCharges(data.data);
 
-        this.columns = transformedHeader;
-        // this.columns = data.grid.columns;
-        this.sorting = data.grid.sorting;
-        this.searching = data.grid.searching;
-        this.paging = data.grid.paging;
-        this.source = newdata;
-        this.LoadTable = true;
-
         if (data.data.length === 0) {
-          this.LoadTable = false;
-          this.loading = false;
           if (data) {
             Swal.fire({
               icon: "error",
@@ -281,13 +262,38 @@ export class SalesRegisterAdvancedComponent implements OnInit {
           }
           return;
         }
-        // Push the module counter data to the server
-        this.MCountrService.PushModuleCounter();
+        let result = {
+          data: [],
+          grid: {
+            columns: [],
+            sorting: {},
+            searching: {},
+            paging: {}
+          }
+        };
+        result.grid.columns = transformedHeader;
+        result.grid.sorting = data.grid.sorting;
+        result.grid.searching = data.grid.searching;
+        result.grid.paging = data.grid.paging;
+        result.data = newdata;
+
+        // Prepare the state data to include all necessary properties
+        const stateData = {
+          data: result,
+          formTitle: this.formTitle,
+          csvFileName: this.csvFileName
+        };
+        // Convert the state data to a JSON string and encode it        
+        this.nav.setData(stateData);
+        // Create the new URL with the state data as a query parameter
+        const url = `/#/Reports/generic-report-view`;
+        // Open the URL in a new tab
+        window.open(url, '_blank');
         Swal.hideLoading();
         setTimeout(() => {
           Swal.close();
         }, 1000);
-        this.loading = false;
+
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal(
           "error",
@@ -347,5 +353,4 @@ export class SalesRegisterAdvancedComponent implements OnInit {
       console.log("failed");
     }
   }
-
 }

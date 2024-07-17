@@ -556,9 +556,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
         // Call the vehicleStatusUpdate function here
         const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.arrivalData, this._operation, true);
         Swal.fire({
-          icon: "info",
-          title: "Trip is close",
-          text: "Trip is close at" + this.currentBranch,
+          icon: "success",
+          title: "Trip Completed",
+          text: "Trip is completed at " + this.currentBranch,
           showConfirmButton: true,
         });
         // Handle the result if needed

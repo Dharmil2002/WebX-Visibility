@@ -2493,7 +2493,6 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       try {
         let GSTAmount = parseFloat(this.freightForm.get("gstChargedAmount")?.value) || 0
         const totAmt = parseFloat(this.freightForm.controls['totAmt'].value) || 0;
-
         this.voucherModel = {
           companyCode: this.storage.companyCode,
           docType: "VR",
@@ -2516,8 +2515,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
           finYear: financialYear,
           accLocation: this.storage.branch,
           preperedFor: "Customer",
-          partyCode: DocketBookingRequestBody["bPARTY"] || "",
-          partyName: DocketBookingRequestBody["bPARTYNM"] || "",
+          partyCode: DocketBookingRequestBody?.data["bPARTY"] || "",
+          partyName: DocketBookingRequestBody?.data["bPARTYNM"] || "",
           partyState: "",
           entryBy: this.storage.userName,
           entryDate: new Date(),

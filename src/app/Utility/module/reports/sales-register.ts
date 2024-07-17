@@ -3,6 +3,7 @@ import moment from "moment";
 import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { StorageService } from "src/app/core/service/storage.service";
+import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
 @Injectable({
      providedIn: "root",
 })
@@ -134,34 +135,34 @@ export class SalesRegisterService {
           // console.log(resLtl.data);
 
           const data = [...resftl.data.data, ...resLtl.data.data]
+          // console.log(data);
 
-          //  console.log(data);
+          resftl.data.grid.columns = this.updateColumnHeaders(resftl.data.grid.columns, DocCalledAs);
+          resLtl.data.grid.columns = this.updateColumnHeaders(resLtl.data.grid.columns, DocCalledAs);
+
           const details = data.map((item) => ({
                ...item,
-               GCNDt: item.GCNDt ? moment(item.GCNDt).format("DD MMM YYYY") : "",
-               EDD: item.EDD ? moment(item.EDD).format("DD MMM YYYY") : "",
-               cNOTEDITDT: item.cNOTEDITDT ? moment(item.cNOTEDITDT).format("DD MMM YYYY") : "",
-               invDt: item.invDt ? moment(item.invDt).format("DD MMM YYYY") : "",
-               Time: item.Time ? moment(item.Time).format("HH:mm") : "",
-               subTtl: item.subTtl ? item.subTtl.toFixed(2) : 0,
-               gSTAmnt: item.gSTAmnt ? item.gSTAmnt.toFixed(2) : 0,
+               dKTDT: item.dKTDT ? moment(item.dKTDT).local().format("DD MMM YYYY HH:mm") : "",
+               eDDDT: item.eDDDT ? moment(item.eDDDT).local().format("DD MMM YYYY HH:mm") : "",
+               cNOTEDITDT: item.cNOTEDITDT ? moment(item.cNOTEDITDT).local().format("DD MMM YYYY HH:mm") : "",
+               tOTAMT: item.tOTAMT ? item.tOTAMT.toFixed(2) : 0,
+               gSTAMT: item.gSTAMT ? item.gSTAMT.toFixed(2) : 0,
           }));
 
-          const getDistinctByProperty = <T, K extends keyof T>(array: T[], key: K): T[] => {
-               const seen = new Set();
-               return array.filter(item => {
-                    const value = item[key];
-                    if (seen.has(value)) {
-                         return false;
-                    } else {
-                         seen.add(value);
-                         return true;
-                    }
-               });
-          };
           return {
-               data: getDistinctByProperty(details, 'GCNNo'),
-               grid: resLtl.data.grid
+               data: details,
+               grid: resftl.data.grid || resLtl.data.grid
           };
      }
+     //#region to change docketname
+     updateColumnHeaders(columns, docCalledAs) {
+          return columns.map(column => {
+               if (column.header.includes("${docCalledAs.Docket}")) {
+                    const docketValue = docCalledAs.Docket; // Fetch the appropriate value dynamically
+                    column.header = column.header.replace("${docCalledAs.Docket}", docketValue);
+               }
+               return column;
+          });
+     }
+     //#endregion
 }

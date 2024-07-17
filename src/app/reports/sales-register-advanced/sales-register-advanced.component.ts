@@ -307,8 +307,8 @@ export class SalesRegisterAdvancedComponent implements OnInit {
     const existingCharges = new Set();
 
     data.forEach((item) => {
-      if (item.chgLst && Array.isArray(item.chgLst) && item.chgLst.length > 0) {
-        item.chgLst.forEach((charge) => {
+      if (item.cHGLST && Array.isArray(item.cHGLST) && item.cHGLST.length > 0) {
+        item.cHGLST.forEach((charge) => {
           if (!existingCharges.has(charge.cHGNM)) {
             item[charge.cHGNM] = charge.aMT;
             existingCharges.add(charge.cHGNM);
@@ -326,8 +326,8 @@ export class SalesRegisterAdvancedComponent implements OnInit {
 
     // Add predefined columns if they don't already exist
     data.forEach((item) => {
-      if (item.chgLst && Array.isArray(item.chgLst) && item.chgLst.length > 0) {
-        item.chgLst.forEach((charge) => {
+      if (item.cHGLST && Array.isArray(item.cHGLST) && item.cHGLST.length > 0) {
+        item.cHGLST.forEach((charge) => {
           if (!existingCharges.has(charge.cHGNM)) {
             columns.push({
               header: charge.cHGNM,

@@ -1,21 +1,22 @@
 import { Injectable } from "@angular/core";
 import { IFieldDefinition } from "../../Interface/IFieldDefinition.interface";
 import { EditShipmentDetailsComponent } from "src/app/operation/vehicle-update-upload/edit-shipment-details/edit-shipment-details.component";
-import { DocCalledAs } from "src/app/shared/constants/docCalledAs";
+import { DocCalledAs, DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
+import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 
 @Injectable({
     providedIn: "root",
 })
 export class StockUpdate implements IFieldDefinition {
-    constructor() { }
-    public columnHeader = {
+    private docCalledAs: DocCalledAsModel;
+    public columnHeader: any = {
         checkBoxRequired: {
             Title: "",
             class: "matcolumncenter",
             Style: "max-width:80px",
           },      
         Shipment: {
-            Title: `${DocCalledAs.Docket} No`,
+            Title: `${ DocCalledAs.Docket} No`,
             class: "matcolumnleft",
             Style: "min-width:18%",
         },
@@ -83,43 +84,43 @@ export class StockUpdate implements IFieldDefinition {
             stickyEnd: true,
         }
     };
-    summaryGroup = [{
-        Name: "Docket Details",
-        Title: "",
-        class: "matcolumncenter",
-        ColSpan: 5,
-        sticky: true
-    },
-    {
-        Name: "Arrived",
-        Title: "Arrived",
-        class: "matcolumncenter",
-        ColSpan: 2,
-        sticky: true
-    },
-    {
-        Name: "Un-Loaded",
-        Title: "Un-Loaded",
-        class: "matcolumncenter",
-        ColSpan: 2,
-        sticky: true
-    },
-    {
-        Name: "Pending",
-        Title: "Pending",
-        class: "matcolumncenter",
-        ColSpan: 2,
-        sticky: true
-    },
-    {
-        Name: "leg",
-        Title: "",
-        class: "matcolumncenter",
-        ColSpan: 3,
-        sticky: true
-    }
-    ];;
-    public staticField = [
+    public summaryGroup: any[] = [{
+            Name: "Docket Details",
+            Title: "",
+            class: "matcolumncenter",
+            ColSpan: 5,
+            sticky: true
+        },
+        {
+            Name: "Arrived",
+            Title: "Arrived",
+            class: "matcolumncenter",
+            ColSpan: 2,
+            sticky: true
+        },
+        {
+            Name: "Un-Loaded",
+            Title: "Un-Loaded",
+            class: "matcolumncenter",
+            ColSpan: 2,
+            sticky: true
+        },
+        {
+            Name: "Pending",
+            Title: "Pending",
+            class: "matcolumncenter",
+            ColSpan: 2,
+            sticky: true
+        },
+        {
+            Name: "leg",
+            Title: "",
+            class: "matcolumncenter",
+            ColSpan: 3,
+            sticky: true
+        }
+    ];
+    public staticField: string[] = [
         "Shipment",
         "Suffix",
         "Origin",
@@ -132,8 +133,20 @@ export class StockUpdate implements IFieldDefinition {
         "pendWt",
         "Leg"
     ];
+
+    constructor(
+        private controlPanel: ControlPanelService
+    ) { 
+        this.docCalledAs = this.controlPanel.DocCalledAs;
+
+        this.columnHeader.Shipment.Title = `${this.docCalledAs.Docket} No`;
+
+        this.summaryGroup.filter((item) => item.Name === "Docket Details")[0].Title = `${this.docCalledAs.Docket} Details`;
+        //this.staticField[0] = `${this.docCalledAs.Docket} No`;
+    }   
+    
     menuItems = [
-        { label: 'Edit', componentDetails: EditShipmentDetailsComponent, function: "GeneralMultipleView" },
+        { label: 'Update', componentDetails: EditShipmentDetailsComponent, function: "GeneralMultipleView" },
     ];
     getColumn(columnName: string): any | undefined {
         return this.columnHeader[columnName] ?? undefined;

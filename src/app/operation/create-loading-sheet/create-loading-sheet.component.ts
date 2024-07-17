@@ -29,6 +29,8 @@ import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service"
 import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
 import { firstValueFrom } from "rxjs";
 import { MarkerVehicleService } from "src/app/Utility/module/operation/market-vehicle/marker-vehicle.service";
+import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
+import { DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
 
 @Component({
   selector: "app-create-loading-sheet",
@@ -60,6 +62,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     { label: "count", componentDetails: LoadingSheetViewComponent },
     // Add more menu items as needed
   ];
+
   // Declaring breadcrumbs
   breadscrums = [
     {
@@ -100,76 +103,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
   ];
   addNewTitle: string = "Add Market";
-  columnHeader = {
-    checkBoxRequired: {
-      Title: "",
-      class: "matcolumncenter",
-      Style: "max-width:20px; max-width:20px",
-      sticky: true,
-    },
-    leg: {
-      Title: "Leg",
-      class: "matcolumnleft",
-      Style: "min-width:100px",
-      sticky: true,
-    },
-    count: {
-      Title: "Shipment",
-      class: "matcolumnright",
-      Style: "max-width:50px; min-width:50px"
-    },
-
-    packages: {
-      Title: "Packages",
-      class: "matcolumnright",
-      Style: "max-width:50px; min-width:50px",
-      datatype: 'number',
-      decimalPlaces: 0
-    },
-
-    weightKg: {
-      Title: "Weight (KG)",
-      class: "matcolumnright",
-      Style: "max-width:80px; min-width:80px",
-      datatype: 'number',
-      decimalPlaces: 0
-    },
-
-    volumeCFT: {
-      Title: "Volume (CFT)",
-      class: "matcolumnright",
-      Style: "max-width:80px; min-width:80px",
-      datatype: 'number',
-      decimalPlaces: 0
-    },
-
-    // tCount: {
-    //   Title: "Shipment",
-    //   class: "matcolumnright",
-    //   Style: "max-width:50px; min-width:50px"
-    // },
-    // tPackages: {
-    //   Title: "Packages",
-    //   class: "matcolumnright",
-    //   Style: "max-width:50px; min-width:50px",
-    //   datatype: 'number',
-    //   decimalPlaces: 0
-    // },
-    // tWeightKg: {
-    //   Title: "Weight (KG)",
-    //   class: "matcolumnright",
-    //   Style: "max-width:80px; min-width:80px",
-    //   datatype: 'number',
-    //   decimalPlaces: 0
-    // },
-    // tVolumeCFT: {
-    //   Title: "Volume (CFT)",
-    //   class: "matcolumnright",
-    //   Style: "max-width:80px; min-width:80px",
-    //   datatype: 'number',
-    //   decimalPlaces: 0
-    // }
-  };
+  columnHeader = {};
   staticField = ["leg", "packages", "weightKg", "volumeCFT", "tCount", "tPackages", "tWeightKg", "tVolumeCFT"];
   // Declaring CSV file's header as key and value pair
   headerForCsv = {
@@ -212,6 +146,8 @@ export class CreateLoadingSheetComponent implements OnInit {
   vehicleDetails: any;
   MarketData: any;
   vehicleTypeList: any;
+  DocCalledAs: DocCalledAsModel;
+
   constructor(
     private Route: Router,
     private _operationService: OperationService,
@@ -226,11 +162,91 @@ export class CreateLoadingSheetComponent implements OnInit {
     private thcService:ThcService,
     private vehicleService: VehicleService,
     private marketVehicleSericve: MarkerVehicleService,
+    private controlPanelService: ControlPanelService,
     public snackBarUtilityService: SnackBarUtilityService
   ) {
     this.companyCode = this.storage.companyCode;
     this.orgBranch = this.storage.branch;
     this.userName = this.storage.userName;
+    this.DocCalledAs = this.controlPanelService.DocCalledAs;
+    this.headerForCsv = {
+      RouteandSchedule: "Leg",
+      Shipments: `${this.DocCalledAs.Docket}s`,
+      Packages: "Packages",
+      WeightKg: "Weight Kg",
+      VolumeCFT: "Volume CFT",
+    };
+
+    this.columnHeader = {
+      checkBoxRequired: {
+        Title: "",
+        class: "matcolumncenter",
+        Style: "max-width:20px; max-width:20px",
+        sticky: true,
+      },
+      leg: {
+        Title: "Leg",
+        class: "matcolumnleft",
+        Style: "min-width:100px",
+        sticky: true,
+      },
+      count: {
+        Title: `${this.DocCalledAs.Docket}s`,
+        class: "matcolumnright",
+        Style: "max-width:50px; min-width:50px"
+      },
+
+      packages: {
+        Title: "Packages",
+        class: "matcolumnright",
+        Style: "max-width:50px; min-width:50px",
+        datatype: 'number',
+        decimalPlaces: 0
+      },
+
+      weightKg: {
+        Title: "Weight (KG)",
+        class: "matcolumnright",
+        Style: "max-width:80px; min-width:80px",
+        datatype: 'number',
+        decimalPlaces: 0
+      },
+
+      volumeCFT: {
+        Title: "Volume (CFT)",
+        class: "matcolumnright",
+        Style: "max-width:80px; min-width:80px",
+        datatype: 'number',
+        decimalPlaces: 0
+      },
+
+      // tCount: {
+      //   Title: "Shipment",
+      //   class: "matcolumnright",
+      //   Style: "max-width:50px; min-width:50px"
+      // },
+      // tPackages: {
+      //   Title: "Packages",
+      //   class: "matcolumnright",
+      //   Style: "max-width:50px; min-width:50px",
+      //   datatype: 'number',
+      //   decimalPlaces: 0
+      // },
+      // tWeightKg: {
+      //   Title: "Weight (KG)",
+      //   class: "matcolumnright",
+      //   Style: "max-width:80px; min-width:80px",
+      //   datatype: 'number',
+      //   decimalPlaces: 0
+      // },
+      // tVolumeCFT: {
+      //   Title: "Volume (CFT)",
+      //   class: "matcolumnright",
+      //   Style: "max-width:80px; min-width:80px",
+      //   datatype: 'number',
+      //   decimalPlaces: 0
+      // }
+    };
 
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.isDisplay = true;
@@ -349,25 +365,25 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
   async getThcDetails() {
     if(this.isUpdate){
-    const res = await this.thcService.getThcDetailsByNo(this.tripData?.TripID || "")
-    if (Object.keys(res.data).length > 0) {
-      this.loadingSheetTableForm.controls['vehicleType'].setValue(res.data?.vTYP||"");
-     // this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(res.data?.vTYP);
-      this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(res.data?.cAP?.vOL||0);
-      this.loadingSheetTableForm.controls['Capacity'].setValue(res.data?.cAP?.wT||"");
-      const fieldName=['vehicle','Capacity','CapacityVolumeCFT','vehicleType'];
-      this.jsonControlArray = this.jsonControlArray.map((x) => {
-        if (fieldName.includes(x.name)) {
-          x.disable = true
-        }
-        return x;
-      });
-     // this.loadingSheetTableForm.controls['vehicle'].disable();
-      //this.loadingSheetTableForm.controls['Capacity'].disable();
-      //this.loadingSheetTableForm.controls['CapacityVolumeCFT'].disable();
-      //this.loadingSheetTableForm.controls['vehicleType'].disable();
+      const res = await this.thcService.getThcDetailsByNo(this.tripData?.TripID || "")
+      if (Object.keys(res.data).length > 0) {
+        this.loadingSheetTableForm.controls['vehicleType'].setValue(res.data?.vTYP||"");
+      // this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(res.data?.vTYP);
+        this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(res.data?.cAP?.vOL||0);
+        this.loadingSheetTableForm.controls['Capacity'].setValue(res.data?.cAP?.wT||"");
+        const fieldName=['vehicle','Capacity','CapacityVolumeCFT','vehicleType'];
+        this.jsonControlArray = this.jsonControlArray.map((x) => {
+          if (fieldName.includes(x.name)) {
+            x.disable = true
+          }
+          return x;
+        });
+        //this.loadingSheetTableForm.controls['vehicle'].disable();
+        //this.loadingSheetTableForm.controls['Capacity'].disable();
+        //this.loadingSheetTableForm.controls['CapacityVolumeCFT'].disable();
+        //this.loadingSheetTableForm.controls['vehicleType'].disable();
+      }
     }
-  }
   }
   /*below function is for the inatalize a forGroup*/
   IntializeFormControl() {

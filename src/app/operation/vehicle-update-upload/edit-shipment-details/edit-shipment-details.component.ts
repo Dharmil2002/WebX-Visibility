@@ -15,6 +15,8 @@ import { GeneralService } from 'src/app/Utility/module/masters/general-master/ge
 import { FormControls } from 'src/app/Models/FormControl/formcontrol';
 import { DepsService } from 'src/app/Utility/module/operation/deps/deps-service';
 import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
+import { DocCalledAsModel } from 'src/app/shared/constants/docCalledAs';
+import { ControlPanelService } from 'src/app/core/service/control-panel/control-panel.service';
 
 @Component({
   selector: 'app-edit-shipment-details',
@@ -35,6 +37,7 @@ export class EditShipmentDetailsComponent implements OnInit {
   selectedFiles: boolean;
   dataFromThirdDialog: any;
   depsDetails: any;
+  formTitle: string = "Shipment Edit";
   requestdata = {
     "eventArgs": {
       "checked": true
@@ -58,6 +61,8 @@ export class EditShipmentDetailsComponent implements OnInit {
     }
   }
   allJsonControlArray: FormControls[];
+  DocCalledAs: DocCalledAsModel;
+
   constructor(
     @Inject(MAT_DIALOG_DATA) public item: any,
     private fb: UntypedFormBuilder,
@@ -68,9 +73,13 @@ export class EditShipmentDetailsComponent implements OnInit {
     private manifestService: ManifestService,
     private filter: FilterUtils,
     private objImageHandling: ImageHandling,
-    public generalService: GeneralService,
+    private generalService: GeneralService,
+    private controlPanel: ControlPanelService
   ) {
+    this.DocCalledAs = this.controlPanel.DocCalledAs;
     this.shipmentDetails = item;
+
+    this.formTitle = `${this.DocCalledAs.Docket} No : ${this.shipmentDetails.Shipment} ${ (this.shipmentDetails.Suffix || 0) > 0 ? "("+this.shipmentDetails.Suffix.toString()+")" : "" }`;
   }
 
   functionCaller($event) {

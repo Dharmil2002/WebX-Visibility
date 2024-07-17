@@ -32,6 +32,7 @@ import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 import moment from "moment";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
+import { MarkerVehicleService } from "src/app/Utility/module/operation/market-vehicle/marker-vehicle.service";
 
 
 @Component({
@@ -149,7 +150,8 @@ export class DepartVehicleComponent implements OnInit {
     private locationService: LocationService,
     private filter: FilterUtils,
     private controlPanel: ControlPanelService,
-    private snackBarUtilityService: SnackBarUtilityService
+    private snackBarUtilityService: SnackBarUtilityService,
+    private markerVehicleService:MarkerVehicleService
   ) {
     this.companyCode = this.storage.companyCode;
     this.orgBranch = this.storage.branch;
@@ -157,6 +159,9 @@ export class DepartVehicleComponent implements OnInit {
 
       this.tripData = this.Route.getCurrentNavigation()?.extras?.state.data;
     }
+   
+  }
+  ngOnInit(): void {
     this.getRules().finally(() => {
       this.IntializeFormControl();
       this.autoBindData();
@@ -165,6 +170,7 @@ export class DepartVehicleComponent implements OnInit {
       // this.autoBindData()
     });
   }
+  
   async getRules() {
     const filter = {
       cID: this.storage.companyCode,
@@ -227,7 +233,7 @@ export class DepartVehicleComponent implements OnInit {
 
   }
   
-  async vehicleDetails() {
+  async vehicleDetails() {  
     try {
       const reqbody = {
         companyCode: this.companyCode,
@@ -330,6 +336,23 @@ export class DepartVehicleComponent implements OnInit {
         }
 
       }
+      if (this.departvehicleTableForm.controls['VendorType'].value === "Market") {
+        const resData = await this.markerVehicleService.GetVehicleData(this.tripData.VehicleNo);
+        
+        if (resData) {
+          const setControlValue = (controlName: string, resValue: any) => {
+            this.departvehicleTableForm.controls[controlName].setValue(
+              !this.departvehicleTableForm.controls[controlName].value ? resValue : ''
+            );
+          };
+      
+          setControlValue('chasisNo', resData?.cHNO);
+          setControlValue('engineNo', resData?.eNGNO);
+          setControlValue('inExdt', resData?.iNCEXP);
+          setControlValue('fitdt', resData?.fITDT);
+        }
+      }
+      
     } catch (error) {
       console.error("Error fetching vehicle details:", error);
       // Handle error appropriately
@@ -365,7 +388,7 @@ export class DepartVehicleComponent implements OnInit {
       this.departureControlArray,
     ]);
   }
-  ngOnInit(): void { }
+
 
   functionCallHandler($event) {
     // console.log("fn handler called", $event);
@@ -499,33 +522,27 @@ export class DepartVehicleComponent implements OnInit {
   }
 
   Close() {
-    this.snackBarUtilityService.commonToast(async () => {
-      this.isDisble = true;
-      this.loadingSheetTableForm.controls['vehicleType'].setValue(this.loadingSheetTableForm.controls['vehicleType']?.value.value || "");
-      this.loadingSheetTableForm.controls['vehicle'].setValue(this.loadingSheetTableForm.controls['vehicle']?.value.value || "");
-      const loadingArray = [this.loadingSheetTableForm.getRawValue()];
-      const departArray = [this.departvehicleTableForm.getRawValue()];
-      const advancearray = [this.advanceTableForm.getRawValue()];
-      const balanceArray = [this.balanceTableForm.getRawValue()];
-      const departureArray = [this.departureTableForm.getRawValue()];
+    this.isDisble = true;
+    this.loadingSheetTableForm.controls['vehicleType'].setValue(this.loadingSheetTableForm.controls['vehicleType']?.value.value || "");
+    this.loadingSheetTableForm.controls['vehicle'].setValue(this.loadingSheetTableForm.controls['vehicle']?.value.value || "");
+    const loadingArray = [this.loadingSheetTableForm.getRawValue()];
+    const departArray = [this.departvehicleTableForm.getRawValue()];
+    const advancearray = [this.advanceTableForm.getRawValue()];
+    const balanceArray = [this.balanceTableForm.getRawValue()];
+    const departureArray = [this.departureTableForm.getRawValue()];
 
-      const mergedArray = [
-        ...loadingArray,
-        ...departArray,
-        ...advancearray,
-        ...balanceArray,
-        ...departureArray,
-      ];
-      const mergedData = this.mergeArrays(mergedArray);
-      delete mergedData.vehicleTypecontrolHandler;
-      mergedData['lsno'] = this.lsDetails?.lsno || '';
-      mergedData['mfNo'] = this.lsDetails?.mfNo || '';
-      this.addDepartData(mergedData);
-      Swal.hideLoading();
-      setTimeout(() => {
-        Swal.close();
-      }, 7000);
-    }, "Depart Vehicle");
+    const mergedArray = [
+      ...loadingArray,
+      ...departArray,
+      ...advancearray,
+      ...balanceArray,
+      ...departureArray,
+    ];
+    const mergedData = this.mergeArrays(mergedArray);
+    delete mergedData.vehicleTypecontrolHandler;
+    mergedData['lsno'] = this.lsDetails?.lsno || '';
+    mergedData['mfNo'] = this.lsDetails?.mfNo || '';
+    this.addDepartData(mergedData);      
   }
   async addDepartData(departData) {
     let charges = []
@@ -541,10 +558,42 @@ export class DepartVehicleComponent implements OnInit {
       charges.push(json);
     });
     departData['cHG'] = charges
-    await this.departureService.getFieldDepartureMapping(departData, this.shipmentData);
-    this.askTracking(departData);
-    //this.goBack('Departures');
+
+    const next = getNextLocation(departData.Route.split(":")[1].split("-"), this.storage.branch);
+    let tripID = await this.departureService.getFieldDepartureMapping(departData, this.shipmentData);
+    
+    this.askTracking(departData);    
+
+    Swal.fire({
+      icon: 'info',
+      title: 'Departure',
+      html: `Vehicle to ${next} is about to depart with THC no <a href="#" id="thcLink">${tripID}</a>.`,
+      confirmButtonText: 'OK',      
+    }).then((result) => {
+      this.goBack('Departures');
+    });
+  
+    // Setup event listener for the hyperlink
+    const link = document.getElementById('thcLink');
+    if (link) {
+      link.addEventListener('click', (event) => {
+        event.preventDefault(); // Prevent the default action of the link
+        this.getTHCViewPrint(event, tripID);
+      });
+    }
+    
   }
+
+  getTHCViewPrint(event: Event, tripId: string): void {
+    const templateBody = {
+      templateName: 'THC',
+      PartyField:"",
+      DocNo: tripId,
+    }
+    const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+    window.open(url, '', 'width=1000,height=800');
+  }
+
   async askTracking(departData) {
     //get trip details
     let filter = {
@@ -555,10 +604,7 @@ export class DepartVehicleComponent implements OnInit {
     //if trip is updated && need ask if user need to track trip
     if (tripDet?.length > 0 && tripDet[0]?.oPSST == 1 && tripDet[0]?.oRGN === this.orgBranch) {
       await this.openVehicleTracking(tripDet);
-    }
-    else {
-      this.goBack('Departures');
-    }
+    }    
   }
 
   async pushDeptCT(tripDet) {

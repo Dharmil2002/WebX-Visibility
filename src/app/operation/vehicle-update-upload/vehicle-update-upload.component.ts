@@ -410,11 +410,11 @@ export class VehicleUpdateUploadComponent implements OnInit {
 
       this.cdr.detectChanges();
       this.kpiData(e);
-    });    
+    });   
   }
 
   onSelectClicked(e){
-    const data = this.loadingTableData.find(x => x.Shipment === e.shipment && x.Suffix === e.suffix);
+    const data = this.loadingTableData.find(x => x.Shipment === e.Shipment && x.Suffix === e.Suffix);
     if (data) {
       let loadedPkg = e.loadedPkg;
       let loadedWT = e.loadedWT;

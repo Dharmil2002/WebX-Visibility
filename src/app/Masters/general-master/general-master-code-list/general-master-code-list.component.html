@@ -1,6 +1,6 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums" [loadTable]="tableLoad">
-    <!-- Loading Generic table as parent component and passing  required data-->
-    <!--
+  <!-- Loading Generic table as parent component and passing  required data-->
+  <!--
         columnHeader: a object that contains only that pair of column id:title that are to be shown on dashBoard.
         tableData : api Response.
         addAndEditPath : path of the page where Add and edit is handled.
@@ -9,14 +9,11 @@
         csvFileName : Name of the csv File.
         activeFunction : function refrence that takes data from child , in order to do changes in parent (current) component.
          -->
-    <app-generic-table-v2
-    *ngIf="!tableLoad" [columnHeader]="columnHeader" [tableData]="csv"
-     [menuItems]="menuItems"[addAndEditPath]="addAndEditPath"
-    (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag" [headercode]="headerCode"
-   (dialogClosed)="onDialogClosed($event)" [dynamicControls]="dynamicControls"
-    [staticField]="staticField"  [viewComponent]="viewComponent"  (onFlagChange)="IsActiveFuntion($event)"
-    (functionCallEmitter)="functionCallHandler($event)" [csvHeaders]="headerForCsv"  [csvFileName]="csvFileName" 
-    [refreshbtn]="true"
-  >
+  <app-generic-table-v2 *ngIf="!tableLoad" [columnHeader]="columnHeader" [tableData]="csv" [tableWidth]="'70%'"
+    [menuItems]="menuItems" [addAndEditPath]="addAndEditPath" (menuItemClicked)="handleMenuItemClick($event)"
+    [menuItemFlag]="menuItemflag" [headercode]="headerCode" (dialogClosed)="onDialogClosed($event)"
+    [dynamicControls]="dynamicControls" [staticField]="staticField" [viewComponent]="viewComponent"
+    (onFlagChange)="IsActiveFuntion($event)" (functionCallEmitter)="functionCallHandler($event)"
+    [csvHeaders]="headerForCsv" [csvFileName]="csvFileName" [refreshbtn]="true">
   </app-generic-table-v2>
 </app-common-wrapper-webxpress>

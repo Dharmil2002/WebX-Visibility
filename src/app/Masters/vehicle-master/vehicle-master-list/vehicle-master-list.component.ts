@@ -19,7 +19,7 @@ export class VehicleMasterListComponent implements OnInit {
             Title: "Created Date",
             class: "matcolumncenter",
             Style: "min-width:15%",
-            datatype: "datetime"
+           // datatype: "datetime"
         },
         vehicleNo: {
             Title: "Vehicle No.",

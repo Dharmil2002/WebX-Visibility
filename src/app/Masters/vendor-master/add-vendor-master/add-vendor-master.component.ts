@@ -152,7 +152,7 @@ export class AddVendorMasterComponent implements OnInit {
     this.companyCode = this.storage.companyCode;
     // this.vendorTabledata.companyCode = this.storage.companyCode;
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
-      debugger;
+    
       this.vendorTabledata = this.route.getCurrentNavigation().extras.state.data;
       this.action = "edit";
       this.isUpdate = true;

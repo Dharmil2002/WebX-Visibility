@@ -62,7 +62,6 @@ import { StoreKeys } from "src/app/config/myconstants";
 import { VoucherServicesService } from "src/app/core/service/Finance/voucher-services.service";
 import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 import { DCRService } from "src/app/Utility/module/masters/dcr/dcr.service";
-import { nextKeyCode } from "src/app/Utility/commonFunction/stringFunctions";
 import { DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
 import { ClusterMasterService } from "src/app/Utility/module/masters/cluster/cluster.master.service";
 import { InvoiceServiceService } from "src/app/Utility/module/billing/InvoiceSummaryBill/invoice-service.service";
@@ -143,6 +142,7 @@ export class ConsignmentEntryFormComponent
   pageLoad: boolean;
   LoadType: any;
   isBoth: boolean = false;
+  sacCodes: any;
   /*in constructor inilization of all the services which required in this type script*/
   constructor(
     private fb: UntypedFormBuilder,
@@ -443,6 +443,8 @@ export class ConsignmentEntryFormComponent
     this.model.FreightTableForm.controls["rcm"].setValue('Y');
     this.model.FreightTableForm.controls["gstAmount"].disable();
     this.model.FreightTableForm.controls["gstChargedAmount"].disable();
+    this.model.FreightTableForm.controls["gstRate"].disable();
+    this.model.FreightTableForm.controls["sacName"].disable();
   }
   //#endregion
   getContainerType(event) {
@@ -718,6 +720,7 @@ export class ConsignmentEntryFormComponent
   /*end */
   /*below code is for the set city value*/
   async setCity() {
+    
     const dest = this.model.consignmentTableForm.get("destination")?.value;
     let cluster = [];
     try {
@@ -748,10 +751,40 @@ export class ConsignmentEntryFormComponent
         const clusterData = await this.clusterService.getClusterCityMapping(
           city
         );
+        let clusterArray=[]
+        clusterArray.push({
+          name: `${dest.pincode}`,
+          value: dest.city,
+          ct: dest.city,
+          pincode: dest.pincode, // include pincode here
+          st: dest.locStateId,
+          clusterName: cluster && cluster.length > 0 ? cluster[0].clusterName : "",
+          clusterId: cluster && cluster.length > 0 ? cluster[0].clusterCode : "",
+        });
+        clusterData.forEach((x)=>{
+          if(x.clusterName){
+            let json={
+            name: `${x.pincode}`,
+            value:`${x.clusterName}`,
+            ct: x.ct,
+            pincode: x.pincode, // include pincode here
+            st: x.st,
+            clusterName: x.clusterName,
+            clusterId:x.clusterId
+            }
+          clusterArray.push(json)
+          }
+            clusterArray.push(x)
+        })
+        const uniqueData = clusterArray.filter((item, index, self) =>
+          index === self.findIndex((t) => (
+              t.value === item.value
+          ))
+      );
         this.filter.Filter(
           this.model.allformControl,
           this.model.consignmentTableForm,
-          clusterData, // clusterData,
+          uniqueData, // clusterData,
           "toCity",
           true
         );
@@ -787,6 +820,42 @@ export class ConsignmentEntryFormComponent
     this.navService.navigateTotab("docket", "dashboard/Index");
   }
   //#endregion
+  async GetSacDetails() {
+    if(this.model.FreightTableForm.controls['sacName'].value && this.model.FreightTableForm.controls['sacName'].value.length>0){
+      let req = {
+        companyCode: this.storage.companyCode,
+        collectionName: "sachsn_master",
+        filter: {
+          TYP: "SAC",
+          "D$or": [
+              {
+                "SNM": {
+                  "D$regex": `^${this.model.FreightTableForm.controls['sacName'].value}`,
+                  "D$options": "i"
+                }
+              },
+              {
+                "SHCD":parseInt(this.model.FreightTableForm.controls['sacName'].value)
+              }
+            ]
+        }
+      }
+      const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+      if (res.data) {
+        this.sacCodes = res.data
+        if(res.data&&res.data.length>0){
+          this.sacCodes = res.data.map((x) => {
+            return {
+              name: x.SNM, value: x.SHCD, rate: x.GSTRT
+              , extra: x
+            }
+          })
+        }
+        this.filter.Filter(this.jsonControlArray,this.model.FreightTableForm,this.sacCodes,'sacName',true)
+      }
+    }
+  
+  }
 
   async commonDropDownMapping() {
     const mapControlArray = (controlArray, mappings) => {
@@ -1933,8 +2002,20 @@ export class ConsignmentEntryFormComponent
     }
   }
 
-  async save() {
-
+   async save() {
+    if(this.model.FreightTableForm.controls['rcm'].value &&  this.model.FreightTableForm.controls['rcm'].value=="N"){
+      const gstChaargedAmount=parseInt(this.model.FreightTableForm.controls['gstChargedAmount'].value)
+      if(gstChaargedAmount<=0){
+        Swal.fire({
+          icon: "warning",
+          title: "validation",
+          text: `Gst charge must be greater than 0.`,
+          showConfirmButton: false,
+        });
+        return false
+      }
+      
+    }
     // get Charges Details Based on ChargesArrayList
     const ChargesArrayList = Object.keys(this.model.NonFreightTableForm?.value || {});
     let ChargesArray = [];
@@ -2136,6 +2217,11 @@ export class ConsignmentEntryFormComponent
       docketDetails["toArea"] = toArea;
       docketDetails["fromAreaCode"] = fromAreaCode;
       docketDetails["toAreaCode"] = toAreaCode;
+      docketDetails["sacCode"] =  this.model.FreightTableForm.controls["sacName"]?.value?.value||"";
+      docketDetails["sacName"] =  this.model.FreightTableForm.controls["sacName"]?.value?.name||"";
+      docketDetails["gstRate"]=this.model.FreightTableForm.controls["gstRate"]?.value||0;
+      docketDetails['gstChargedAmount']=this.model.FreightTableForm.controls["gstChargedAmount"]?.value||0;
+      docketDetails['gstAmount']=this.model.FreightTableForm.controls["gstAmount"]?.value||0;
       docketDetails["vendorCode"] =
         vendorType === "4" ? "8888" : vendorName?.value || "";
       docketDetails["vendorName"] =
@@ -2324,9 +2410,11 @@ export class ConsignmentEntryFormComponent
         oTHAMT: this.model.FreightTableForm.controls["otherAmount"].value,
         gROAMT: this.model.FreightTableForm.controls["grossAmount"].value,
         rCM: this.model.FreightTableForm.controls["rcm"].value,
-        gSTAMT: this.model.FreightTableForm.controls["gstAmount"].value,
-        gSTCHAMT:
-          this.model.FreightTableForm.controls["gstChargedAmount"].value,
+        gSTAMT: this.model.FreightTableForm.controls["gstAmount"]?.value||0,
+        gSTCHAMT:this.model.FreightTableForm.controls["gstChargedAmount"]?.value||0,
+        gSTRT:this.model.FreightTableForm.controls["gstRate"]?.value||0,
+        sNM:this.model.FreightTableForm.controls["sacName"]?.value?.name||"",
+        sHCD:this.model.FreightTableForm.controls["sacName"]?.value?.value||"",
         cHG: ChargesArray,
         tOTAMT: this.model.FreightTableForm.controls["totalAmount"].value,
         sTS: 0,
@@ -2751,28 +2839,37 @@ export class ConsignmentEntryFormComponent
     this.calculateRate();
   }
   calculateRate() {
-    if (parseInt(this.model.FreightTableForm.controls['gstAmount'].value) > 100) {
+  
+    if (parseInt(this.model.FreightTableForm.controls['gstRate'].value) > 100) {
       Swal.fire({
         icon: 'warning',
         title: 'Warning',
         text: 'GST rate should not be greater than 100 %'
       });
-      this.model.FreightTableForm.controls['gstAmount'].setValue(0);
+      this.model.FreightTableForm.controls['gstRate'].setValue(0);
       return
     }
 
     if (this.model.FreightTableForm.controls['rcm'].value == "N") {
-      const gstRate = parseFloat(this.model.FreightTableForm.controls['gstAmount'].value);
+      const gstRate = parseFloat(this.model.FreightTableForm.controls['gstRate'].value);
       const grossAmt = parseFloat(this.model.FreightTableForm.controls['grossAmount'].value);
       const gstAmt = (grossAmt * gstRate) / 100;
       const totalgst = gstAmt ? parseFloat(gstAmt.toFixed(2)) : gstAmt
       this.model.FreightTableForm.controls["gstChargedAmount"].setValue(totalgst);
+      this.model.FreightTableForm.controls["gstAmount"].setValue(totalgst);
       this.model.FreightTableForm.get("totAmt")?.setValue(ConvertToNumber(
         (parseFloat(this.model.FreightTableForm.get("grossAmount")?.value) || 0) +
         (parseFloat(this.model.FreightTableForm.get("gstChargedAmount")?.value) || 0))
       );
     }
   }
+    /*below is the code which is for the get gst rate from sac*/
+    getSacRate(){
+      const data = this.model.FreightTableForm.controls['sacName'].value;
+      this.model.FreightTableForm.controls['gstRate'].setValue(data?.rate||0);
+      this.calculateRate();
+    }
+    /*End*/
   containorCsvDetail() {
     if (this.model.previewResult.length > 0) {
       this.tableLoad = true;
@@ -3606,11 +3703,15 @@ export class ConsignmentEntryFormComponent
       this.model.FreightTableForm.controls["gstChargedAmount"].disable();
       this.model.FreightTableForm.controls["gstAmount"].setValue(0);
       this.model.FreightTableForm.controls["gstChargedAmount"].setValue(0);
-
+      this.model.FreightTableForm.controls['gstRate'].disable();
+      this.model.FreightTableForm.controls['sacName'].setValue(0);
+      this.model.FreightTableForm.controls['gstRate'].setValue(0);
       this.calculateFreight();
     } else {
       this.model.FreightTableForm.controls["gstAmount"].enable();
       this.model.FreightTableForm.controls["gstChargedAmount"].enable();
+      this.model.FreightTableForm.controls["gstRate"].enable();
+      this.model.FreightTableForm.controls['sacName'].enable();
       this.calculateFreight();
     }
   }
@@ -3701,17 +3802,17 @@ export class ConsignmentEntryFormComponent
           dKTTOT: data?.totalAmount || 0.00,
           sUBTOT: data?.grossAmount || 0.00,
           gSTTOT: data?.gstChargedAmount || 0.00,
-          gSTRT: data?.gstAmount || 0.00,
+          gSTRT: data?.gstRate || 0.00,
           tOTAMT: data?.totalAmount || 0.00,
           fCHRG: data?.freight_rate || 0.00,
           sGST: gstTypesArray.includes('SGST') ? parseFloat(data?.gstChargedAmount) / 2 : 0,
-          sGSTRT: gstTypesArray.includes('SGST') ? parseFloat(data.gstAmount || 0) / 2 : 0,
+          sGSTRT: gstTypesArray.includes('SGST') ? parseFloat(data.gstRate || 0) / 2 : 0,
           cGST: gstTypesArray.includes('CGST') ? parseFloat(data?.gstChargedAmount) / 2 : 0,
-          cGSTRT: gstTypesArray.includes('CGST') ? parseFloat(data.gstAmount || 0) / 2 : 0,
+          cGSTRT: gstTypesArray.includes('CGST') ? parseFloat(data.gstRate || 0) / 2 : 0,
           uTGST: gstTypesArray.includes('UTGST') ? parseFloat(data?.gstChargedAmount) : 0,
-          uTGSTRT: gstTypesArray.includes('UTGST') ? parseFloat(data.gstAmount || 0) : 0,
+          uTGSTRT: gstTypesArray.includes('UTGST') ? parseFloat(data.gstRate || 0) : 0,
           iGST: gstTypesArray.includes('IGST') ? parseFloat(data?.gstChargedAmount) : 0,
-          iGSTRT: gstTypesArray.includes('IGST') ? parseFloat(data.gstAmount || 0) : 0,
+          iGSTRT: gstTypesArray.includes('IGST') ? parseFloat(data.gstRate || 0) : 0,
           eNTDT: new Date(),
           eNTLOC: this.storage.branch || "",
           eNTBY: this.storage?.userName || "",
@@ -3766,7 +3867,7 @@ export class ConsignmentEntryFormComponent
         },
         "gST": {
           "tYP": gstTypesArray.toString() || "",
-          "rATE": data?.gstAmount || 0.00,
+          "rATE": data?.gstRate || 0.00,
           "sGST": gstTypesArray.includes('SGST') ? parseFloat(data?.gstChargedAmount) / 2 : 0,
           "cGST": gstTypesArray.includes('CGST') ? parseFloat(data?.gstChargedAmount) / 2 : 0,
           "uTGST": gstTypesArray.includes('UTGST') ? parseFloat(data?.gstChargedAmount) : 0,

@@ -157,7 +157,7 @@ export class VendorWiseOutstandingRegisterReportComponent implements OnInit {
       this.searching = result.grid.searching;
       this.paging = result.grid.paging;
 
-      // Push the module counter data to the server
+      // View Grid Details
       this.MCountrService.PushModuleCounter();
       const stateData = {
         data: result,

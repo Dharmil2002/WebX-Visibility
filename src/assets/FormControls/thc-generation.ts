@@ -1173,6 +1173,15 @@ export class thcControl {
                 }
             },
             {
+                name: 'vehRegDate', label: "Vehicle Register Date", placeholder: "", type: 'date',
+                value: "", generatecontrol: true, disable: view ? view : update ? update : false,
+                Validations: [
+                  
+                ],
+                additionalData: {
+                }
+            },
+            {
                 name: 'vendCode',
                 label: 'vendCode',
                 placeholder: 'vendCode',

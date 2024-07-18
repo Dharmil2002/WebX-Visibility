@@ -44,6 +44,7 @@ import { InvoiceServiceService } from 'src/app/Utility/module/billing/InvoiceSum
 import { getApiCompanyDetail } from 'src/app/finance/invoice-summary-bill/invoice-utility';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { CustomerBillStatus } from 'src/app/Models/docStatus';
+//import { EwayBillService } from 'src/app/Utility/module/operation/eway-bill-details/eway-bill-service';
 
 @Component({
   selector: 'app-consignment-ltl-entry-form',
@@ -189,6 +190,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   }
   isBoth: boolean = false;
   checkboxChecked: boolean;
+  sacCodes: any;
   constructor(
     private controlPanel: ControlPanelService,
     private _NavigationService: NavigationService,
@@ -293,6 +295,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     this.invoiceForm.get('invoiceAmount')?.valueChanges.subscribe(value => {
       this.updateInvoiceValidators(value);
     });
+    this.freightForm.controls['sacName'].disable();
+    //this.GetSacDetails();
   }
   /*end*/
   //*getindividualControls */
@@ -1344,25 +1348,34 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       const gstAmt = (grossAmt * gstRate) / 100;
       const totalgst = gstAmt ? parseFloat(gstAmt.toFixed(2)) : gstAmt
       this.freightForm.controls["gstChargedAmount"].setValue(totalgst);
+      this.freightForm.controls["gstAmount"].setValue(totalgst);
       this.freightForm.get("totAmt")?.setValue(ConvertToNumber(
         (parseFloat(this.freightForm.get("grossAmount")?.value) || 0) +
         (parseFloat(this.freightForm.get("gstChargedAmount")?.value) || 0))
       );
     }
   }
+  /*below is the sacMaster Api*/
   onRcmChange() {
     if (this.freightForm.controls['rcm'].value == "Y") {
       this.freightForm.controls['gstRate'].disable();
       this.freightForm.controls['gstChargedAmount'].disable();
+      this.freightForm.controls['sacName'].disable();
+      this.freightForm.controls['gstChargedAmount'].disable();
+      this.freightForm.controls['gstAmount'].disable();
       this.freightForm.controls['gstRate'].setValue(0);
       this.freightForm.controls['gstChargedAmount'].setValue(0);
-
+      this.freightForm.controls['gstAmount'].setValue(0);
+      this.freightForm.controls['sacName'].setValue(0);
       this.calculateFreight();
     }
     else {
-      this.freightForm.controls['gstRate'].enable();
+      //this.freightForm.controls['gstRate'].enable();
       this.freightForm.controls['gstChargedAmount'].enable();
-      this.invoiceControlArray.find(x => x.name == "gstRate").disable = false
+      this.freightForm.controls['gstAmount'].enable();
+      this.freightForm.controls['sacName'].enable();
+      //this.invoiceControlArray.find(x => x.name == "gstRate").disable = false
+      this.invoiceControlArray.find(x => x.name == "gstAmount").disable = false
       this.invoiceControlArray.find(x => x.name == "gstChargedAmount").disable = false
       this.calculateFreight();
     }
@@ -1729,7 +1742,19 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       return false
     }
     const data = { ...this.consignmentForm.getRawValue(), ...this.freightForm.getRawValue() }
-
+    if(data.rcm && data.rcm=="N"){
+      const gstChaargedAmount=parseInt(data?.gstChargedAmount||0)
+      if(gstChaargedAmount<=0){
+        Swal.fire({
+          icon: "warning",
+          title: "validation",
+          text: `Gst charge must be greater than 0.`,
+          showConfirmButton: false,
+        });
+        return false
+      }
+      
+    }
     let yieldOn = this.contract?.cYIELDON || "CYO-0002";
     let yieldValue = ConvertToNumber(((yieldOn == "CYO-0001" ? data?.freight_amount : data?.grossAmount) || 0) / this.chargeBase.ChargedWeight, 2);
 
@@ -2487,6 +2512,52 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
       this.GSTRate = res.data.GSTRT || 12;
     }
   }
+  //**get Sac data for dropdown */
+  async GetSacDetails() {
+    
+    if(this.freightForm.controls['sacName'].value && this.freightForm.controls['sacName'].value.length>0){
+      let req = {
+        companyCode: this.storage.companyCode,
+        collectionName: "sachsn_master",
+        filter: {
+          TYP: "SAC",
+          "D$or": [
+              {
+                "SNM": {
+                  "D$regex": `^${this.freightForm.controls['sacName'].value}`,
+                  "D$options": "i"
+                }
+              },
+              {
+                "SHCD":parseInt(this.freightForm.controls['sacName'].value)
+              }
+            ]
+        }
+      }
+      const res = await firstValueFrom(this.masterService.masterPost("generic/get", req));
+      if (res.data) {
+        this.sacCodes = res.data
+        if(res.data&&res.data.length>0){
+          this.sacCodes = res.data.map((x) => {
+            return {
+              name: x.SNM, value: x.SID, rate: x.GSTRT
+              , extra: x
+            }
+          })
+        }
+        this.filter.Filter(this.freightControlArray,this.freightForm,this.sacCodes,'sacName',true)
+      }
+    }
+  
+  }
+  /*End*/
+  /*below is the code which is for the get gst rate from sac*/
+  getSacRate(){
+    const data = this.freightForm.controls['sacName'].value;
+    this.freightForm.controls['gstRate'].setValue(data?.rate||0);
+    this.calculateRate();
+  }
+  /*End*/
   // Account Posting When  C Note Booked
   async AccountPosting(DocketBookingRequestBody, DocketNo) {
     this.snackBarUtilityService.commonToast(async () => {
@@ -3025,6 +3096,22 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }, "C-Note Booking Voucher Generating..!");
 
   }
+  // async getEwayBill() {
+		
+	// 	const ewayBillNo=this.invoiceForm.controls['ewayBillNo'].value;
+	// 	if(ewayBillNo.length>12||ewayBillNo.length<12){
+	// 	  return;
+	// 	}
+	// 	const res=await this.ewayBillService.getEwayBill(ewayBillNo);
+	// 	if(res){
+	// 	  this.invoiceForm.controls['billDate'].setValue(new Date(res?.ewayBillDate));
+	// 	  this.invoiceForm.controls['expiryDate'].setValue(moment(res?.validUpto, 'DD/MM/YYYY hh:mm:ss A').toDate());
+	// 	  this.invoiceForm.controls['invoiceNo'].setValue(res?.docNo||"");
+	// 	  this.invoiceForm.controls['invoiceDate'].setValue(new Date(res?.docDate));
+	// 	  this.invoiceForm.controls['invoiceAmount'].setValue(res?.totalValue||0);
+	
+	// 	}
+	//   }
   GetVouchersLedgersForAutoBilling(billData, BillNo) {
     const TotalAmount = billData?.aMT;
     const GstAmount = billData?.gST?.aMT;

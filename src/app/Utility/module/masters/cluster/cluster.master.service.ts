@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { StorageService } from "src/app/core/service/storage.service";
+import { chunkArray } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
 
 @Injectable({
     providedIn: "root",
@@ -75,29 +76,67 @@ export class ClusterMasterService {
             }
 
             const pinCodes = pinResponse.data.map(item => item.PIN);
-            const clusterRequestBody = {
-                companyCode: this.storage.companyCode,
-                collectionName: "cluster_detail",
-                filter: { pincode: { D$in: pinCodes },cLSTYPNM: "Area"  }  // Assuming '$in' is the correct operator
-            };
-
-            const clusterResponse = await firstValueFrom(this.masterService.masterMongoPost("generic/get", clusterRequestBody));
-                const data = Array.from(new Set(pinResponse.data.map(obj => obj.CT)))
-                .map(ct => {
-                    // Find the first occurrence of this ct in the original data to get its pincode
-                    const originalItem =pinResponse.data.find(item => item.CT === ct);
-                    const getCluster = clusterResponse?.data.find(x => x.pincode.includes(originalItem.PIN))||"";
-                    return {
-                      name: `${originalItem.PIN}`,
-                      value:`${ct}`,
-                      ct: ct,
-                      pincode: originalItem.PIN, // include pincode here
-                      st: originalItem?.ST,
-                      clusterName: getCluster?.clusterName||"",
-                      clusterId: getCluster?.clusterCode||""
+            try {
+                // Chunk pinCodes into arrays of 500
+                const pincodeChunks = chunkArray(pinCodes, 1000);
+            
+                // Array to collect all clusters from API calls
+                let allClusters = [];
+            
+                // Iterate over each chunk and make API calls
+                for (const chunk of pincodeChunks) {
+                  try {
+                    const clusterRequestBody = {
+                      companyCode: this.storage.companyCode,
+                      collectionName: 'cluster_detail',
+                      filter: {
+                        pincode: { D$in: chunk },
+                        cLSTYPNM: 'Area'
+                      }
                     };
-                  });
+                    const clusterResponse = await firstValueFrom(this.masterService.masterMongoPost('generic/get', clusterRequestBody));
+                    allClusters = [...allClusters, ...clusterResponse?.data || []]; // Collect clusters from MongoDB response
+                  } catch (err) {
+                    console.log(err); // Handle errors if necessary
+                  }
+                }
+            
+                // Process city data based on pinResponse and clusterResponse
+                const data = pinResponse.data.reduce((acc, obj) => {
+                    // Check if there's already an entry with the same CT and PIN
+                    const existingItemIndex = acc.findIndex(item => item.ct === obj.CT && item.pincode === obj.PIN);
+                    
+                    if (existingItemIndex === -1) {
+                      // If no such entry exists, add it to the accumulator array
+                      const getCluster = allClusters.find(x => x.pincode.includes(obj.PIN)) || "";
+                      acc.push({
+                        name: `${obj.PIN}`,
+                        value: `${obj.CT}`,
+                        ct: obj.CT,
+                        pincode: obj.PIN,
+                        st: obj.ST,
+                        clusterName: getCluster?.clusterName || "",
+                        clusterId: getCluster?.clusterCode || ""
+                      });
+                    } else {
+                      // If an entry with the same CT and PIN already exists, update it if needed
+                      const existingItem = acc[existingItemIndex];
+                      const getCluster = allClusters.find(x => x.pincode.includes(obj.PIN)) || "";
+                      // Update fields if needed (optional)
+                      existingItem.st = obj.ST;
+                      existingItem.clusterName = getCluster?.clusterName || "";
+                      existingItem.clusterId = getCluster?.clusterCode || "";
+                    }
+                    
+                    return acc;
+                  }, []);
+                    return data;
+            
                 return data;
+              } catch (err) {
+                console.log(err);
+                return []; // Return empty array or handle error appropriately
+              }
         } catch (error) {
             console.error('Failed to fetch cluster data:', error);
         }

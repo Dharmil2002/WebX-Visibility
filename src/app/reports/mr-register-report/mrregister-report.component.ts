@@ -178,7 +178,7 @@ export class MRRegisterReportComponent implements OnInit {
           ? this.mRRegisterForm.value.custnmcdHandler.map(x => x.name)
           : [];
 
-        const branch = this.mRRegisterForm.value.branch.name;
+        const branch = this.mRRegisterForm.value.branch.value;
         const division = this.mRRegisterForm.value.division;
 
         const MRNOs = this.mRRegisterForm.value.MRNO;
@@ -252,18 +252,19 @@ export class MRRegisterReportComponent implements OnInit {
 
   // function to set charges
   setcharges(chargeList: any[], headers) {
-
     const columnHeader = { ...headers };
     this.chargesKeys = [];
     chargeList.forEach((item) => {
-      item.chargeList.forEach((charge) => {
-        const key = Object.keys(charge)[0];
+      if (item.chargeList) {
+        item.chargeList.forEach((charge) => {
+          const key = Object.keys(charge)[0];
 
-        if (!this.chargesKeys.includes(key)) {
-          this.chargesKeys.push(key);
-        }
-        columnHeader[key] = key;  // Add the charge to the header
-      });
+          if (!this.chargesKeys.includes(key)) {
+            this.chargesKeys.push(key);
+          }
+          columnHeader[key] = key;  // Add the charge to the header
+        });
+      }
     });
 
     return columnHeader; // Return the transformed data
@@ -274,11 +275,13 @@ export class MRRegisterReportComponent implements OnInit {
     const transformed = data.map((item) => {
       const newItem = { ...item }; // Create a new object for each item
 
-      item.chargeList.forEach((charge: any) => {
-        const key = Object.keys(charge)[0];
-        const value = charge[key];
-        newItem[key] = value; // Add charge properties to the new item
-      });
+      if (item.chargeList) {
+        item.chargeList.forEach((charge: any) => {
+          const key = Object.keys(charge)[0];
+          const value = charge[key];
+          newItem[key] = value; // Add charge properties to the new item
+        });
+      }
 
       delete newItem.chargeList; // Remove the original chargeList property
       return newItem;

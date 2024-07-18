@@ -140,15 +140,21 @@ export class SalesRegisterService {
           resftl.data.grid.columns = this.updateColumnHeaders(resftl.data.grid.columns, DocCalledAs);
           resLtl.data.grid.columns = this.updateColumnHeaders(resLtl.data.grid.columns, DocCalledAs);
 
-          const details = data.map((item) => ({
-               ...item,
-               dKTDT: item.dKTDT ? moment(item.dKTDT).local().format("DD MMM YYYY HH:mm") : "",
-               eDDDT: item.eDDDT ? moment(item.eDDDT).local().format("DD MMM YYYY HH:mm") : "",
-               cNOTEDITDT: item.cNOTEDITDT ? moment(item.cNOTEDITDT).local().format("DD MMM YYYY HH:mm") : "",
-               tOTAMT: item.tOTAMT ? item.tOTAMT.toFixed(2) : 0,
-               gSTAMT: item.gSTAMT ? item.gSTAMT.toFixed(2) : 0,
-          }));
-
+          const details = await Promise.all(
+               data.map(async (item) => {
+                    const userName = await this.getUserName(item.lEDITBY);
+                    // console.log(`UserName for ${item.lEDITBY}:`, userName); // Log the fetched userName
+                    return {
+                         ...item,
+                         dKTDT: item.dKTDT ? moment(item.dKTDT).local().format("DD MMM YYYY HH:mm") : "",
+                         eDDDT: item.eDDDT ? moment(item.eDDDT).local().format("DD MMM YYYY HH:mm") : "",
+                         lEDITDT: item.lEDITDT ? moment(item.lEDITDT).local().format("DD MMM YYYY HH:mm") : "",
+                         tOTAMT: item.tOTAMT ? item.tOTAMT.toFixed(2) : 0,
+                         gSTAMT: item.gSTAMT ? item.gSTAMT.toFixed(2) : 0,
+                         lEDITBY: userName // Use the fetched userName here
+                    };
+               })
+          );
           return {
                data: details,
                grid: resftl.data.grid || resLtl.data.grid
@@ -163,6 +169,32 @@ export class SalesRegisterService {
                }
                return column;
           });
+     }
+     //#endregion
+
+     //#region to get user name as per user Id
+     async getUserName(lEDITBY) {
+          // Prepare the request  
+          const reqBody = {
+               companyCode: this.storage.companyCode,
+               collectionName: "user_master",
+               filters: [
+                    { D$match: { userId: lEDITBY } },
+                    {
+                         D$project: {
+                              "_id": 0,
+                              "name": 1,
+                         }
+                    }
+               ]
+          };
+          const response = await firstValueFrom(this.masterServices.masterMongoPost("generic/query", reqBody));
+          // console.log(response.data);
+
+          // Assuming response.data is an array of objects and you need a single name
+          const user = response?.data?.[0]?.name;
+          return user || "";
+
      }
      //#endregion
 }

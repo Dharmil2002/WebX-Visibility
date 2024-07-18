@@ -3,6 +3,7 @@ import moment from 'moment';
 import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
+import { SalesRegisterService } from './sales-register';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,8 @@ import { StorageService } from 'src/app/core/service/storage.service';
 export class MrRegisterService {
 
   constructor(private masterService: MasterService,
-    private storage: StorageService,) { }
+    private storage: StorageService,
+    private salesRegisterService: SalesRegisterService) { }
 
   /**
     * Retrieves MR register data based on the provided filters.
@@ -167,27 +169,7 @@ export class MrRegisterService {
             GatePassNo: {
               D$ifNull: ["$docNo", ""],
             },
-            GCNNo: {
-              D$reduce: {
-                input: "$gCNNO",
-                initialValue: "",
-                in: {
-                  D$concat: [
-                    "$$value",
-                    {
-                      D$cond: [
-                        {
-                          D$eq: ["$$value", ""],
-                        },
-                        "",
-                        ", ",
-                      ],
-                    },
-                    "$$this",
-                  ],
-                },
-              },
-            },
+            GCNNo: "$gCNNO",
             BillNo: "",
             Origin: {
               D$arrayElemAt: ["$docketDetails.oRGN", 0], // Extracts the first element from the array
@@ -279,17 +261,23 @@ export class MrRegisterService {
     try {
       const res = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBody));
 
-      res.data.forEach(item => {
-        item.MRTime = item.MRTime ? moment(item.MRDate).format('hh:mmA') : '';
-        item.MRDate = item.MRDate ? moment(item.MRDate).format('DD MMM YY') : '';
-        item.DeliveryDateandTime = item.DeliveryDateandTime ? moment(item.DeliveryDateandTime).format('DD MMM YY') : '';
-        item.ChequeDate = item.ChequeDate ? moment(item.ChequeDate).format('DD MMM YY') : '';
-        item.MRCloseDate = item.MRCloseDate ? moment(item.MRCloseDate).format('DD MMM YY') : '';
+      const details = await Promise.all(
+        res.data.map(async (item) => {
+          const userName = await this.salesRegisterService.getUserName(item.MRCloseBy);
 
-        item.chargeList = this.setchargeList(item.chargeList);
-      });
-
-      return res.data
+          return {
+            ...item,
+            MRCloseBy: userName, // Use the fetched userName here
+            MRTime: item.MRTime ? moment(item.MRDate).format('hh:mmA') : '',
+            MRDate: item.MRDate ? moment(item.MRDate).local().format("DD MMM YYYY HH:mm") : "",
+            DeliveryDateandTime: item.DeliveryDateandTime ? moment(item.DeliveryDateandTime).local().format("DD MMM YYYY HH:mm") : "",
+            ChequeDate: item.ChequeDate ? moment(item.ChequeDate).local().format("DD MMM YYYY HH:mm") : "",
+            MRCloseDate: item.MRCloseDate ? moment(item.MRCloseDate).local().format("DD MMM YYYY HH:mm") : "",
+            chargeList: this.setchargeList(item.chargeList)
+          };
+        })
+      );
+      return details
     } catch (error) {
       console.error('Error fetching Mr data:', error);
       return [];
@@ -299,26 +287,28 @@ export class MrRegisterService {
 
     const chargeTotals: { [key: string]: number } = {}; // Initialize chargeTotals to store totals for each charge name
 
-    chargeArray.forEach(chrge => {
-      chrge.forEach(charge => {
-        if (!chargeTotals[charge.cHGNM]) {
-          chargeTotals[charge.cHGNM] = charge.aMT; // Initialize total for charge name if not already present
-        } else {
-          if (charge.oPS === "+") {
-            chargeTotals[charge.cHGNM] += charge.aMT; // Add amount for addition operation
-          } else if (charge.oPS === "-") {
-            chargeTotals[charge.cHGNM] -= Math.abs(charge.aMT); // Subtract amount for subtraction operation
+    // Check if chargeArray is valid and not [null]
+    if (chargeArray && chargeArray.length && chargeArray[0] !== null) {
+      chargeArray.forEach(chrge => {
+        chrge.forEach(charge => {
+          if (!chargeTotals[charge.cHGNM]) {
+            chargeTotals[charge.cHGNM] = charge.aMT; // Initialize total for charge name if not already present
+          } else {
+            if (charge.oPS === "+") {
+              chargeTotals[charge.cHGNM] += charge.aMT; // Add amount for addition operation
+            } else if (charge.oPS === "-") {
+              chargeTotals[charge.cHGNM] -= Math.abs(charge.aMT); // Subtract amount for subtraction operation
+            }
           }
-        }
+        });
       });
-    });
 
-    // Convert chargeTotals object to array of objects with desired format
-    const result = Object.keys(chargeTotals).map(chargeName => ({
-      [chargeName]: chargeTotals[chargeName],
-    }));
+      // Convert chargeTotals object to array of objects with desired format
+      const result = Object.keys(chargeTotals).map(chargeName => ({
+        [chargeName]: chargeTotals[chargeName],
+      }));
 
-    return result; // Return the transformed data
+      return result; // Return the transformed data
+    }
   }
-
 }

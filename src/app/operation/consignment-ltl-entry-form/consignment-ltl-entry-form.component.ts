@@ -1859,7 +1859,7 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
     }
   }
   async toPayAccouting(DocketBookingRequestBody) {
-    const payType = this.consignmentForm.get('payType').value;
+    const payType = DocketBookingRequestBody.data.pAYTYP;
     if (payType === "P01" || payType === "P02" || payType === "P03") {
       this.AccountPosting(DocketBookingRequestBody, this.consignmentForm.controls["docketNumber"].value)
     }
@@ -2491,8 +2491,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
   async AccountPosting(DocketBookingRequestBody, DocketNo) {
     this.snackBarUtilityService.commonToast(async () => {
       try {
-        let GSTAmount = parseFloat(this.freightForm.get("gstChargedAmount")?.value) || 0
-        const totAmt = parseFloat(this.freightForm.controls['totAmt'].value) || 0;
+        let GSTAmount = DocketBookingRequestBody?.data["gSTCHAMT"] || 0
+        const totAmt = parseFloat(DocketBookingRequestBody?.data["tOTAMT"]) || 0;
         this.voucherModel = {
           companyCode: this.storage.companyCode,
           docType: "VR",
@@ -2530,8 +2530,8 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
           tcsSectionName: "",
           tcsRate: 0,
           tcsAmount: 0,
-          IGST: GSTAmount,
-          SGST: 0,
+          IGST: 0,
+          SGST: GSTAmount,
           CGST: 0,
           UGST: 0,
           GSTTotal: GSTAmount,
@@ -2564,57 +2564,49 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         this.voucherModel.data = this.voucherDataModel;
         this.voucherModel.debitAgainstDocumentList = [];
 
-        this.voucherServicesService
-          .FinancePost("fin/account/voucherentry", this.voucherModel)
-          .subscribe({
-            next: (res: any) => {
-              if (res.success) {
-                // If Payment Mode is Paid then Generate Bill
-                if (this.consignmentForm.value.payType == "P01") {
-                  this.AutoCustomerInvoicing(DocketBookingRequestBody, DocketNo);
-                } else {
-                  Swal.fire({
-                    icon: "success",
-                    title: "Booked Successfully And Voucher Created",
-                    text: "GCN No: " + DocketNo + "  Voucher No: " + res?.data?.mainData?.ops[0].vNO,
-                    showConfirmButton: true,
-                    denyButtonText: 'Print',
-                    showDenyButton: true,
-                    showCancelButton: true,
-                    cancelButtonText: 'Close'
-                  }).then((result) => {
-                    if (result.isConfirmed) {
-                      // Redirect after the alert is closed with OK button.
-                      this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
-                    } else if (result.isDenied) {
-                      // Handle the action for the deny button here.
-                      const templateBody = {
-                        templateName: "DKT",
-                        PartyField: "",
-                        DocNo: this.consignmentForm.controls["docketNumber"].value,
-                      };
-                      const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
-                      window.open(url, '', 'width=1000,height=800');
-                      this.route.navigateByUrl('Operation/consignment-entry-ltl').then(() => {
-                        window.location.reload();
-                      });
-                    } else if (result.isDismissed) {
-                      // Handle the action for the cancel button here.
-                      this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
-                    }
-                  });
-                }
-
-              } else {
-                this.snackBarUtilityService.ShowCommonSwal("error", res.message);
+        const res = await firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", this.voucherModel));
+        if (res.success) {
+          // If Payment Mode is Paid then Generate Bill
+          if (this.consignmentForm.value.payType == "P01") {
+            this.AutoCustomerInvoicing(DocketBookingRequestBody, DocketNo);
+          } else {
+            Swal.fire({
+              icon: "success",
+              title: "Booked Successfully And Voucher Created",
+              text: "GCN No: " + DocketNo + "  Voucher No: " + res?.data?.mainData?.ops[0].vNO,
+              showConfirmButton: true,
+              denyButtonText: 'Print',
+              showDenyButton: true,
+              showCancelButton: true,
+              cancelButtonText: 'Close'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                // Redirect after the alert is closed with OK button.
+                this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+              } else if (result.isDenied) {
+                // Handle the action for the deny button here.
+                const templateBody = {
+                  templateName: "DKT",
+                  PartyField: "",
+                  DocNo: this.consignmentForm.controls["docketNumber"].value,
+                };
+                const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+                window.open(url, '', 'width=1000,height=800');
+                this.route.navigateByUrl('Operation/consignment-entry-ltl').then(() => {
+                  window.location.reload();
+                });
+              } else if (result.isDismissed) {
+                // Handle the action for the cancel button here.
+                this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
               }
-            },
-            error: (err: any) => {
-              this.snackBarUtilityService.ShowCommonSwal("error", err);
-            },
-          });
+            });
+          }
+        }
+        else {
+          this.snackBarUtilityService.ShowCommonSwal("error", res.message);
+        }
       } catch (error) {
-        this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
+        this.snackBarUtilityService.ShowCommonSwal("error", error.message);
       }
     }, "C-Note Booking Voucher Generating..!");
   }
@@ -2939,100 +2931,93 @@ export class ConsignmentLTLEntryFormComponent implements OnInit {
         this.voucherModel.data = this.voucherDataModel;
         this.voucherModel.debitAgainstDocumentList = [];
 
-        this.voucherServicesService
-          .FinancePost("fin/account/voucherentry", this.voucherModel)
-          .subscribe({
-            next: (res: any) => {
-
-              let reqBody = {
-                companyCode: this.storage.companyCode,
-                voucherNo: res?.data?.mainData?.ops[0].vNO,
-                transDate: Date(),
-                finYear: financialYear,
-                branch: this.storage.branch,
-                transCode: VoucherInstanceType.BillApproval,
-                transType: VoucherInstanceType[VoucherInstanceType.BillApproval],
-                voucherCode: VoucherType.JournalVoucher,
-                voucherType: VoucherType[VoucherType.JournalVoucher],
-                docType: "Voucher",
-                partyType: "Customer",
-                docNo: BillNo,
-                partyCode: billData?.cUST?.cD || "",
-                partyName: billData?.cUST?.nM || "",
-                entryBy: this.storage.userName,
-                entryDate: Date(),
-                debit: VoucherlineitemList.filter(item => item.credit == 0).map(function (item) {
-                  return {
-                    "accCode": item.accCode,
-                    "accName": item.accName,
-                    "accCategory": item.accCategory,
-                    "amount": item.debit,
-                    "narration": item.narration ?? ""
-                  };
-                }),
-                credit: VoucherlineitemList.filter(item => item.debit == 0).map(function (item) {
-                  return {
-                    "accCode": item.accCode,
-                    "accName": item.accName,
-                    "accCategory": item.accCategory,
-                    "amount": item.credit,
-                    "narration": item.narration ?? ""
-                  };
-                }),
+        const res = await firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", this.voucherModel));
+        if (res.success) {
+          let reqBody = {
+            companyCode: this.storage.companyCode,
+            voucherNo: res?.data?.mainData?.ops[0].vNO,
+            transDate: Date(),
+            finYear: financialYear,
+            branch: this.storage.branch,
+            transCode: VoucherInstanceType.BillApproval,
+            transType: VoucherInstanceType[VoucherInstanceType.BillApproval],
+            voucherCode: VoucherType.JournalVoucher,
+            voucherType: VoucherType[VoucherType.JournalVoucher],
+            docType: "Voucher",
+            partyType: "Customer",
+            docNo: BillNo,
+            partyCode: billData?.cUST?.cD || "",
+            partyName: billData?.cUST?.nM || "",
+            entryBy: this.storage.userName,
+            entryDate: Date(),
+            debit: VoucherlineitemList.filter(item => item.credit == 0).map(function (item) {
+              return {
+                "accCode": item.accCode,
+                "accName": item.accName,
+                "accCategory": item.accCategory,
+                "amount": item.debit,
+                "narration": item.narration ?? ""
               };
+            }),
+            credit: VoucherlineitemList.filter(item => item.debit == 0).map(function (item) {
+              return {
+                "accCode": item.accCode,
+                "accName": item.accName,
+                "accCategory": item.accCategory,
+                "amount": item.credit,
+                "narration": item.narration ?? ""
+              };
+            }),
+          };
 
-              this.voucherServicesService
-                .FinancePost("fin/account/posting", reqBody)
-                .subscribe({
-                  next: (res: any) => {
-                    Swal.fire({
-                      icon: "success",
-                      title: "Booked Successfully And Bill Created",
-                      text: "GCN No: " + DocketNo + " Bill No: " + BillNo,
-                      confirmButtonText: 'OK',
-                      showConfirmButton: true,
-                      denyButtonText: 'Print',
-                      showDenyButton: true,
-                      showCancelButton: true,
-                      cancelButtonText: 'Close'
-                    }).then((result) => {
-                      if (result.isConfirmed) {
-                        // Redirect after the alert is closed with OK button.
-                        this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
-                      } else if (result.isDenied) {
-                        // Handle the action for the deny button here.
-                        const templateBody = {
-                          templateName: "DKT",
-                          PartyField: "",
-                          DocNo: this.consignmentForm.controls["docketNumber"].value,
-                        }
-                        const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
-                        window.open(url, '', 'width=1000,height=800');
-                        this.route.navigateByUrl('Operation/consignment-entry-ltl').then(() => {
-                          window.location.reload();
-                        });
-                      } else if (result.isDismissed) {
-                        // Handle the action for the cancel button here.
-                        this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
-                      }
-                    });
-                  },
-                  error: (err: any) => {
-
-                    if (err.status === 400) {
-                      this.snackBarUtilityService.ShowCommonSwal("error", "Bad Request");
-                    } else {
-                      this.snackBarUtilityService.ShowCommonSwal("error", err);
-                    }
-                  },
+          const postingResult = await firstValueFrom(this.voucherServicesService.FinancePost("fin/account/posting", reqBody));
+          if (postingResult.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Booked Successfully And Bill Created",
+              text: "GCN No: " + DocketNo + " Bill No: " + BillNo,
+              confirmButtonText: 'OK',
+              showConfirmButton: true,
+              denyButtonText: 'Print',
+              showDenyButton: true,
+              showCancelButton: true,
+              cancelButtonText: 'Close'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                // Redirect after the alert is closed with OK button.
+                this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+              } else if (result.isDenied) {
+                // Handle the action for the deny button here.
+                const templateBody = {
+                  templateName: "DKT",
+                  PartyField: "",
+                  DocNo: this.consignmentForm.controls["docketNumber"].value,
+                }
+                const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+                window.open(url, '', 'width=1000,height=800');
+                this.route.navigateByUrl('Operation/consignment-entry-ltl').then(() => {
+                  window.location.reload();
                 });
+              } else if (result.isDismissed) {
+                // Handle the action for the cancel button here.
+                this._NavigationService.navigateTotab('DocketStock', "dashboard/Index");
+              }
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: postingResult.message,
+              showConfirmButton: false,
+            });
+          }
+        }
+        else {
+          this.snackBarUtilityService.ShowCommonSwal("error", res.message);
+        }
 
-            },
-            error: (err: any) => {
-              this.snackBarUtilityService.ShowCommonSwal("error", err);
-            },
-          });
       } catch (error) {
+        console.log(error);
         this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
       }
 

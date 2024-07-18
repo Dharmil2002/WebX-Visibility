@@ -152,8 +152,8 @@ export class AddVendorMasterComponent implements OnInit {
     this.companyCode = this.storage.companyCode;
     // this.vendorTabledata.companyCode = this.storage.companyCode;
     if (this.route.getCurrentNavigation()?.extras?.state != null) {
-      this.vendorTabledata =
-        this.route.getCurrentNavigation().extras.state.data;
+      debugger;
+      this.vendorTabledata = this.route.getCurrentNavigation().extras.state.data;
       this.action = "edit";
       this.isUpdate = true;
       this.imageData = {
@@ -194,10 +194,11 @@ export class AddVendorMasterComponent implements OnInit {
     if (this.action !== "edit") {
       this.vendorTabledata = new VendorMaster({});
       this.vendorTabledata.companyCode = this.storage.companyCode;
-    }
-    this.initializeFormControl();
+    }    
   }
   ngOnInit(): void {
+
+    this.initializeFormControl();    
     this.getDropDownData();
     this.getDetailsTds();
     //this.getAllMastersData();
@@ -344,8 +345,8 @@ export class AddVendorMasterComponent implements OnInit {
       if (vendType) {
         let foundObject = this.vendorTypeData.find(
           (x) =>
-            x.name.toLowerCase() === vendType.toLowerCase() ||
-            x.value.toLowerCase() === vendType.toLowerCase()
+            x.name.toLowerCase() === `${vendType}`.toLowerCase() ||
+            `${x.value}`.toLowerCase() === `${vendType}`.toLowerCase()
         );
         if (foundObject) {
           this.vendorTableForm.controls.vendorType.setValue(foundObject);
@@ -374,8 +375,8 @@ export class AddVendorMasterComponent implements OnInit {
       if (MSMEType) {
         let foundObject = this.msmeTypeData.find(
           (x) =>
-            x.name.toLowerCase() === MSMEType.toLowerCase() ||
-            x.value.toLowerCase() === MSMEType.toLowerCase()
+            x.name.toLowerCase() === `${MSMEType}`.toLowerCase() ||
+            `${x.value}`.toLowerCase() === `${MSMEType}`.toLowerCase()
         );
         if (foundObject) {
           this.MSMETableForm.controls.msmeType.setValue(foundObject);
@@ -446,6 +447,8 @@ export class AddVendorMasterComponent implements OnInit {
           }
         });
       }
+
+      this.vendorTableForm.controls["vendorAdvance"].setValue(this.vendorTabledata.vendorAdvance || 0);
     }
     this.filter.Filter(
       this.jsonControlVendorArray,

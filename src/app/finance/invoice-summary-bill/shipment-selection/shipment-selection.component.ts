@@ -8,27 +8,27 @@ import { GenericViewTableComponent } from 'src/app/shared-components/generic-vie
   templateUrl: './shipment-selection.component.html'
 })
 export class ShipmentSelectionComponent implements OnInit {
-  isLoad:boolean=true;
+  isLoad: boolean = true;
   shipments: any;
-  tableData:any;
-metaData = {
-  checkBoxRequired: true,
-  noColumnSort: ["checkBoxRequired"],
-};
-dynamicControls = {
-  add: false,
-  edit: false,
-  csv: false,
-};
+  tableData: any;
+  metaData = {
+    checkBoxRequired: true,
+    noColumnSort: ["checkBoxRequired"],
+  };
+  dynamicControls = {
+    add: false,
+    edit: false,
+    csv: false,
+  };
   stateName: any;
   constructor(
-    public definition:invoiceModel,
+    public definition: invoiceModel,
     public dialogRef: MatDialogRef<GenericViewTableComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-  ) { 
-   this.stateName=this.data.stateName;
-   this.tableData=this.data.extraData;
-   this.isLoad=false;
+  ) {
+    this.stateName = this.data.stateName;
+    this.tableData = this.data.extraData;
+    this.isLoad = false;
   }
 
   ngOnInit(): void {
@@ -37,20 +37,19 @@ dynamicControls = {
     // Add logic to close the MatDialog
     this.dialogRef.close();
   }
-  onSubmitButtonClick(){
-    this.dialogRef.close({stateName:this.stateName,selectedData:this.tableData.filter((x)=>x.isSelected==true)});
+  onSubmitButtonClick() {
+    this.dialogRef.close({ stateName: this.stateName, selectedData: this.tableData.filter((x) => x.isSelected == true) });
   }
-  getCalucationDetails($event){    
-    const gstRate = parseFloat(this.data.gstRate.replace('%', '')) / 100;
-    $event.filter((x)=>x.isSelected==true);
+  getCalucationDetails($event) {
+    $event.filter((x) => x.isSelected == true);
     $event = $event.map((item) => {
-      if(item.isSelected) {
-        item.gst = parseFloat((item.amount * (gstRate)).toFixed(2));
-        item.total = parseFloat(item.amount) + parseFloat(item.gst)      
+      if (item.isSelected) {
+        item.gst = parseFloat((item.amount * ((item.extraData?.gSTRT ?? 0) / 100)).toFixed(2));
+        item.total = parseFloat(item.amount) + parseFloat(item.gst)
       }
       else {
         item.gst = 0.00;
-        item.total= parseFloat(item.amount); 
+        item.total = parseFloat(item.amount);
       }
       return item;
     });

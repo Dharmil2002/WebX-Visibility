@@ -18,7 +18,7 @@ export class ShipmentEditBillingComponent implements OnInit {
   headerColumn: any;
   isLoad: boolean = true;
   staticField = [''];
-  menuItems = [{ label: "Approve", status: [0] }, { label: "Edit", status: [0] }, { label: "Hold", status: [1] }];
+  menuItems = [{ label: "Approve", status: [0] }, { label: "Edit", status: [0] }];
   menuItemflag: boolean = true;
   metaData = {
     checkBoxRequired: true,

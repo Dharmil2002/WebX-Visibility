@@ -58,6 +58,16 @@ export class PendingBillingComponent implements OnInit {
       class: "matcolumnleft",
       Style: "max-width: 100px",
     },
+    rCM: {
+      Title: "RCM",
+      class: "matcolumnleft",
+      Style: "max-width: 80px",
+    },
+    gSTRT: {
+      Title: "GST %",
+      class: "matcolumncenter",
+      Style: "max-width: 100px",
+    },
     dockets: {
       Title: "Shipment",
       class: "matcolumncenter",
@@ -82,6 +92,8 @@ export class PendingBillingComponent implements OnInit {
   }
   staticField = [
     "tMODE",
+    "rCM",
+    "gSTRT",
     "billingParty",
     "sum"
   ]
@@ -140,11 +152,23 @@ export class PendingBillingComponent implements OnInit {
   async get(data) {
     this.tableLoad = true;
     const unBillingData = await this.invoiceService.getPendingDetails(data.start, data.end, data.customer);
-    this.tableData = unBillingData.map(item => {
-      item.sum = parseFloat(item.sum.toFixed(2));
-      item.action = item.dockets != 0 ? "Generate Invoice" : "";
-      return item;
-    });
+    // Assuming unBillingData is your array of objects
+    this.tableData = unBillingData
+      .map(item => {
+        item.sum = parseFloat(item.sum.toFixed(2));
+        item.action = item.dockets !== 0 ? "Generate Invoice" : "";
+        return item;
+      })
+      .sort((a, b) => {
+        if (a.billingParty[0] < b.billingParty[0]) {
+          return -1;
+        }
+        if (a.billingParty[0] > b.billingParty[0]) {
+          return 1;
+        }
+        return 0;
+      });
+
     this.tableLoad = false;
     this.getKpiCount();
   }

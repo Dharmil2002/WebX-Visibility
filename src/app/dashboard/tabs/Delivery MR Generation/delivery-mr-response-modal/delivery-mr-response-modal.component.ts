@@ -9,7 +9,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
 export class DeliveryMrResponseModalComponent implements OnInit {
   tableData: [] | any;
   tableload = true; // flag , indicates if data is still loading or not , used to show loading animation
-  companyCode: number =0;
+  companyCode: number = 0;
   menuItemflag: boolean = false;
   METADATA = {
     checkBoxRequired: true,
@@ -65,7 +65,6 @@ export class DeliveryMrResponseModalComponent implements OnInit {
     this.companyCode = this.storageService.companyCode;
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       const data = this.router.getCurrentNavigation()?.extras?.state.data;
-      console.log(data);
       this.resultData = data.ops;
     } else {
       this.redirectToMRGeneration();
@@ -115,11 +114,11 @@ export class DeliveryMrResponseModalComponent implements OnInit {
     this.router.navigate(['/dashboard/Index'], { queryParams: { tab: tabIndex } });
   }
 
-  openviewprint(event){
+  openviewprint(event) {
     const DocNo = event.data.dLMRNO
     const req = {
       templateName: "DMR",
-      PartyField:"",
+      PartyField: "",
       DocNo: DocNo,
     };
     const url = `${window.location.origin

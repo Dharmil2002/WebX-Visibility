@@ -36,11 +36,11 @@ export class DeductionChargesComponent implements OnInit {
   IntializeFormControl() {
     const loadingControlForm = new DeducationControl();
     this.jsonControlArray = loadingControlForm.getShipmentControls();
-    this.invoices=loadingControlForm.getTdsControls();
+    this.invoices = loadingControlForm.getTdsControls();
     this.deducationTableForm = formGroupBuilder(this.fb, [this.jsonControlArray]);
     this.chargesTableForm = formGroupBuilder(this.fb, [this.invoices]);
     this.autoFillCustDetail();
-  //  this.getProductionCharges();
+    //  this.getProductionCharges();
   }
   async getProductionCharges() {
     const result = await this.invoiceService.getCharges("Road");
@@ -51,8 +51,8 @@ export class DeductionChargesComponent implements OnInit {
             name: element.SelectCharges || '',
             label: `${element.SelectCharges}(${element.Add_Deduct})` || '',
             placeholder: element.Add_Deduct || '',
-            type: 'text', // Set your default type here
-            value:0, // Set your default value here
+            type: 'number', // Set your default type here
+            value: 0, // Set your default value here
             filterOptions: '', // Set your default filterOptions here
             displaywith: '', // Set your default displaywith here
             generatecontrol: true,
@@ -95,10 +95,11 @@ export class DeductionChargesComponent implements OnInit {
         pendingAmt: custDetail.aMT ?? 0,
       });
     }
-    this.chargesTableForm.controls['tds'].setValue((parseFloat(custDetail.aMT)*5/100).toFixed(2));
+    //(parseFloat(custDetail.aMT)*5/100).toFixed(2)
+    this.chargesTableForm.controls['tds'].setValue(0);
   }
   calucatedCharges() {
-    
+
     const chargeFormGroup = this.chargesTableForm.controls;
     const tds = parseFloatWithFallback(chargeFormGroup['tds'].value);
     const ftDist = parseFloatWithFallback(chargeFormGroup['ftDist'].value);
@@ -107,9 +108,9 @@ export class DeductionChargesComponent implements OnInit {
     const additionalCharges = parseFloatWithFallback(chargeFormGroup['additionalCharges'].value);
     const netDeduction = -tds - ftDist - otherDeduction - claimsDeduction + additionalCharges;
     chargeFormGroup.netDeduction.setValue(Math.abs(netDeduction).toFixed(2));
-    
+
     const billingAmount = parseFloat(this.deducationTableForm.controls['amt'].value);
-    if ( chargeFormGroup.netDeduction.value> billingAmount) {
+    if (chargeFormGroup.netDeduction.value > billingAmount) {
       Swal.fire({
         icon: 'warning',
         title: 'Deduction Error',
@@ -117,8 +118,8 @@ export class DeductionChargesComponent implements OnInit {
       });
     }
   }
-  save(){
-    
-    this.dialogRef.close({...this.chargesTableForm.value,...this.deducationTableForm.value});
+  save() {
+
+    this.dialogRef.close({ ...this.chargesTableForm.value, ...this.deducationTableForm.value });
   }
 }

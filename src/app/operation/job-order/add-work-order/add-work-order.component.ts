@@ -1640,7 +1640,7 @@ export class AddWorkOrderComponent implements OnInit {
         title: `Form(s) have values`,
         html: `The following form(s) have values:<br>${formNamesMessage}.<br>Please add the values using the "Add New" button before proceeding.`,
         icon: "error",
-        confirmButtonText: "Okay",
+        confirmButtonText: "OK",
       });
 
       return true; // Validation failed
@@ -1852,7 +1852,6 @@ export class AddWorkOrderComponent implements OnInit {
         companyCode: this.storage.companyCode,
         collectionName: "work_order_headers",
         data: data,
-        filter: { cID: this.storage.companyCode },
       };
       const res = await firstValueFrom(
         this.masterService.masterPost("generic/create", createReq)

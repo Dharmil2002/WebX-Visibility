@@ -369,6 +369,11 @@ export class BillApprovalComponent implements OnInit {
     const gstType = data?.gST?.tYP;
 
     const GSTTypeList = gstType.split(',');
+    // Check GST Type Contains UTGST then Push CGST
+    if (GSTTypeList.includes('UTGST') || GSTTypeList.includes('SGST')) {
+      GSTTypeList.push('CGST');
+    }
+
     GSTTypeList.forEach(element => {
       if (gstType && gstTypeMapping[element]) {
         const { accCode, accName, accCategory, prop } = gstTypeMapping[element];

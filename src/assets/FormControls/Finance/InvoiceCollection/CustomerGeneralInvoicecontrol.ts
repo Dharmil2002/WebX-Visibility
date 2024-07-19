@@ -32,7 +32,7 @@ export class CustomerGeneralInvoiceControl {
         disable: false,
         Validations: [],
         additionalData: {
-          minDate: new Date(),
+          //minDate: new Date(),
         },
       },
       {

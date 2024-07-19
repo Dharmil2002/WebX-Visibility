@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import {
   AbstractControl,
@@ -32,7 +32,7 @@ import { HttpClient } from "@angular/common/http";
 import moment from "moment";
 import Swal from "sweetalert2";
 import { DataService } from "src/app/core/service/job-order.service";
-import { OperationService } from "src/app/core/service/operations/operation.service";
+import { JobOrderService } from "src/app/core/service/jobOrder-service/jobOrder-services.service";
 @Component({
   selector: "app-add-work-order",
   templateUrl: "./add-work-order.component.html",
@@ -101,6 +101,18 @@ export class AddWorkOrderComponent implements OnInit {
   supervisorStatus: any;
   ServiceData: { count: any; title: string; class: string }[];
   SpareData: { count: any; title: string; class: string }[];
+  returnto: string;
+  returntoStatus: any;
+  vendorData: any;
+  isClose: boolean = false;
+  historyworkOrderData: any;
+  historyMaintenaceServiceData: any;
+  historyMaintenaceSpareData: any;
+  historyTyreDetailsData: any;
+  historyTyreManagnmentData: any;
+  historyBatteryData: any;
+  workorderdata: any;
+  workOrderNo: any;
   constructor(
     private http: HttpClient,
     private fb: UntypedFormBuilder,
@@ -108,10 +120,20 @@ export class AddWorkOrderComponent implements OnInit {
     private router: Router,
     private filter: FilterUtils,
     private dataService: DataService,
-    private operation: OperationService,
-    private masterService: MasterService
+    private masterService: MasterService,
+    private joborder: JobOrderService
   ) {
-    this.companyCode = this.storage.companyCode;
+    if (this.router.getCurrentNavigation()?.extras?.state != null) {
+      this.workorderdata = this.router.getCurrentNavigation().extras.state.data;
+      const label = this.workorderdata?.label.label;
+      this.breadscrums[0].active =
+        label === "Update" ? "Work Order Modify" : "Work Order Close";
+      this.breadscrums[0].title =
+        label === "Update" ? "Work Order Modify" : "Work Order Close";
+      this.isUpdate = label === "Update";
+      this.isClose = label !== "Update";
+      this.submit = label === "Update" ? "Modify" : "Close";
+    }
     this.menuItemData = this.dataService.getMenuItemData();
     if (this.menuItemData) {
       this.WorkOrderModel = new WorkOrderModel(this.menuItemData.data);
@@ -121,28 +143,26 @@ export class AddWorkOrderComponent implements OnInit {
     }
   }
   ngOnInit(): void {
-    if (this.router.getCurrentNavigation()?.extras?.state != null) {
-      this.WorkOrderModel =
-        this.router.getCurrentNavigation().extras.state.data;
-      this.isUpdate = true;
-      this.breadscrums[0].active = "Work Order Modify";
-      this.breadscrums[0].title = "Work Order Modify";
-      this.submit = "Modify";
-    }
     this.backPath = "/Operation/JobOrder";
     this.http.get(this.jsonUrl).subscribe((res) => {
+      // this.tableLoad=true
       this.data = res;
       let tableArray = this.data["data"];
       this.tableData = tableArray;
-      this.tableLoad = false;
+      // this.tableLoad = false;
     });
+    if (this.isUpdate || this.isClose) {
+      this.getWorkOrderRelatedData(
+        this.workorderdata?.data?.wORKNO,
+        this.workorderdata?.data?.cATEGORY
+      );
+    }
     this.initializeFormControl();
     this.getWorkOrdersData();
     this.getJobSubCategorydata();
     this.getUserData();
-    this.WorkOrderForm.controls["actualreturndate"].disable();
-    this.WorkOrderForm.controls["workshoptype"].setValue("Internal");
     this.checkForWorkshopType();
+    this.handleDisabledProperties();
     this.WorkOrderForm.controls["workshoptype"].valueChanges.subscribe((x) => {
       this.valuechanged = true;
     });
@@ -150,7 +170,8 @@ export class AddWorkOrderComponent implements OnInit {
   initializeFormControl() {
     this.WorkOrderFormControls = new WorkOrderFormControls(
       this.WorkOrderModel,
-      this.isUpdate
+      this.isUpdate,
+      this.isClose
     );
     this.jsonControlWorkOrderArray =
       this.WorkOrderFormControls.getWorkOrderFormControls();
@@ -165,25 +186,33 @@ export class AddWorkOrderComponent implements OnInit {
     this.jsonControlLabourDetailsArray =
       this.WorkOrderFormControls.getLabourDetailsArrayControls();
     this.jsonControlWorkOrderArray.forEach((data) => {
-      if (data.name === "vendor") {
-        this.vendor = data.name;
-        this.vendorStatus = data.additionalData.showNameAndValue;
-      }
-      if (data.name === "location") {
-        this.location = data.name;
-        this.locationStatus = data.additionalData.showNameAndValue;
-      }
-      if (data.name === "subcategory") {
-        this.jobsubCategory = data.name;
-        this.jobsubCategoryStatus = data.additionalData.showNameAndValue;
-      }
-      if (data.name === "handedover") {
-        this.handedover = data.name;
-        this.handedoverStatus = data.additionalData.showNameAndValue;
-      }
-      if (data.name === "supervisor") {
-        this.supervisor = data.name;
-        this.supervisorStatus = data.additionalData.showNameAndValue;
+      switch (data.name) {
+        case "vendor":
+          this.vendor = data.name;
+          this.vendorStatus = data.additionalData.showNameAndValue;
+          break;
+        case "location":
+          this.location = data.name;
+          this.locationStatus = data.additionalData.showNameAndValue;
+          break;
+        case "subcategory":
+          this.jobsubCategory = data.name;
+          this.jobsubCategoryStatus = data.additionalData.showNameAndValue;
+          break;
+        case "handedover":
+          this.handedover = data.name;
+          this.handedoverStatus = data.additionalData.showNameAndValue;
+          break;
+        case "supervisor":
+          this.supervisor = data.name;
+          this.supervisorStatus = data.additionalData.showNameAndValue;
+          break;
+        case "returnto":
+          this.returnto = data.name;
+          this.returntoStatus = data.additionalData.showNameAndValue;
+          break;
+        default:
+          return;
       }
     });
     this.originalJsonControlWorkOrderArray = [
@@ -207,6 +236,19 @@ export class AddWorkOrderComponent implements OnInit {
     this.LabourDetailsForm = formGroupBuilder(this.fb, [
       this.jsonControlLabourDetailsArray,
     ]);
+    if (this.isUpdate || this.isClose) {
+      this.WorkOrderForm.controls["ordercategory"].patchValue(
+        this.menuItemData.data.cATEGORY
+      );
+      this.WorkOrderForm.controls["workshoptype"].patchValue(
+        this.menuItemData.data.tYPE
+      );
+      this.CheckForSelectedCategory();
+      this.ServiceDetailsForm.controls["StartDTM"].setValue("");
+    } else {
+      // this block will run when isUpdate and isClose is false which means at the time of adding the data
+      this.WorkOrderForm.controls["workshoptype"].patchValue("Internal");
+    }
   }
   clearControlValidators(control: AbstractControl) {
     control.clearValidators();
@@ -218,24 +260,278 @@ export class AddWorkOrderComponent implements OnInit {
       control.updateValueAndValidity();
     }
   }
+  toggleEnableFormControls(
+    formControls: { [key: string]: string[] },
+    shouldEnable: boolean
+  ) {
+    Object.keys(formControls).forEach((form) => {
+      formControls[form].forEach((control) => {
+        shouldEnable
+          ? this[form].controls[control].enable()
+          : this[form].controls[control].disable();
+      });
+    });
+  }
+  handleDisabledProperties() {
+    const formControls = {
+      ServiceDetailsForm: ["EndDTM", "ApprovedCost"],
+      SpareDetailsForm: ["EndDTM", "ApprovedCost"],
+      WorkOrderForm: [
+        "closeKmRead",
+        "ServiceKm",
+        "actualreturndate",
+        "returnto",
+      ],
+      BatteryChangeForm: ["NSerial", "NOEM", "NModel", "NReason"],
+      TyreDetailsForm: ["ChangeReason", "NTyreID", "NOEMandModel"],
+    };
+    this.toggleEnableFormControls(formControls, this.isClose);
+    if (this.isClose) {
+      this.WorkOrderForm.controls["orderdate"].disable();
+      this.WorkOrderForm.controls["sentdate"].disable();
+    }
+  }
+  setMaintenanceServiceData(data) {
+    for (const x of data) {
+      this.tableData1.push({
+        id: x._id,
+        TaskGroup: x.tSGRP,
+        Task: x.tASK,
+        MaintenanceType: x.mAINTP,
+        Estimatedhours: x.eSTHRS,
+        Hourlycost: x.hCST,
+        Cost: x.cST,
+        ApprovedCost: x.aPCST,
+        Mechanic: x.mECNIC,
+        StartDTM: x.sDTM,
+        EndDTM: x.eDTM,
+        actions: this.isClose ? ["Edit"] : ["Edit", "Remove"],
+      });
+    }
+    this.SetServiceData();
+    this.updateTotalTableValues(this.tableData1, this.tableData2);
+    this.tableLoad = true;
+    this.isServiceDetailsLoad = true;
+  }
+  setMaintenanceSpareData(data) {
+    for (const x of data) {
+      this.tableData2.push({
+        id: x._id,
+        TaskGroup: x.tSGRP,
+        SparePart: x.sPRt,
+        MaintenanceType: x.mAINTP,
+        Stock: x.sTO,
+        Quantity: x.qUAN,
+        CostOrUnit: x.cST,
+        TCost: x.TcST,
+        ApprovedCost: x.aPCST,
+        Mechanic: x.mECNIC,
+        StartDTM: x.sDTM,
+        EndDTM: x.eDTM,
+        actions: this.isClose ? ["Edit"] : ["Edit", "Remove"],
+      });
+    }
+    this.SetSpareData();
+    this.updateTotalTableValues(this.tableData1, this.tableData2);
+    this.isSpareDetailsLoad = true;
+  }
+  setbatterydata(data) {
+    this.BatteryChangeForm.controls["CSerial"].setValue(data.sRL.cRT);
+    this.BatteryChangeForm.controls["COEM"].setValue(data.oEM.cRT);
+    this.BatteryChangeForm.controls["CModel"].setValue(data.mDL.cRT);
+    this.BatteryChangeForm.controls["CReason"].setValue(data.rESN.cRT);
+  }
+  setLabourtData(data) {
+    this.LabourDetailsForm.controls["Mechanic"].setValue(data.mECNIC);
+    this.LabourDetailsForm.controls["CostH"].setValue(data.cSTH);
+    this.LabourDetailsForm.controls["LabourH"].setValue(data.lBH);
+    this.LabourDetailsForm.controls["LabourC"].setValue(data.lBCST);
+  }
+  setTyreData(data) {
+    for (const x of data) {
+      this.tableData3.push({
+        id: x._id,
+        position: x.pSN,
+        CTyreID: x.cTID,
+        COEMandModel: x.oNMODL,
+        NOEMandModel: x.nONMODL,
+        NTyreID: x.nTID,
+        Comment: x.cMT ? x.cMT : "",
+        ChangeReason: x.cREASON,
+        Cost: x.cST,
+        actions: this.isClose ? ["Edit"] : ["Edit", "Remove"],
+      });
+    }
+    this.isTyreDetailsLoad = true;
+  }
+
+  async getWorkOrderRelatedData(workOrderNo, category) {
+    this.workOrderNo = workOrderNo;
+    const aggregationFilters: any = [
+      {
+        D$match: {
+          wORKNO: workOrderNo,
+        },
+      },
+    ];
+    let resultProcessing;
+    switch (category) {
+      case "Battery management":
+        aggregationFilters.push({
+          D$lookup: {
+            from: "work_battery",
+            localField: "wORKNO",
+            foreignField: "wORKNO",
+            as: "batteryManagementData",
+          },
+        });
+        if (this.isClose) {
+          aggregationFilters.push({
+            D$project: {
+              _id: 0,
+              batteryManagementData: "$batteryManagementData",
+            },
+          });
+        }
+        resultProcessing = (workOrderData) => {
+          if (this.isUpdate) {
+            const { batteryManagementData, ...filteredWorkOrderData } =
+              workOrderData;
+            this.historyworkOrderData = filteredWorkOrderData;
+            this.historyBatteryData = batteryManagementData;
+          }
+          this.setbatterydata(workOrderData.batteryManagementData[0]);
+          this.setLabourtData(workOrderData.batteryManagementData[0]);
+        };
+        break;
+      case "Maintenance":
+        aggregationFilters.push(
+          {
+            D$lookup: {
+              from: "work_maintenance_service",
+              localField: "wORKNO",
+              foreignField: "wORKNO",
+              as: "maintenanceServiceDetails",
+            },
+          },
+          {
+            D$lookup: {
+              from: "work_maintenance_spair",
+              localField: "wORKNO",
+              foreignField: "wORKNO",
+              as: "maintenanceSpareParts",
+            },
+          }
+        );
+        if (this.isClose) {
+          aggregationFilters.push({
+            D$project: {
+              _id: 0,
+              maintenanceServiceDetails: "$maintenanceServiceDetails",
+              maintenanceSpareParts: "$maintenanceSpareParts",
+            },
+          });
+        }
+        resultProcessing = (workOrderData) => {
+          if (this.isUpdate) {
+            const {
+              maintenanceServiceDetails,
+              maintenanceSpareParts,
+              ...filteredWorkOrderData
+            } = workOrderData;
+            this.historyworkOrderData = filteredWorkOrderData;
+            this.historyMaintenaceServiceData = maintenanceServiceDetails;
+            if (maintenanceSpareParts) {
+              this.historyMaintenaceSpareData = maintenanceSpareParts;
+            }
+          }
+          this.setMaintenanceServiceData(
+            workOrderData.maintenanceServiceDetails
+          );
+          if (workOrderData.maintenanceSpareParts.length) {
+            this.setMaintenanceSpareData(workOrderData.maintenanceSpareParts);
+          }
+        };
+        break;
+      case "Tyre management":
+        aggregationFilters.push(
+          {
+            D$lookup: {
+              from: "work_tyre",
+              localField: "wORKNO",
+              foreignField: "wORKNO",
+              as: "tyreManagementData",
+            },
+          },
+          {
+            D$lookup: {
+              from: "work_tyre_details",
+              localField: "wORKNO",
+              foreignField: "wORKNO",
+              as: "tyreDetails",
+            },
+          }
+        );
+        if (this.isClose) {
+          aggregationFilters.push({
+            D$project: {
+              _id: 0,
+              tyreManagementData: "$tyreManagementData",
+              tyreDetails: "$tyreDetails",
+            },
+          });
+        }
+        resultProcessing = (workOrderData) => {
+          if (this.isUpdate) {
+            const {
+              tyreManagementData,
+              tyreDetails,
+              ...filteredWorkOrderData
+            } = workOrderData;
+            this.historyworkOrderData = filteredWorkOrderData;
+            this.historyTyreDetailsData = tyreDetails;
+            this.historyTyreManagnmentData = tyreManagementData;
+          }
+          this.setTyreData(workOrderData.tyreManagementData);
+          this.setLabourtData(workOrderData.tyreDetails[0]);
+        };
+        break;
+
+      default:
+        return;
+    }
+    const result = await this.joborder.getWorkOrdersWithFilters(
+      aggregationFilters
+    );
+    if (result.length > 0) {
+      resultProcessing(result[0]);
+    }
+  }
   CheckForSelectedCategory() {
     this.selectedcategory = this.WorkOrderForm.controls["ordercategory"].value;
     this.resetFormFields();
     if (this.selectedcategory === "Maintenance") {
       const startDTMvalue = this.WorkOrderForm.controls["orderdate"].value;
-      this.ServiceDetailsForm.controls["StartDTM"].setValue(startDTMvalue);
-      this.ServiceDetailsForm.controls["EndDTM"].disable();
-      this.SpareDetailsForm.controls["EndDTM"].disable();
+      this.ServiceDetailsForm.controls["StartDTM"].patchValue(startDTMvalue);
     }
   }
   async getUserData() {
     let req = {
       companyCode: this.storage.companyCode,
       collectionName: "user_master",
-      filter: { companyCode: this.storage.companyCode },
+      filters: [
+        { D$match: { companyCode: this.storage.companyCode } },
+        {
+          D$project: {
+            userId: 1,
+            name: 1,
+            _id: 0,
+          },
+        },
+      ],
     };
     const res = await firstValueFrom(
-      this.masterService.masterPost("generic/get", req)
+      this.masterService.masterPost("generic/query", req)
     );
     if (res.success && res.data) {
       const data = res.data;
@@ -259,16 +555,37 @@ export class AddWorkOrderComponent implements OnInit {
         this.supervisor,
         this.supervisorStatus
       );
+      this.filter.Filter(
+        this.jsonControlWorkOrderArray,
+        this.WorkOrderForm,
+        userdata,
+        this.returnto,
+        this.returntoStatus
+      );
     }
   }
   async getJobSubCategorydata() {
     let req = {
       companyCode: this.storage.companyCode,
       collectionName: "General_master",
-      filter: { companyCode: this.storage.companyCode, codeType: "JOBSCAT" },
+      filters: [
+        {
+          D$match: {
+            companyCode: this.storage.companyCode,
+            codeType: "JOBSCAT",
+          },
+        },
+        {
+          D$project: {
+            codeDesc: 1,
+            _id: 0,
+          },
+        },
+      ],
     };
+
     const res = await firstValueFrom(
-      this.masterService.masterPost("generic/get", req)
+      this.masterService.masterPost("generic/query", req)
     );
     if (res.success && res.data) {
       const data = res.data;
@@ -313,20 +630,31 @@ export class AddWorkOrderComponent implements OnInit {
         autocompleteValidator(),
       ]);
       await this.getVendorData();
+      await this.getVendorLocation();
     }
   }
   async getVendorData() {
     let req = {
       companyCode: this.storage.companyCode,
       collectionName: "vendor_detail",
-      filter: { companyCode: this.storage.companyCode },
+      filters: [
+        { D$match: { companyCode: this.storage.companyCode } },
+        {
+          D$project: {
+            vendorName: 1,
+            vendorCode: 1,
+            vendorLocation: 1,
+            _id: 0,
+          },
+        },
+      ],
     };
     const res = await firstValueFrom(
-      this.masterService.masterPost("generic/get", req)
+      this.masterService.masterPost("generic/query", req)
     );
     if (res.success && res.data) {
-      const data = res.data;
-      const vendordata = data.map((x) => {
+      this.vendorData = res.data;
+      const vendordata = this.vendorData.map((x) => {
         return {
           name: x.vendorName,
           value: x.vendorCode,
@@ -342,43 +670,50 @@ export class AddWorkOrderComponent implements OnInit {
     }
   }
   async getVendorLocation() {
-    const value = this.WorkOrderForm.controls["vendor"].value;
-    let req = {
-      companyCode: this.storage.companyCode,
-      collectionName: "vendor_detail",
-      filter: { companyCode: this.storage.companyCode, vendorName: value.name },
-    };
-    const res = await firstValueFrom(
-      this.masterService.masterPost("generic/get", req)
+    if (!this.vendorData) {
+      return;
+    }
+    const value = this.WorkOrderForm.controls["vendor"].value.name;
+    const selectedVendor = this.vendorData.find(
+      (vendor) => vendor.vendorName === value
     );
-    if (res.success && res.data) {
-      const data = res.data;
-      const vendordata = data[0];
-      const vendorlocation = vendordata.vendorLocation;
-      let locreq = {
-        companyCode: this.storage.companyCode,
-        collectionName: "location_detail",
-        filter: { locCode: { D$in: vendorlocation } },
-      };
-      const locRes = await firstValueFrom(
-        this.masterService.masterPost("generic/get", locreq)
+    let locreq = {
+      companyCode: this.storage.companyCode,
+      collectionName: "location_detail",
+      filters: [
+        {
+          D$match: {
+            companyCode: this.storage.companyCode,
+            locCode: { D$in: selectedVendor.vendorLocation },
+          },
+        },
+        {
+          D$project: {
+            locCode: 1,
+            locName: 1,
+            _id: 0,
+          },
+        },
+      ],
+    };
+    const locRes = await firstValueFrom(
+      this.masterService.masterPost("generic/query", locreq)
+    );
+    if (locRes.success && locRes.data) {
+      const res = locRes.data;
+      const locdata = res.map((x) => {
+        return {
+          name: x.locCode,
+          value: x.locName,
+        };
+      });
+      this.filter.Filter(
+        this.jsonControlWorkOrderArray,
+        this.WorkOrderForm,
+        locdata,
+        this.location,
+        this.locationStatus
       );
-      if (locRes.success && locRes.data) {
-        const locdata = locRes.data;
-        const dropdowndata = locdata.map((x) => {
-          return {
-            name: x.locCode,
-            value: x.locName,
-          };
-        });
-        this.filter.Filter(
-          this.jsonControlWorkOrderArray,
-          this.WorkOrderForm,
-          dropdowndata,
-          this.location,
-          this.locationStatus
-        );
-      }
     }
   }
   CalculateTotalServiceCost() {
@@ -401,8 +736,43 @@ export class AddWorkOrderComponent implements OnInit {
     const totalLabourCost = costvalue * labourhoursvalue;
     this.LabourDetailsForm.controls["LabourC"].patchValue(totalLabourCost);
   }
-  // one single method for checking all current values and new values and if same fire valiation.
+  CalculateServiceKm() {
+    const startkm = this.WorkOrderForm.controls["startKmRead"].value;
+    if (this.isClose) {
+      const closekm = this.WorkOrderForm.controls["closeKmRead"].value;
+      if (closekm <= startkm) {
+        // Show error message with SweetAlert
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Kilometer Readings",
+          text: "Closing kilometers cannot be less or equal to starting kilometers.",
+        }).then(() => {
+          this.WorkOrderForm.controls["closeKmRead"].reset();
+          this.WorkOrderForm.controls["ServiceKm"].reset();
+        });
+        return;
+      }
+      const serviceKm = closekm - startkm;
+      this.WorkOrderForm.controls["ServiceKm"].patchValue(serviceKm);
+    } else {
+      const joborderstartkm = this.menuItemData.data.sKM;
+      if (startkm < joborderstartkm) {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Input",
+          text: `The starting kilometer should be at least ${joborderstartkm}. Please enter a value greater than or equal to ${joborderstartkm}.`,
+          confirmButtonText: "OK",
+        }).then(() => {
+          this.WorkOrderForm.controls["startKmRead"].reset();
+        });
+      }
+    }
+  }
+  // one single method for checking all current values and new values and if same values  fire valiation.
   validateCurrentAndNewValues() {
+    if (!this.isClose) {
+      return;
+    }
     // Determine which form is currently being processed
     let formValues, formControls;
     if (this.BatteryChangeForm && this.BatteryChangeForm.dirty) {
@@ -421,7 +791,7 @@ export class AddWorkOrderComponent implements OnInit {
             const currentValue = formValues[key];
             const newValue = formValues[newKey];
             // Perform the validation
-            if (newValue === currentValue) {
+            if (newValue == currentValue) {
               Swal.fire({
                 icon: "error",
                 title: "Validation Error",
@@ -491,11 +861,11 @@ export class AddWorkOrderComponent implements OnInit {
       ...value,
       id: ServiceDetailTablelength + 1,
       StartDTM: moment(value.StartDTM).format("DD-MM-yy HH:mm"),
-      // EndDTM: moment(value.EndDTM).format("DD-MM-yy HH:mm"),
-      actions: ["Edit", "Remove"],
+      EndDTM: this.isClose ? moment(value.EndDTM).format("DD-MM-yy HH:mm") : "",
+      actions: this.isClose ? ["Edit"] : ["Edit", "Remove"],
     };
     this.tableData1 = [...this.tableData1, newEntry];
-    this.updateTotalTableValues(this.tableData1,this.tableData2);
+    this.updateTotalTableValues(this.tableData1, this.tableData2);
     this.SetServiceData();
     this.ServiceDetailsForm.reset();
   }
@@ -509,8 +879,8 @@ export class AddWorkOrderComponent implements OnInit {
       ...value,
       id: SpareDetailTablelength + 1,
       StartDTM: moment(value.StartDTM).format("DD-MM-yy HH:mm"),
-      // EndDTM: moment(value.EndDTM).format("DD-MM-yy HH:mm"),
-      actions: ["Edit", "Remove"],
+      EndDTM: this.isClose ? moment(value.EndDTM).format("DD-MM-yy HH:mm") : "",
+      actions: this.isClose ? ["Edit"] : ["Edit", "Remove"],
     };
     this.tableData2 = [...this.tableData2, newEntry];
     this.updateTotalTableValues(this.tableData1, this.tableData2);
@@ -524,7 +894,7 @@ export class AddWorkOrderComponent implements OnInit {
     const newEntry = {
       ...value,
       id: TyreDetailTablelength + 1,
-      actions: ["Edit", "Remove"],
+      actions: this.isClose ? ["Edit"] : ["Edit", "Remove"],
     };
     this.tableData3 = [...this.tableData3, newEntry];
     this.TyreDetailsForm.reset();
@@ -560,9 +930,9 @@ export class AddWorkOrderComponent implements OnInit {
       StartDTM: parsedStartDTM,
       EndDTM: parsedEndDTM,
     };
-    this.ServiceDetailsForm.setValue(formValues);
+    this.ServiceDetailsForm.patchValue(formValues);
     this.tableData1 = this.tableData1.filter((x) => x.id !== data.data.id);
-    this.updateTotalTableValues(this.tableData1,this.tableData2);
+    this.updateTotalTableValues(this.tableData1, this.tableData2);
   }
   fillSpareData(data) {
     const {
@@ -597,7 +967,7 @@ export class AddWorkOrderComponent implements OnInit {
       StartDTM: parsedStartDTM,
       EndDTM: parsedEndDTM,
     };
-    this.SpareDetailsForm.setValue(formValues);
+    this.SpareDetailsForm.patchValue(formValues);
     this.tableData2 = this.tableData2.filter((x) => x.id !== data.data.id);
     this.updateTotalTableValues(this.tableData1, this.tableData2);
   }
@@ -620,7 +990,7 @@ export class AddWorkOrderComponent implements OnInit {
       ChangeReason,
       Comment,
     };
-    this.TyreDetailsForm.setValue(formValues);
+    this.TyreDetailsForm.patchValue(formValues);
     this.tableData3 = this.tableData3.filter((x) => x.id !== data.data.id);
   }
   SetServiceData() {
@@ -659,7 +1029,7 @@ export class AddWorkOrderComponent implements OnInit {
   fillServiceDetails(data) {
     if (data.label.label === "Remove") {
       this.tableData1 = this.tableData1.filter((x) => x.id !== data.data.id);
-      this.updateTotalTableValues(this.tableData1,this.tableData2);
+      this.updateTotalTableValues(this.tableData1, this.tableData2);
     } else {
       const atLeastOneValuePresent = Object.keys(
         this.ServiceDetailsForm.controls
@@ -775,21 +1145,17 @@ export class AddWorkOrderComponent implements OnInit {
     }
   }
   async getWorkOrdersData() {
-    const requestObject = {
-      companyCode: this.storage.companyCode,
-      collectionName: "work_order_headers",
-    };
-    const res = await firstValueFrom(
-      this.operation.operationPost("generic/get", requestObject)
-    );
-    if (res.success) {
-      const data = res.data;
-      const lastWorkOrder = data[data.length - 1];
-      const lastWorkNo = lastWorkOrder.wORKNO;
+    const res = await this.joborder.getSingleWorkOrderData({
+      cID: this.storage.companyCode,
+    });
+    if (res) {
+      const data = res;
+      const lastWorkNo = data.wORKNO;
       const lastFiveDigits = lastWorkNo.split("/").pop();
-      this.counter = parseInt(lastFiveDigits);
+      this.counter = parseInt(lastFiveDigits, 10); // Convert to integer
     }
   }
+
   ResetLocationFormField() {
     this.WorkOrderForm.controls["location"].reset();
   }
@@ -808,26 +1174,33 @@ export class AddWorkOrderComponent implements OnInit {
     this.tableData2 = [];
     this.tableData3 = [];
   }
-  async createData(collectionName, data) {
+  async createData(collectionName, data, isHistory = false) {
+    const finalCollectionName = isHistory
+      ? `${collectionName}_history`
+      : collectionName;
     try {
       const createReq = {
-        companyCode: this.companyCode,
-        collectionName,
+        companyCode: this.storage.companyCode,
+        collectionName: finalCollectionName,
         data,
-        filter: { companyCode: this.companyCode },
+        filter: { cID: this.storage.companyCode },
       };
       const res = await firstValueFrom(
-        this.operation.operationPost("generic/create", createReq)
+        this.masterService.masterPost("generic/create", createReq)
       );
       if (res.success) {
-        console.log("data Created");
+        console.log("Data created in collection:", finalCollectionName);
       }
     } catch (err) {
-      console.error(`Error creating data`, err);
+      console.error(
+        `Error creating data in collection ${finalCollectionName}`,
+        err
+      );
     }
   }
-  generateMaintenanceData(randomNumber) {
-    return {
+
+  generateMaintenanceData(randomNumber?) {
+    const data = {
       _id: `${this.storage.companyCode}-${randomNumber}`,
       cID: this.storage.companyCode,
       jOBNO: this.WorkOrderForm.controls["orderNo"].value,
@@ -871,57 +1244,100 @@ export class AddWorkOrderComponent implements OnInit {
       mODDT: null,
       mODLOC: null,
     };
+    if (this.isUpdate || this.isClose) {
+      ["_id", "cID", "jOBNO", "wORKNO", "eNTBY", "eNTDT", "eNTLOC"].forEach(
+        (key) => delete data[key]
+      );
+      data.mODBY = this.storage.userName;
+      data.mODDT = new Date();
+      data.mODLOC = this.storage.branch;
+    }
+    if (this.isClose) {
+      const targets = [data.sMRY.lBH, data.sMRY.lBC, data.sMRY.sPC];
+      targets.forEach((target) => {
+        target.cLSBY = this.storage.userName;
+        target.cLSDT = new Date();
+      });
+    }
+    return data;
   }
   generateServiceData(randomNumber) {
-    return this.tableData1.map((x, i) => ({
-      _id: `${this.storage.companyCode}-${randomNumber}-${i + 1}`,
-      cID: this.storage.companyCode,
-      jOBNO: this.WorkOrderForm.controls["orderNo"].value,
-      wORKNO: randomNumber,
-      tSGRP: x.TaskGroup,
-      tASK: x.Task,
-      mAINTP: x.MaintenanceType,
-      eSTHRS: x.Estimatedhours,
-      hCST: x.Hourlycost,
-      cST: x.Cost,
-      aPCST: x.ApprovedCost,
-      mECNIC: x.Mechanic,
-      sDTM: x.StartDTM,
-      eDTM: null,
-      eNTBY: this.storage.userName,
-      eNTDT: new Date(),
-      eNTLOC: this.storage.branch,
-      mODBY: null,
-      mODDT: null,
-      mODLOC: null,
-    }));
+    return this.tableData1.map((x, i) => {
+      const data = {
+        _id: `${this.storage.companyCode}-${randomNumber}-${i + 1}`,
+        cID: this.storage.companyCode,
+        jOBNO: this.WorkOrderForm.controls["orderNo"].value,
+        wORKNO: randomNumber,
+        tSGRP: x.TaskGroup,
+        tASK: x.Task,
+        mAINTP: x.MaintenanceType,
+        eSTHRS: x.Estimatedhours,
+        hCST: x.Hourlycost,
+        cST: x.Cost,
+        aPCST: null,
+        mECNIC: x.Mechanic,
+        sDTM: x.StartDTM,
+        eDTM: null,
+        eNTBY: this.storage.userName,
+        eNTDT: new Date(),
+        eNTLOC: this.storage.branch,
+        mODBY: null,
+        mODDT: null,
+        mODLOC: null,
+      };
+
+      if (this.isUpdate || this.isClose) {
+        data.mODBY = this.storage.userName;
+        data.mODDT = new Date();
+        data.mODLOC = this.storage.branch;
+      }
+      if (this.isClose) {
+        data.aPCST = x.ApprovedCost;
+        data.eDTM = x.EndDTM;
+      }
+      return data;
+    });
   }
   generateSpareData(randomNumber) {
-    return this.tableData2.map((x, i) => ({
-      _id: `${this.storage.companyCode}-${randomNumber}-${i + 1}`,
-      cID: this.storage.companyCode,
-      jOBNO: this.WorkOrderForm.controls["orderNo"].value,
-      wORKNO: randomNumber,
-      tSGRP: x.TaskGroup,
-      tASK: x.Task,
-      mAINTP: x.MaintenanceType,
-      eSTHRS: x.Estimatedhours,
-      hCST: x.Hourlycost,
-      cST: x.Cost,
-      aPCST: x.ApprovedCost,
-      mECNIC: x.Mechanic,
-      sDTM: x.StartDTM,
-      eDTM: null,
-      eNTBY: this.storage.userName,
-      eNTDT: new Date(),
-      eNTLOC: this.storage.branch,
-      mODBY: null,
-      mODDT: null,
-      mODLOC: null,
-    }));
+    return this.tableData2.map((x, i) => {
+      const data = {
+        _id: `${this.storage.companyCode}-${randomNumber}-${i + 1}`,
+        cID: this.storage.companyCode,
+        jOBNO: this.WorkOrderForm.controls["orderNo"].value,
+        wORKNO: randomNumber,
+        tSGRP: x.TaskGroup,
+        sPRt: x.SparePart,
+        mAINTP: x.MaintenanceType,
+        sTO: x.Stock,
+        qUAN: x.Quantity,
+        cST: x.CostOrUnit,
+        TcST: x.TCost,
+        aPCST: null,
+        mECNIC: x.Mechanic,
+        sDTM: x.StartDTM,
+        eDTM: null,
+        eNTBY: this.storage.userName,
+        eNTDT: new Date(),
+        eNTLOC: this.storage.branch,
+        mODBY: null,
+        mODDT: null,
+        mODLOC: null,
+      };
+
+      if (this.isUpdate || this.isClose) {
+        data.mODBY = this.storage.userName;
+        data.mODDT = new Date();
+        data.mODLOC = this.storage.branch;
+      }
+      if (this.isClose) {
+        data.aPCST = x.ApprovedCost;
+        data.eDTM = x.EndDTM;
+      }
+      return data;
+    });
   }
-  generateBatteryData(randomNumber) {
-    return {
+  generateBatteryData(randomNumber?) {
+    const data = {
       _id: `${this.storage.companyCode}-${randomNumber}`,
       cID: this.storage.companyCode,
       jOBNO: this.WorkOrderForm.controls["orderNo"].value,
@@ -943,7 +1359,7 @@ export class AddWorkOrderComponent implements OnInit {
         rPL: null,
       },
       mECNIC: this.LabourDetailsForm.controls["Mechanic"].value,
-      cOSTPHRS: this.LabourDetailsForm.controls["CostH"].value,
+      cSTH: this.LabourDetailsForm.controls["CostH"].value,
       lBH: this.LabourDetailsForm.controls["LabourH"].value,
       lBCST: this.LabourDetailsForm.controls["LabourC"].value,
       eNTBY: this.storage.userName,
@@ -953,30 +1369,59 @@ export class AddWorkOrderComponent implements OnInit {
       mODDT: null,
       mODLOC: null,
     };
+    if (this.isUpdate || this.isClose) {
+      ["_id", "cID", "jOBNO", "wORKNO", "eNTBY", "eNTDT", "eNTLOC"].forEach(
+        (key) => delete data[key]
+      );
+      data.mODBY = this.storage.userName;
+      data.mODDT = new Date();
+      data.mODLOC = this.storage.branch;
+    }
+    if (this.isClose) {
+      data.sRL.rPL = this.BatteryChangeForm.controls["NSerial"].value;
+      data.oEM.rPL = this.BatteryChangeForm.controls["NOEM"].value;
+      data.mDL.rPL = this.BatteryChangeForm.controls["NModel"].value;
+      data.rESN.rPL = this.BatteryChangeForm.controls["NReason"].value ?? null;
+    }
+    return data;
   }
   generateTyreData(randomNumber) {
-    return this.tableData3.map((x, i) => ({
-      _id: `${this.storage.companyCode}-${randomNumber}-${i + 1}`,
-      cID: this.storage.companyCode,
-      jOBNO: this.WorkOrderForm.controls["orderNo"].value,
-      wORKNO: randomNumber,
-      pSN: x.position,
-      cTID: x.CTyreID,
-      oNMODL: x.OEMandModel,
-      nTID: null,
-      nONMODL: null,
-      cREASON: null,
-      cMT: null,
-      eNTBY: this.storage.userName,
-      eNTDT: new Date(),
-      eNTLOC: this.storage.branch,
-      mODBY: null,
-      mODDT: null,
-      mODLOC: null,
-    }));
+    return this.tableData3.map((x, i) => {
+      const data = {
+        _id: `${this.storage.companyCode}-${randomNumber}-${i + 1}`,
+        cID: this.storage.companyCode,
+        jOBNO: this.WorkOrderForm.controls["orderNo"].value,
+        wORKNO: randomNumber,
+        pSN: x.position,
+        cTID: x.CTyreID,
+        oNMODL: x.COEMandModel,
+        nTID: null,
+        nONMODL: null,
+        cREASON: null,
+        cMT: null,
+        eNTBY: this.storage.userName,
+        eNTDT: new Date(),
+        eNTLOC: this.storage.branch,
+        mODBY: null,
+        mODDT: null,
+        mODLOC: null,
+      };
+
+      if (this.isUpdate || this.isClose) {
+        data.mODBY = this.storage.userName;
+        data.mODDT = new Date();
+        data.mODLOC = this.storage.branch;
+      }
+      if (this.isClose) {
+        (data.nONMODL = x.NOEMandModel),
+          (data.nTID = x.NTyreID),
+          (data.cREASON = x.ChangeReason);
+      }
+      return data;
+    });
   }
-  generateLabourData(randomNumber) {
-    return {
+  generateLabourData(randomNumber?) {
+    const data = {
       _id: `${this.storage.companyCode}-${randomNumber}`,
       cID: this.storage.companyCode,
       jOBNO: this.WorkOrderForm.controls["orderNo"].value,
@@ -992,39 +1437,235 @@ export class AddWorkOrderComponent implements OnInit {
       mODDT: null,
       mODLOC: null,
     };
-  }
-  async processMaintenance(randomNumber) {
-    const maintenancedata = this.generateMaintenanceData(randomNumber);
-    await this.createData("work_maintenance", maintenancedata);
-
-    const servicedata = this.generateServiceData(randomNumber);
-    for (const x of servicedata) {
-      await this.createData("work_maintenance_service", x);
+    if (this.isUpdate || this.isClose) {
+      ["_id", "cID", "jOBNO", "wORKNO", "eNTBY", "eNTDT", "eNTLOC"].forEach(
+        (key) => delete data[key]
+      );
+      data.mODBY = this.storage.userName;
+      data.mODDT = new Date();
+      data.mODLOC = this.storage.branch;
     }
+    return data;
+  }
+  modifyIds(data: any[]) {
+    return data.map((item) => ({
+      ...item,
+      _id: `${item._id}-${Math.floor(Math.random() * 100000)}`,
+    }));
+  }
+  generateUniqueId(currentId) {
+    return `${currentId}-${Math.floor(Math.random() * 100000)}`;
+  }
 
+  async processMaintenance(
+    randomNumber,
+    isHistory = false,
+    historyData = null,
+    historyServiceData = null,
+    historySpareData = null
+  ) {
+    if (!this.isUpdate && !this.isClose) {
+      const maintenanceData = isHistory
+        ? historyData
+        : this.generateMaintenanceData(randomNumber);
+      await this.createData("work_maintenance", maintenanceData, isHistory);
+    }
+    const serviceData = isHistory
+      ? historyServiceData
+      : this.generateServiceData(randomNumber);
+    for (const item of serviceData) {
+      await this.createData("work_maintenance_service", item, isHistory);
+    }
+    const spareData = isHistory
+      ? historySpareData
+      : this.generateSpareData(randomNumber);
     if (this.tableData2.length > 0) {
-      const sparedata = this.generateSpareData(randomNumber);
-      for (const x of sparedata) {
-        await this.createData("work_maintenance_spair", x);
+      for (const item of spareData) {
+        await this.createData("work_maintenance_spair", item, isHistory);
       }
     }
   }
-  async processBatteryManagement(randomNumber) {
-    const batteryData = this.generateBatteryData(randomNumber);
-    await this.createData("work_battery", batteryData);
+  async processBatteryManagement(
+    randomNumber,
+    isHistory = false,
+    historyData = null
+  ) {
+    const batteryData = isHistory
+      ? historyData
+      : this.generateBatteryData(randomNumber);
+    await this.createData("work_battery", batteryData, isHistory);
+  }
+  async processTyreManagement(
+    randomNumber,
+    isHistory = false,
+    historyTyreData = null,
+    historyLabourData = null
+  ) {
+    const tyreData = isHistory
+      ? historyTyreData
+      : this.generateTyreData(randomNumber);
+    for (const x of tyreData) {
+      await this.createData("work_tyre", x, isHistory);
+    }
+    if ((!this.isUpdate && !this.isClose) || isHistory) {
+      const labourData = isHistory
+        ? historyLabourData
+        : this.generateLabourData(randomNumber);
+      await this.createData("work_tyre_details", labourData, isHistory);
+    }
   }
 
-  async processTyreManagement(randomNumber) {
-    const tyreData = this.generateTyreData(randomNumber);
-    for (const x of tyreData) {
-      await this.createData("work_tyre", x);
+  async deleteDocumentsFromCollection(collectionName, filter) {
+    const reqbody = {
+      companyCode: this.storage.companyCode,
+      collectionName: collectionName,
+      filter: filter,
+    };
+    await firstValueFrom(
+      this.masterService.masterMongoRemove("generic/removeAll", reqbody)
+    );
+  }
+  async handleHistoryData() {
+    this.historyworkOrderData._id = this.generateUniqueId(
+      this.historyworkOrderData._id
+    );
+    await this.createData(
+      "work_order_headers",
+      this.historyworkOrderData,
+      true
+    );
+    switch (this.selectedcategory) {
+      case "Maintenance":
+        const servicedata = this.modifyIds(this.historyMaintenaceServiceData);
+        const sparedata = this.modifyIds(this.historyMaintenaceSpareData);
+        await this.processMaintenance(
+          this.workOrderNo,
+          true,
+          null,
+          servicedata,
+          sparedata
+        );
+        break;
+      case "Battery management":
+        this.historyBatteryData[0]._id = this.generateUniqueId(
+          this.historyBatteryData[0]._id
+        );
+        await this.processBatteryManagement(
+          this.workOrderNo,
+          true,
+          this.historyBatteryData
+        );
+        break;
+      case "Tyre management":
+        const tyredata = this.modifyIds(this.historyTyreManagnmentData);
+        this.historyTyreDetailsData[0]._id = `${
+          this.historyTyreDetailsData[0]._id
+        }-${Math.floor(Math.random() * 100000)}`;
+        await this.processTyreManagement(
+          this.workOrderNo,
+          true,
+          tyredata,
+          this.historyTyreDetailsData
+        );
+        break;
+      default:
+        return;
     }
-    const labourData = this.generateLabourData(randomNumber);
-    await this.createData("work_tyre_details", labourData);
+  }
+  validateTableData(tables): any {
+    const errors = [];
+    tables.forEach(({ tableData, tableName }) => {
+      // Check if tableData is not empty
+      if (tableData && tableData.length > 0) {
+        tableData.forEach((data, rowIndex) => {
+          const nullKeys = Object.keys(data).filter(
+            (key) => data[key] === null
+          );
+          if (nullKeys.length > 0) {
+            const errorText = nullKeys.map((key) => `"${key}"`).join(", ");
+            errors.push(
+              `Table: ${tableName}, Row: ${rowIndex + 1}, Empty: ${errorText}`
+            );
+          }
+        });
+      }
+    });
+    if (errors.length > 0) {
+      Swal.fire({
+        title: "Validation Error",
+        html: errors.join("<br/>"), // Join all errors into a single string with line breaks
+        icon: "error",
+      });
+      return true; // Validation failed
+    }
+    return false; // Validation passed
+  }
+  checkFormsForValues() {
+    const formsToCheck = [
+      { form: this.ServiceDetailsForm, name: "Service Details" },
+      { form: this.SpareDetailsForm, name: "Spare Details" },
+      { form: this.TyreDetailsForm, name: "Tyre Details" },
+    ];
+
+    // Track forms with values
+    const formsWithValues = formsToCheck
+      .filter((formObj) => {
+        const form = formObj.form;
+        const formName = formObj.name;
+
+        // Check if any control in the form has a value
+        const hasValues = Object.keys(form.controls).some((key) => {
+          const control = form.get(key);
+          return (
+            control &&
+            control.value !== null &&
+            control.value !== undefined &&
+            control.value !== ""
+          );
+        });
+
+        if (hasValues) {
+          return formName;
+        }
+      })
+      .map((formObj) => formObj.name);
+
+    // If any form has values, show SweetAlert
+    if (formsWithValues.length > 0) {
+      const formNamesMessage = formsWithValues
+        .map((name) => `"${name}"`)
+        .join(", ");
+
+      Swal.fire({
+        title: `Form(s) have values`,
+        html: `The following form(s) have values:<br>${formNamesMessage}.<br>Please add the values using the "Add New" button before proceeding.`,
+        icon: "error",
+        confirmButtonText: "Okay",
+      });
+
+      return true; // Validation failed
+    }
+
+    return false; // Validation passed
   }
 
   async save() {
-    const newNumberString = this.counter + 1;
+    if (this.checkFormsForValues()) {
+      return;
+    }
+    if (this.isClose) {
+      if (
+        this.validateTableData([
+          { tableData: this.tableData1, tableName: "Service Details" },
+          { tableData: this.tableData2, tableName: "Spare Details" },
+          { tableData: this.tableData3, tableName: "Tyre Details" },
+        ])
+      ) {
+        return;
+      }
+    }
+    this.counter += 1;
+    const newNumberString = this.counter.toString().padStart(6, "0");
     const currentYear = new Date().getFullYear();
     const nextYear = currentYear + 1;
     const currentYearShort = currentYear.toString().slice(-2);
@@ -1036,21 +1677,7 @@ export class AddWorkOrderComponent implements OnInit {
       "/" +
       yearSegment +
       "/" +
-      `0000${newNumberString}`;
-
-    switch (this.selectedcategory) {
-      case "Maintenance":
-        await this.processMaintenance(randomNumber);
-        break;
-      case "Battery management":
-        await this.processBatteryManagement(randomNumber);
-        break;
-      case "Tyre management":
-        await this.processTyreManagement(randomNumber);
-        break;
-      default:
-        return;
-    }
+      `${newNumberString}`;
     const data = {
       _id: `${this.storage.companyCode}-${randomNumber}`,
       cID: this.storage.companyCode,
@@ -1059,19 +1686,26 @@ export class AddWorkOrderComponent implements OnInit {
       wORKNO: randomNumber,
       jDT: this.WorkOrderForm.controls["orderdate"].value,
       cATEGORY: this.WorkOrderForm.controls["ordercategory"].value,
-      sCATEGORY: "Accident",
+      sCATEGORY: this.WorkOrderForm.controls["subcategory"].value.name,
       tYPE: this.WorkOrderForm.controls["workshoptype"].value,
       vEND: null,
+      vLOC: null,
       lOC: this.storage.branch,
-      sDT: null,
-      eRDT: null,
+      sDT: this.WorkOrderForm.controls["sentdate"].value,
+      eRDT: this.WorkOrderForm.controls["estimatereturndate"].value,
       aRDT: null,
       sKM: this.WorkOrderForm.controls["startKmRead"].value,
-      cKM: this.WorkOrderForm.controls["closeKmRead"].value,
-      sVCKM: this.WorkOrderForm.controls["ServiceKm"].value,
-      hOBY: this.WorkOrderForm.controls["handedover"].value.name,
-      sUPV: this.WorkOrderForm.controls["supervisor"].value.name,
-      rTRNTO: this.WorkOrderForm.controls["returnto"].value,
+      cKM: null,
+      sVCKM: null,
+      hOBYD: {
+        hOBYNM: this.WorkOrderForm.controls["handedover"].value.name,
+        hOBYCD: this.WorkOrderForm.controls["handedover"].value.value,
+      },
+      sUPVD: {
+        sUPVNM: this.WorkOrderForm.controls["supervisor"].value.name,
+        sUPCD: this.WorkOrderForm.controls["supervisor"].value.value,
+      },
+      rTRNTO: null,
       sTATUS: "Generated",
       cLTP: null,
       vEHD: {
@@ -1103,41 +1737,144 @@ export class AddWorkOrderComponent implements OnInit {
         vCD: this.WorkOrderForm.controls["vendor"].value.value,
         vNM: this.WorkOrderForm.controls["vendor"].value.name,
       };
+      data.vLOC = {
+        vLOCD: this.WorkOrderForm.controls["location"].value.value,
+        vLOCNM: this.WorkOrderForm.controls["location"].value.name,
+      };
     }
-    const createReq = {
-      companyCode: this.companyCode,
-      collectionName: "work_order_headers",
-      data: data,
-      filter: { companyCode: this.companyCode },
-    };
-    const res = await firstValueFrom(
-      this.operation.operationPost("generic/create", createReq)
-    );
-    await this.getJobOrderData();
-    if (res.success) {
-      Swal.fire({
-        icon: "success",
-        title: "Successful",
-        text: "Record added Successfully",
-        showConfirmButton: true,
-      });
-      this.router.navigateByUrl("/Operation/JobOrder");
+    if (this.isUpdate || this.isClose) {
+      const id = this.WorkOrderModel?._id;
+      [
+        "_id",
+        "cID",
+        "jOBNO",
+        "docNo",
+        "wORKNO",
+        "jDT",
+        "cATEGORY",
+        "eNTBY",
+        "eNTDT",
+        "eNTLOC",
+        "vEHD",
+        "vEHNO",
+      ].forEach((key) => delete data[key]);
+      data.sTATUS = this.isClose ? "Closed" : "Updated";
+      data.mODBY = this.storage.userName;
+      data.mODDT = new Date();
+      data.mODLOC = this.storage.branch;
+      if (this.isClose) {
+        data.aRDT = this.WorkOrderForm.controls["actualreturndate"].value;
+        data.cKM = this.WorkOrderForm.controls["closeKmRead"].value;
+        data.sVCKM = this.WorkOrderForm.controls["ServiceKm"].value;
+        data.rTRNTO = this.WorkOrderForm.controls["returnto"].value;
+        data.cSBY = this.storage.userName;
+        data.cSDT = new Date();
+      }
+      switch (this.selectedcategory) {
+        case "Maintenance":
+          const maintData = this.generateMaintenanceData();
+          await this.joborder.updateWorkOrder(
+            "work_maintenance",
+            { wORKNO: this.workOrderNo },
+            maintData
+          );
+          await this.deleteDocumentsFromCollection("work_maintenance_service", {
+            wORKNO: this.workOrderNo,
+          });
+          if (
+            (this.isUpdate && this.historyMaintenaceSpareData.length) ||
+            (this.isClose && this.tableData2.length)
+          ) {
+            await this.deleteDocumentsFromCollection("work_maintenance_spair", {
+              wORKNO: this.workOrderNo,
+            });
+          }
+          await this.processMaintenance(this.workOrderNo);
+          break;
+        case "Battery management":
+          const data = this.generateBatteryData();
+          await this.joborder.updateWorkOrder(
+            "work_battery",
+            { wORKNO: this.workOrderNo },
+            data
+          );
+          break;
+        case "Tyre management":
+          const labourdata = this.generateLabourData();
+          await this.joborder.updateWorkOrder(
+            "work_tyre_details",
+            { wORKNO: this.workOrderNo },
+            labourdata
+          );
+          await this.deleteDocumentsFromCollection("work_tyre", {
+            wORKNO: this.workOrderNo,
+          });
+          await this.processTyreManagement(this.workOrderNo);
+          break;
+        default:
+          return;
+      }
+      const res = await this.joborder.updateWorkOrder(
+        "work_order_headers",
+        { _id: id },
+        data
+      );
+      if (res) {
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: this.isClose
+            ? "Work Order Closed Successfully"
+            : "Record updated Successfully",
+          showConfirmButton: true,
+        }).then(() => {
+          this.router.navigateByUrl("/Operation/JobOrder");
+        });
+      }
+      if (this.isUpdate) {
+        await this.handleHistoryData();
+      }
+    } else {
+      switch (this.selectedcategory) {
+        case "Maintenance":
+          await this.processMaintenance(randomNumber);
+          break;
+        case "Battery management":
+          await this.processBatteryManagement(randomNumber);
+          break;
+        case "Tyre management":
+          await this.processTyreManagement(randomNumber);
+          break;
+        default:
+          return;
+      }
+      const createReq = {
+        companyCode: this.storage.companyCode,
+        collectionName: "work_order_headers",
+        data: data,
+        filter: { cID: this.storage.companyCode },
+      };
+      const res = await firstValueFrom(
+        this.masterService.masterPost("generic/create", createReq)
+      );
+      await this.getJoborderdata();
+      if (res.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: "Record added Successfully",
+          showConfirmButton: true,
+        });
+        this.router.navigateByUrl("/Operation/JobOrder");
+      }
     }
   }
-  async getJobOrderData() {
+  async getJoborderdata() {
     try {
       const JobOrdervalue = this.WorkOrderForm.controls["orderNo"].value;
-      const requestObject = {
-        companyCode: this.storage.companyCode,
-        collectionName: "job_order_headers",
-        filter: { jOBNO: JobOrdervalue },
-      };
-
-      const res = await firstValueFrom(
-        this.operation.operationPost("generic/get", requestObject)
-      );
-      if (res.success && res.data && res.data.length > 0) {
-        await this.updateWorkOrderCount(res.data[0]);
+      const res = await this.joborder.getJobOrderData({ jOBNO: JobOrdervalue });
+      if (res) {
+        await this.updateWorkOrderCount(res[0]);
       }
     } catch (error) {
       console.error("Error getting job order data:", error);
@@ -1152,7 +1889,7 @@ export class AddWorkOrderComponent implements OnInit {
         update: { wCNO: data.wCNO + 1 },
       };
       await firstValueFrom(
-        this.operation.operationPut("generic/update", requestObject)
+        this.masterService.masterPut("generic/update", requestObject)
       );
     } catch (error) {
       console.error("Error updating work order count:", error);

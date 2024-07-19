@@ -5,8 +5,36 @@
     (callFunction)="functionCallHandler($event)" [showSaveAndCancelButton]="false">
   </app-form-webxpress>
 </form>
-
+<form [formGroup]="departvehicleTableForm">
+  <app-form-webxpress [form]="departvehicleTableForm" [FormTitle]="'Vehicle Details'"
+      [formData]="departControlArray" (functionCallEmitter)="functionCallHandler($event)"
+      [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+  </app-form-webxpress>
+</form>
 <app-generic-card-webxpress [boxData]="boxData"></app-generic-card-webxpress>
+<div *ngIf="!isScan">
+  <app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="definition.columnHeader"
+  [tableData]="csv" [metaData]="metaData" 
+  [menuItems]="definition.menuItems"  [columnGroup]="definition.summaryGroup"[staticField]="definition.staticField" [Link]="linkArray" 
+  [stickyHeader]="true" [TableContainerStyle]="TableContainerStyle"[tableWidth]="tableWidth"
+  [maxWidth]="maxWidth"  [containerWidth]="containerWidth"(dialogClosed)="onDailogClose($event)" (functionCallEmitter)="functionCallHandler($event)" (menuItemClicked)="handleMenuItemClick($event)" [addAndEditPath]="addAndEditPath"
+  [menuItemFlag]="menuItemflag" (selectAllClicked)="OnLoading($event)"
+   [selectAllRequired]="selectAllRequired" (onFlagChange)="OnLoading($event)" [filterColumn]="filterColumn" [allColumnFilter]="allColumnFilter">
+  </app-generic-table-v2>
+  </div>
+<form [formGroup]="advanceTableForm">
+  <app-form-webxpress [form]="advanceTableForm" [FormTitle]="'Advance and Balance'"
+      [formData]="advanceControlArray" (functionCallEmitter)="functionCallHandler($event)"
+      [showSaveAndCancelButton]="false" (callFunction)="functionCallHandler($event)">
+  </app-form-webxpress>
+</form>
+<form [formGroup]="balanceTableForm">
+  <app-form-webxpress [form]="balanceTableForm" [FormTitle]="'Balance Amount'" [formData]="balanceControlArray"
+      (functionCallEmitter)="functionCallHandler($event)" [showSaveAndCancelButton]="false"
+      (callFunction)="functionCallHandler($event)">
+  </app-form-webxpress>
+</form>
+
 <div *ngIf="isScan">
 <div class="search-bar-container">
   <input #scanPackageInput type="text" placeholder="Scan..." [(ngModel)]="scanPackage" (change)="updatePackage()" class="search-bar-input">
@@ -23,21 +51,11 @@
 [showHeader]='false'>
 </app-generic-table-v2>
 </div>
-<div *ngIf="!isScan">
-<app-generic-table-v2 *ngIf="!tableload" [dynamicControls]="dynamicControls" [columnHeader]="definition.columnHeader"
-[tableData]="csv" [metaData]="metaData" 
-[menuItems]="definition.menuItems"  [columnGroup]="definition.summaryGroup"[staticField]="definition.staticField" [Link]="linkArray" 
-[stickyHeader]="true" [TableContainerStyle]="TableContainerStyle"[tableWidth]="tableWidth"
-[maxWidth]="maxWidth"  [containerWidth]="containerWidth"(dialogClosed)="onDailogClose($event)" (functionCallEmitter)="functionCallHandler($event)" (menuItemClicked)="handleMenuItemClick($event)" [addAndEditPath]="addAndEditPath"
-[menuItemFlag]="menuItemflag"
- [selectAllRequired]="selectAllRequired" (onFlagChange)="OnLoading($event)" [filterColumn]="filterColumn" [allColumnFilter]="allColumnFilter">
-</app-generic-table-v2>
-</div>
 
 <div class="row" *ngIf="!tableload">
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2 mt-2">
         <div class="example-button-row d-flex justify-content-end">
-            <button class="msr-3" mat-raised-button color="primary" (click)="CompleteScan()"[disabled]="!updateSheetTableForm.valid">Depart Delivery Vehicle</button>
+            <button class="msr-3" mat-raised-button color="primary" (click)="CompleteScan()"[disabled]="isSubmit">Depart Delivery Vehicle</button>
         </div>
     </div>
 </div>

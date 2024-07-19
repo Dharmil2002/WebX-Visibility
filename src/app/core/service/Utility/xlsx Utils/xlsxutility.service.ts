@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
 import * as XLSX from 'xlsx';
 import { Observable, catchError, firstValueFrom, forkJoin, map, of } from 'rxjs';
@@ -11,6 +10,7 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { StateService } from 'src/app/Utility/module/masters/state/state.service';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { UploadFieldType } from 'src/app/config/myconstants';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -36,7 +36,7 @@ export class xlsxutilityService {
   }
   //#region to fetch all pincode data
   async fetchAllPincodeData(pinChunks): Promise<any[]> {
-    console.log(this.storage.companyCode);
+    
     const chunks = chunkArray(pinChunks, 50);
 
     const promises = chunks.map(chunk =>
@@ -178,8 +178,7 @@ export class xlsxutilityService {
      const objectsWithoutErrors = results.filter(obj => obj.error === null).flat();
 
      // Concatenate the two arrays, putting objects without errors first
-     const sortedValidatedData = [...objectsWithoutErrors, ...objectsWithErrors];
-     console.log(sortedValidatedData);
+     const sortedValidatedData = [...objectsWithoutErrors, ...objectsWithErrors];     
      return sortedValidatedData;
   }
 
@@ -570,7 +569,9 @@ export class xlsxutilityService {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result != undefined) {
-        console.log(result);
+        if(!environment.production) {
+          console.log(result);
+        }
       }
     });
   }

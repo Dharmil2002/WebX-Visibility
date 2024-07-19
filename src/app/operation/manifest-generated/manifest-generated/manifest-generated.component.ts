@@ -82,44 +82,16 @@ export class ManifestGeneratedComponent implements OnInit {
 
     }
   }
-  getMenifest() {
-    let groupedDataWithoutKey;
-    const groupedData = this.menifest.reduce((acc, element) => {
-      const leg = element.Leg;
-      if (!acc[leg]) {
-        acc[leg] = {
-          Leg: leg,
-          TotalWeightKg: 0,
-          TotalVolumeCFT: 0,
-          TotalPackages: 0,
-          ShipmentCount: 0,
-          Data: []
-        };
-      }
-      acc[leg].TotalWeightKg += element.WeightKg;
-      acc[leg].TotalVolumeCFT += element.VolumeCFT;
-      acc[leg].TotalPackages += element.Packages;
-      acc[leg].ShipmentCount++;
-      acc[leg].Data.push(element);
-      return acc;
-    }, {});
-    groupedDataWithoutKey = Object.values(groupedData);
+  getMenifest() {    
     let MeniFestDetails: any[] = [];
-    groupedDataWithoutKey.forEach(element => {
-      let loadedWt = element.Data.reduce((acc, nestedElement) =>
-        acc + (Array.isArray(nestedElement.Data) ? nestedElement.Data.reduce((innerAcc, innerElement) => innerAcc + innerElement.lDWT, 0) : 0),
-        0);
-      let loadedPkgs = element.Data.reduce((acc, nestedElement) =>
-        acc + (Array.isArray(nestedElement.Data) ? nestedElement.Data.reduce((innerAcc, innerElement) => innerAcc + innerElement.lDPKG, 0) : 0),
-        0);
+    this.menifest.forEach(element => {    
       let meniFestjson = {
         MFNumber: this.mfNo,
         Leg: element?.Leg || '',
-        ShipmentsLoadedBooked: element.ShipmentCount + "/" + element.ShipmentCount,
-        PackagesLoadedBooked: `${element?.TotalPackages}` + "/" + `${loadedPkgs}`,
-        WeightKg: `${element?.TotalWeightKg}` + "/" + `${loadedWt}`,
-        // loadedPkg:`${element?.TotalPackages}`+"/"+`${loadedPkgs}`,
-        VolumeCFT: element.TotalVolumeCFT,
+        ShipmentsLoadedBooked: element.ShipmentCount,
+        PackagesLoadedBooked: `${element?.TotalPackages}` + "/" + `${element.Packages}`,
+        WeightKg: `${element?.TotalWeightKg}` + "/" + `${element.WeightKg}`,
+        VolumeCFT:  `${element?.TotalVolumeCFT}` + "/" + `${element.VolumeCFT}`,
         Action: "Print"
       }
       MeniFestDetails.push(meniFestjson)

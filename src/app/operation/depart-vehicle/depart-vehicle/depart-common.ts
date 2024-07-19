@@ -2,6 +2,7 @@ import { FormGroup } from "@angular/forms";
 import { runningNumber } from "src/app/Utility/date/date-utils";
 import { StoreKeys } from "src/app/config/myconstants";
 import * as StorageService from "src/app/core/service/storage.service";
+import Swal from "sweetalert2";
 
 /**
  * Retrieves loading sheet details for a specific trip and vehicle.
@@ -95,6 +96,17 @@ export function calculateTotalAdvances(form: FormGroup): void {
 // Calculates the balance amount based on total trip amount and total advances, and sets it in the form.
 export function calculateBalanceAmount(form: FormGroup, totalTripAmt): void {
     const totalAdv = parseFloat(form.controls['Advance'].value) || 0;
+
+    if(totalAdv > totalTripAmt) {
+        form.controls['Advance'].setValue(0);
+        Swal.fire({
+            icon: "warning",
+            title: "Validation",
+            text: `Advance Amount can not be greater than Total Trip Amount`,
+            showConfirmButton: true,
+          });
+        return;
+    }
     // Calculate the balance amount
     const balanceAmount = totalTripAmt - totalAdv;
 

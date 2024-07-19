@@ -508,6 +508,8 @@ export class ProductChargesComponent implements OnInit {
       { name: "ON GCN", value: "GCN" },
       { name: "On THC Generation", value: "THC" },
       { name: "ON Delivery MR", value: "DeliveryMR" },
+      { name: "Delivery RunSheet", value: "DRS" },
+      {name: "PickUp RunSheet", value: "PRS" },
     ];
 
     if (this.isUpdate && this.UpdatedData?.cHAPP) {

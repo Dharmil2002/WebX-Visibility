@@ -20,6 +20,8 @@ import { StockUpdate } from 'src/app/Models/stock-update/stock-update';
 import { showAlert } from 'src/app/Utility/message/sweet-alert';
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { DepsService } from 'src/app/Utility/module/operation/deps/deps-service';
+import { DocCalledAsModel } from 'src/app/shared/constants/docCalledAs';
+import { ConvertToNumber } from 'src/app/Utility/commonFunction/common';
 
 @Component({
   selector: 'app-update-loading-sheet',
@@ -41,14 +43,14 @@ export class UpdateLoadingSheetComponent implements OnInit {
   scanPackage: string;
   width: "20%"
   height: "90%"
-  shipingHeader = {
+  shipingHeader:any = {
     "Leg": "Leg",
     "Shipment": "Shipments",
     "Packages": "Packages",
     "WeightKg": "Weight Kg",
     "VolumeCFT": "Volume CFT"
   }
-  columnHeader = {
+  columnHeader:any = {
     "Shipment": "Shipment",
     "Suffix": "Suffix",
     "Origin": "Origin",
@@ -65,7 +67,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   };
   shipmentStatus: string = 'Unloaded';
   //  #region declaring Csv File's Header as key and value Pair
-  headerForCsv = {
+  headerForCsv:any = {
     "Shipment": "Shipment",
     "Suffix": "Suffix",
     "Origin": "Origin",
@@ -75,7 +77,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
     "Pending": "Pending",
     "Leg": "Leg"
   }
-  shipingHeaderForCsv = {
+  shipingHeaderForCsv:any = {
     "Leg": "Leg",
     "Shipment": "Shipments",
     "Packages": "Packages",
@@ -115,6 +117,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
   isDisbled: boolean = false;
   menuItemflag: boolean = true;
   selectAllRequired: boolean = true;
+  DocCalledAs: DocCalledAsModel;
   metaData = {};
   @ViewChild('scanPackageInput') scanPackageInput: ElementRef;
 
@@ -138,10 +141,22 @@ export class UpdateLoadingSheetComponent implements OnInit {
     }
     this.currentBranch = this.storage.branch;
     this.companyCode = this.storage.companyCode;
+    this.DocCalledAs = this.controlPanel.DocCalledAs;
     this.shipmentStatus = 'Unloaded';
-    this.arrivalData = item;
+    this.arrivalData = item;    
+
+    this.shipingHeader.Shipment = `${this.DocCalledAs.Docket}s`;
+    this.shipingHeaderForCsv.shipment = `${this.DocCalledAs.Docket}s`;
+
+    this.columnHeader.Shipment = `${this.DocCalledAs.Docket} No`;
+    this.headerForCsv.Shipment = `${this.DocCalledAs.Docket} No`;
+    
+  }
+
+  ngOnInit(): void {
     this.getLoadingSheetDetail();
     this.IntializeFormControl();
+    this.getRules();
   }
 
   async getLoadingSheetDetail() {
@@ -156,19 +171,20 @@ export class UpdateLoadingSheetComponent implements OnInit {
       Destination: shipment?.dEST || "",
       Suffix: shipment?.sFX || 0,
       Packages: parseInt(shipment.pKGS),
-      weight: parseInt(shipment.wT),
-      cWeight: parseInt(shipment.cWT),
+      weight: parseFloat(shipment.wT),
+      cWeight: parseFloat(shipment.cWT),
       unloadedPkg: 0,
-      unloadedWT: 0,
+      unloadedWT: 0.00,
+      unloadedCWT: 0.00,
       pendPkg: parseInt(shipment.pKGS),
-      pendWt: parseInt(shipment.wT),
-      pendCwt: parseInt(shipment.cWT),
+      pendWt: parseFloat(shipment.wT),
+      pendCwt: parseFloat(shipment.cWT),
       Leg: shipment?.lEG || "",
       KgWt: shipment?.wT || "",
       mfNo: shipment?.docNo || "",
       CftVolume: shipment?.vOL || "",
       extraDetails:shipment,
-      actions: ["Edit"]
+      actions: ["Update"]
     }));
     this.boxData = kpiData(this.csv, this.shipmentStatus, "");
     this.tableload = false;
@@ -181,27 +197,92 @@ export class UpdateLoadingSheetComponent implements OnInit {
     this.shipingDataTable = shipingTableDataArray;
     this.getPackagesData();
   }
+
   onDailogClose(event) {
     this.shipmentsEdit(event)
   }
 
-  shipmentsEdit(event) {
+  onSelectAllClicked(event) {
+    this.csv.forEach((e) => {
 
-    const data = this.csv.find(x => x.Shipment === event.shipment && x.Suffix === event.suffix);
+      let unloadedPkg = e.unloadedPkg;
+      let unloadedWT = e.unloadedWT;
+      let unloadedCWT = e.unloadedCWT;
+
+      if(e.isSelected && unloadedPkg <= 0) {
+        unloadedPkg = e.Packages;
+        unloadedWT = e.weight;
+        unloadedCWT = e.cWeight;
+      } 
+      else if(!e.isSelected && unloadedPkg == e.Packages) {
+        unloadedPkg = 0;
+        unloadedWT = 0;
+        unloadedCWT = 0;
+      }
+      
+      e.unloadedPkg = unloadedPkg;
+      e.unloadedWT = unloadedWT;
+      e.unloadedCWT = unloadedCWT;
+
+      e.pendPkg = e.Packages - unloadedPkg;
+      e.pendWt = ConvertToNumber(e.weight - unloadedWT, 2);
+      e.pendCwt = ConvertToNumber(e.cWeight -unloadedCWT, 2);
+    });    
+    this.cdr.detectChanges();
+  }
+
+  onSelectClicked(e){
+    this.loadingData = e;
+    const data = this.csv.find(x => x.Shipment === e.Shipment && x.Suffix === e.Suffix);
     if (data) {
-      const unloadedPkg = parseInt(event.noofPkts, 10);
-      const unloadedWT = parseFloat(event.actualWeight).toFixed(2);
-      const unloadctWeight = parseFloat(event.ctWeight).toFixed(2);
-      const pendPkg = data.Packages - unloadedPkg;
-      const pendWt = data.weight - parseFloat(event.actualWeight);
-      const pendCwt = data.cWeight - parseFloat(event.ctWeight);
-      const depsType = event.depsOptions||'';
-      const isDeps = event.isDeps||'';
-      const extra=event;
-      Object.assign(data, { unloadedPkg, unloadedWT, unloadctWeight, pendPkg, pendWt, pendCwt,depsType,extra,isDeps});
+      let unloadedPkg = e.unloadedPkg;
+      let unloadedWT = e.unloadedWT;
+      let unloadedCWT = e.unloadedCWT;
+
+      if(e.isSelected) {
+        unloadedPkg = e.Packages;
+        unloadedWT = e.weight;
+        unloadedCWT = e.cWeight;
+      }
+
+      const isSelected = e.isSelected;
+      let pendPkg = e.Packages - unloadedPkg;
+      let pendWt = ConvertToNumber(e.weight - unloadedWT, 2);
+      let pendCwt = ConvertToNumber(e.cWeight - unloadedCWT, 2);
+
+      e.unloadedPkg = unloadedPkg;
+      e.unloadedWT = unloadedWT;
+      e.unloadedCWT = unloadedCWT;
+      e.pendPkg = pendPkg;
+      e.pendWt = pendWt;
+      e.pendCwt = pendCwt;
+
+      Object.assign(data, { isSelected, unloadedPkg, unloadedWT, unloadedCWT, pendPkg, pendWt, pendCwt });
+      
       this.cdr.detectChanges();
     }
   }
+
+  shipmentsEdit(event) {
+    if(event) {
+      const data = this.csv.find(x => x.Shipment === event.shipment && x.Suffix === event.suffix);
+      if (data) {
+        const unloadedPkg = parseInt(event.noofPkts);
+        const unloadedWT = parseFloat(event.actualWeight).toFixed(2);
+        const unloadctWeight = parseFloat(event.ctWeight).toFixed(2);
+        const pendPkg = data.Packages - unloadedPkg;
+        const pendWt = data.weight - parseFloat(event.actualWeight);
+        const pendCwt = data.cWeight - parseFloat(event.ctWeight);
+        const depsType = event.depsOptions||'';
+        const isDeps = event.isDeps||'';
+        const isSelected = unloadedPkg > 0;
+        const extra=event;
+        Object.assign(data, { isSelected, unloadedPkg, unloadedWT, unloadctWeight, pendPkg, pendWt, pendCwt,depsType,extra,isDeps});
+        this.cdr.detectChanges();
+      }
+    }
+  }
+
   async getPackagesData() {
     const reqBody = {
       "companyCode": this.companyCode,
@@ -277,9 +358,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
     });
 
   }
-  ngOnInit(): void {
-    this.getRules();
-  }
+  
   async getRules() {
     const filter = {
       cID: this.storage.companyCode,
@@ -322,9 +401,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
     // Set the arrival data binding
     this.setArrivalDataBindData();
   }
-  IsActiveFuntion($event) {
-    this.loadingData = $event
-  }
+  
   functionCallHandler($event) {
     // console.log("fn handler called", $event);
     let field = $event.field;                   // the actual formControl instance
@@ -339,9 +416,7 @@ export class UpdateLoadingSheetComponent implements OnInit {
       console.log("failed");
     }
   }
-  onSelectAllClicked(event) {
-
-  }
+  
   async CompleteScan() {
     this.snackBarUtilityService.commonToast(
       async () => {
@@ -481,9 +556,9 @@ export class UpdateLoadingSheetComponent implements OnInit {
         // Call the vehicleStatusUpdate function here
         const result = await vehicleStatusUpdate(this.currentBranch, this.companyCode, this.arrivalData, this._operation, true);
         Swal.fire({
-          icon: "info",
-          title: "Trip is close",
-          text: "Trip is close at" + this.currentBranch,
+          icon: "success",
+          title: "Trip Completed",
+          text: "Trip is completed at " + this.currentBranch,
           showConfirmButton: true,
         });
         // Handle the result if needed

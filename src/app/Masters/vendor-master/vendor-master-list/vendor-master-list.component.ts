@@ -34,7 +34,7 @@ export class VendorMasterListComponent implements OnInit {
       Style: "min-width:15%",
       datatype: "string"
     },
-    vendorType: {
+    vendorTypeName: {
       Title: "Vendor Type",
       class: "matcolumnleft",
       Style: "min-width:15%",
@@ -156,8 +156,6 @@ export class VendorMasterListComponent implements OnInit {
         const dataWithSrno = res.data.map(item => {
           const transformedItem = {
             ...item,
-            vendorName: item.vendorName.toUpperCase(),
-            vendorType: item.vendorTypeName ? item.vendorTypeName.toUpperCase() : '',
             eNTDT: item.eNTDT ? formatDocketDate(item.eNTDT) : ''
           };
 

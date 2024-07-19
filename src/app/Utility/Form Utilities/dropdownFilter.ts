@@ -44,14 +44,14 @@ export class FilterUtils {
    */
   private _filterWithNameValue(name: string, dropdownOption: AutoComplateCommon[]): AutoComplateCommon[] {
     const filterValue = name.toLowerCase();
-    const filteredDropdown = dropdownOption.filter((option) =>
-      filterValue.includes(':')
-        ? option.name.toLowerCase().indexOf(filterValue.split(':')[1]) === 0
-        : option.name.toLowerCase().indexOf(filterValue) === 0
-    );
+    const filteredDropdown = dropdownOption.filter((option) => {
+      const nameMatch = option.name.toLowerCase().includes(filterValue.includes(':') ? filterValue.split(':')[1] : filterValue);
+      const valueMatch = option.value.toLowerCase().includes(filterValue.includes(':') ? filterValue.split(':')[1] : filterValue);
+      return nameMatch || valueMatch;
+    });
     return filteredDropdown;
   }
-
+  
   /**
    * Filter function to filter dropdown options based on name.
    * @param name - The name used for filtering.

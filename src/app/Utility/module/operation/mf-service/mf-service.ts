@@ -7,6 +7,7 @@ import { financialYear } from "src/app/Utility/date/date-utils";
 import { DocketEvents, DocketStatus, getEnumName } from "src/app/Models/docStatus";
 import convert from 'convert-units';
 import moment from "moment";
+import { environment } from "src/environments/environment";
 
 @Injectable({
     providedIn: "root",
@@ -121,7 +122,7 @@ export class ManifestService {
         let isSuffex = false;
         const sfxEnvData = [];
         const getInvoice = await this.gettingLastSuffix(details);
-        const mfDetails = details.map((d) => {
+        const mfDetails = details.filter(f => f.isSelected && f.loadedPkg > 0).map((d) => {
             try {
                 /*below code is for cft calucation */
                 let lDVOL = 0;
@@ -259,11 +260,14 @@ export class ManifestService {
                 }
                 return mfJson;
             } catch (error) {
+                if(!environment.production) {
+                    console.log(error);
+                }
                 return null; // Example error handling
             }
         });
 
-        const filteredMfDetails = mfDetails.filter(detail => detail !== null);
+        const filteredMfDetails = mfDetails.filter(d => d !== null);
         //const sfxDockets = details.filter((x) => x.pendPkg > 0);
         const mfHeader = {
             "_id": "",

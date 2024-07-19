@@ -61,7 +61,8 @@ export class XlsxPreviewPageComponent extends UnsubscribeOnDestroyAdapter {
   saveDialog() {
     const filteredData = this.selection.selected.map(item => {
       const filteredItem: any = {};
-      this.columnKeys.forEach(key => {
+      const columns = [ ...this.columnKeys, ...this.hideColumns ];
+      columns.forEach(key => {
         if (item[key]) {
           filteredItem[key] = item[key];
         }
@@ -146,7 +147,7 @@ export class XlsxPreviewPageComponent extends UnsubscribeOnDestroyAdapter {
       const { select, ...rest } = row; // Exclude the 'select' property
       return rest;
     });
-    CsvDataServiceService.exportToCsv('Upload List.csv', dataToExport);
+    CsvDataServiceService.exportToCsv('Upload List.csv', dataToExport, true);
   }
   //#endregion
 }

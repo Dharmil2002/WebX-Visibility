@@ -17,6 +17,9 @@ import { GeolocationService } from "src/app/core/service/geo-service/geolocation
 import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
 import { DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
 import { ClusterMasterService } from "../../masters/cluster/cluster.master.service";
+import { StateService } from "../../masters/state/state.service";
+import { getApiCompanyDetail } from "src/app/finance/invoice-summary-bill/invoice-utility";
+import { MasterService } from "src/app/core/service/Masters/master.service";
 @Injectable({
     providedIn: "root",
 })
@@ -101,7 +104,9 @@ export class DocketService {
         private navService: NavigationService,
         private geoLocationService: GeolocationService,
         private controlPanel: ControlPanelService,
-        private clusterService: ClusterMasterService
+        private clusterService: ClusterMasterService,
+        private stateService: StateService,
+        private masterService:MasterService
     ) {
         this.docCalledAs = this.controlPanel.DocCalledAs;
 
@@ -1154,7 +1159,6 @@ export class DocketService {
         return res.data.length > 0 ? true : false;
     }
     async consgimentFieldMapping(data, chargeBase, invoiceData = [], isUpdate = false, otherData, nonfreight = "") {
-
         let nonfreightAmt = {};
         if (nonfreight) {
             Object.keys(nonfreight).forEach((key) => {
@@ -1163,6 +1167,15 @@ export class DocketService {
                 });
                 nonfreightAmt[modifiedKey] = nonfreight[key];
             });
+        }
+        let gstTypesArray;
+        if(data.rcm && data.rcm=="N"){
+            const tranDetail = await getApiCompanyDetail(this.masterService);
+            const gstAppliedList = await this.stateService.checkGst(tranDetail?.data[0].gstNo,data?.cnogst);
+             gstTypesArray = Object.keys(gstAppliedList).filter(key => gstAppliedList[key]) || [];
+        }
+        else{
+            gstTypesArray=['']
         }
         let docketField = {
             "_id": data?.id || "",
@@ -1231,16 +1244,19 @@ export class DocketService {
             "rCM": data?.rcm || "N",
             "gSTRT": ConvertToNumber(data?.gstRate || 0, 2),
             "gSTCHAMT": ConvertToNumber(data?.gstChargedAmount || 0, 2),
+            "gSTAMT": ConvertToNumber(data?.gstAmount||0,2),
             "gST": {
-                "tY": "SGST",
-                "iGRT": 0,
-                "sGRT": 6,
-                "cGRT": 6,
-                "uGRT": 0,
-                "iGST": 0,
-                "sGST": ConvertToNumber(data?.gstChargedAmount / 2 || 0, 2),
-                "cGST": ConvertToNumber(data?.gstChargedAmount / 2 || 0, 2),
-                "uGST": 0,
+                "sNM":data?.sacName?.name||"",
+                "sHCD":data?.sacName?.value||"",
+                "tY": gstTypesArray.filter((x)=>x!="CGST").toString() || "",
+                "iGRT":gstTypesArray.includes('IGST') ? parseFloat(data?.gstRate) : 0,
+                "sGRT":gstTypesArray.includes('SGST') ? parseFloat(data?.gstRate) / 2 : 0,
+                "cGRT":gstTypesArray.includes('CGST') ? parseFloat(data?.gstRate) / 2 : 0,
+                "uGRT": gstTypesArray.includes('UTGST') ? parseFloat(data?.gstRate) : 0,
+                "iGST":gstTypesArray.includes('IGST') ? parseFloat(data?.gstChargedAmount) : 0,
+                "sGST":gstTypesArray.includes('SGST') ? parseFloat(data?.gstChargedAmount) / 2 : 0,
+                "cGST":gstTypesArray.includes('CGST') ? parseFloat(data?.gstChargedAmount) / 2 : 0,
+                "uGST":gstTypesArray.includes('UTGST') ? parseFloat(data?.gstChargedAmount) : 0,
                 "aMT": ConvertToNumber(data?.gstChargedAmount || 0, 2)
             },
             "tOTAMT": ConvertToNumber(data?.totAmt || 0, 2),
@@ -1338,12 +1354,15 @@ export class DocketService {
             pNM: data?.billingParty.name || "",
             bLOC: this.storage.branch,
             cURR: "INR",
+            sNM:data?.sacName?.name||"",
+            sHCD:data?.sacName?.value||"",
             fRTAMT: ConvertToNumber(data?.freight_amount || 0, 2),
             oTHAMT: ConvertToNumber(data?.otherAmount || 0, 2),
             gROAMT: ConvertToNumber(data?.grossAmount || 0, 2),
-            rCM: data.rcm,
-            gSTAMT: ConvertToNumber(data?.gstAmount || 0, 2),
+            rCM: data?.rcm||"Y",
+            gSTRT:ConvertToNumber(data?.gstRate || 0, 2),
             gSTCHAMT: ConvertToNumber(data?.gstChargedAmount || 0, 2),
+            gSTAMT: ConvertToNumber(data?.gstAmount || 0, 2),
             cHG: otherData ? otherData.otherCharges : '',
             tOTAMT: ConvertToNumber(data?.totAmt || 0, 2),
             sTS: DocketFinStatus.Pending,

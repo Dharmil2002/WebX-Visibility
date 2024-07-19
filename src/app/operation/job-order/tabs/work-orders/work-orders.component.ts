@@ -7,6 +7,7 @@ import { OperationService } from "src/app/core/service/operations/operation.serv
 import Swal from "sweetalert2";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { DataService } from "src/app/core/service/job-order.service";
+import { JobOrderService } from "src/app/core/service/jobOrder-service/jobOrder-services.service";
 @Component({
   selector: "app-work-orders",
   templateUrl: "./work-orders.component.html",
@@ -20,19 +21,8 @@ export class WorkOrdersComponent implements OnInit {
   filterColumn: boolean = true;
   allColumnFilter: any;
   tableData: any;
-  // menuItems = [
-  //   { label: "New Work Order" },
-  //   { label: "Approve" },
-  //   { label: "Update" },
-  //   { label: "Close" },
-  //   { label: "Cancel" },
-  // ];
-  menuItems = [
-    { label: "Approve" },
-    { label: "Update" },
-    { label: "Close" },
-    { label: "Cancel" },
-  ];
+
+  menuItems = [{ label: "Update" }, { label: "Close" }, { label: "Cancel" }];
   menuItemflag: boolean = true;
   dynamicControls = {
     add: true,
@@ -102,10 +92,10 @@ export class WorkOrdersComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private operation: OperationService,
     private storage: StorageService,
-    private masterService: MasterService,
-    private dataService: DataService
+    private dataService: DataService,
+    private joborder: JobOrderService,
+    private masterService: MasterService
   ) {
     this.addAndEditPath = "Operation/AddJobOrder";
     this.allColumnFilter = this.columnHeader;
@@ -115,38 +105,23 @@ export class WorkOrdersComponent implements OnInit {
   }
   async handleMenuItemClick(data) {
     const label = data.label.label;
-    // if (data.label.label == "New Work Order") {
-    //   this.dataService.setMenuItemData(data); // Set data in DataService
-    //   this.router.navigateByUrl("/Operation/AddWorkOrder")
-    // }
-    let details = {};
     let successMessage = "";
-
     switch (label) {
-      case "Approve":
-        details = {
-          sTATUS: "Approved",
-          // aPBY: this.storage.loginName,
-          // aPDT: new Date(),
-        };
-        successMessage = "Successfully Approved";
-        break;
       case "Update":
-        details = {
-          sTATUS: "Updated",
-          mODBY: this.storage.loginName,
-          mODDT: new Date(),
-          mODLOC: this.storage.branch,
-        };
-        successMessage = "Successfully Updated";
+        this.dataService.setMenuItemData(data);
+        this.router.navigate(["Operation/AddWorkOrder"], {
+          state: {
+            data: data,
+          },
+        });
         break;
       case "Close":
-        details = {
-          sTATUS: "Closed",
-          cSBY: this.storage.loginName,
-          cSDT: new Date(),
-        };
-        successMessage = "Successfully Closed";
+        this.dataService.setMenuItemData(data);
+        this.router.navigate(["Operation/AddWorkOrder"], {
+          state: {
+            data: data,
+          },
+        });
         break;
       case "Cancel":
         const result = await Swal.fire({
@@ -161,103 +136,57 @@ export class WorkOrdersComponent implements OnInit {
               .value;
           },
         });
-
         if (result.isConfirmed) {
           if (data.data.docNo) {
-            details = {
-              sTATUS: "Cancel",
+            let details = {
+              sTATUS: "Cancelled",
+              cLBY:this.storage.userName,
               cL: true,
               cLDT: new Date(),
               cREMARKS: result.value,
             };
-            successMessage = "Successfully Cancelled";
+            const res=await this.joborder.updateWorkOrder("work_order_headers",{docNo: data.data.docNo},details)
+            if (res) {
+              Swal.fire({
+                icon: "success",
+                title: "WorkOrder Successfully Cancelled",
+                showConfirmButton: true,
+              }).then(()=>{
+                this.getWorkOrderData();
+              })
+            }
           }
         } else {
-          Swal.fire(
-            "Error",
-            "Error in Voucher Reverse Accounting Entry",
-            "error"
-          );
+          return;
         }
         break;
       default:
         return;
     }
-    try {
-      const req = {
-        companyCode: this.storage.companyCode,
-        collectionName: "work_order_headers",
-        filter: { docNo: data.data.docNo },
-        update: details,
-      };
-
-      const res = await firstValueFrom(
-        this.masterService.masterPut("generic/update", req)
-      );
-      if (res.success) {
-        this.getWorkOrderData();
-        Swal.fire({
-          icon: "success",
-          title: successMessage,
-          text: res.message,
-          showConfirmButton: true,
-        });
-        this.router.navigateByUrl("/Operation/JobOrder");
-      }
-    } catch (error) {
-      console.error("Error updating work order:", error);
-    }
   }
-  // async getWorkOrderData() {
-  //   const requestObject = {
-  //     companyCode: this.storage.companyCode,
-  //     collectionName: "work_order_headers",
-  //   };
-  //   const res = await firstValueFrom(
-  //     this.operation.operationPost("generic/get", requestObject)
-  //   );
-  //   if (res.success) {
-  //     const data = res.data;
-  //     const newArray = data.map((data) => ({
-  //       ...data,
-  //       Vendor:`${data?.vEND?.vCD}:${data?.vEND?.vNM}`,
-  //       // actions: ["New Work Order", "Approve", "Update", "Close", "Cancel"],
-  //       actions: ["Approve", "Update", "Close", "Cancel"],
-  //     }));
-  //     this.tableData = newArray;
-  //     this.tableLoad = false;
-  //   }
-  // }
   async getWorkOrderData() {
-    const requestObject = {
-      companyCode: this.storage.companyCode,
-      collectionName: "work_order_headers",
-    };
-    try {
-      const res = await firstValueFrom(
-        this.operation.operationPost("generic/get", requestObject)
-      );
-      if (res.success) {
-        const data = res.data;
-        const newArray = data.map((item) => {
-          // Create the base object with common properties
-          const newItem = {
-            ...item,
-            actions: ["Approve", "Update", "Close", "Cancel"],
-          };
-          // Conditionally add the Vendor property
-          if (item?.vEND?.vCD && item?.vEND?.vNM) {
-            newItem.Vendor = `${item.vEND.vCD}:${item.vEND.vNM}`;
-          }
-          return newItem;
-        });
+    const res = await this.joborder.getWorkOrderData({
+      cID: this.storage.companyCode,
+    });
+    if (res) {
+      const data = res;
+      const newArray = data.map((item) => {
+        const newItem = {
+          ...item,
+          actions: ["Update", "Close", "Cancel"],
+        };
+        if(newItem.sTATUS === "Cancelled" || newItem.sTATUS==="Closed"){
+          newItem.actions = []
+        }
+        // Conditionally add the Vendor property
+        if (item?.vEND?.vCD && item?.vEND?.vNM) {
+          newItem.Vendor = `${item.vEND.vCD}:${item.vEND.vNM}`;
+        }
+        return newItem;
+      });
 
-        this.tableData = newArray;
-        this.tableLoad = false;
-      }
-    } catch (error) {
-      console.error("Error fetching work order data:", error);
-      // Handle error appropriately (e.g., show error message to user)
+      this.tableData = newArray;
+      this.tableLoad = false;
     }
   }
 }

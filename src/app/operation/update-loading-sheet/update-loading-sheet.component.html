@@ -9,7 +9,7 @@
 <generic-table-webxpress *ngIf="!tableload" [columnHeader]="shipingHeader" [tableData]="shipingDataTable"
     [addAndEditPath]="addAndEditPath" [uploadComponent]="uploadComponent" [csvHeaders]="shipingHeaderForCsv"
     [csvFileName]="csvFileName" (onFlagChange)="IsActiveFuntion($event)" [metaData]="METADATA" [Link]="linkArray"
-    [toggleArray]="toggleArray" [extraData]="extraData" [menuItems]="menuItems"
+    [toggleArray]="toggleArray" [extraData]="extraData" [menuItems]="menuItems"    
     (menuItemClicked)="handleMenuItemClick($event)" [menuItemFlag]="menuItemflag" [dynamicControls]="dynamicControls"
     [centerAligned]="centerShippingData">
 </generic-table-webxpress>
@@ -37,8 +37,10 @@
     [tableData]="csv" [metaData]="metaData" (selectAllClicked)="onSelectAllClicked($event)"
     [menuItems]="definition.menuItems"  [columnGroup]="definition.summaryGroup"[staticField]="definition.staticField" [Link]="linkArray" 
     [stickyHeader]="true" [TableContainerStyle]="TableContainerStyle"[width]="width"[height]="height"
+    (selectAllClicked) = "onSelectAllClicked($event)"
+    (onSelectionChange) = "onSelectClicked($event)"
     [maxWidth]="maxWidth"(dialogClosed)="onDailogClose($event)" (functionCallEmitter)="functionCallHandler($event)" (menuItemClicked)="handleMenuItemClick($event)" [addAndEditPath]="addAndEditPath"
-    [menuItemFlag]="menuItemflag"[selectAllRequired]="selectAllRequired" (onFlagChange)="IsActiveFuntion($event)" [uploadComponent]= true  (uploadEvent)="upload()" [filterColumn]="filterColumn" [allColumnFilter]="allColumnFilter">
+    [menuItemFlag]="menuItemflag"[selectAllRequired]="selectAllRequired" [uploadComponent]= true  (uploadEvent)="upload()" [filterColumn]="filterColumn" [allColumnFilter]="allColumnFilter">
     </app-generic-table-v2>
     </div>
 <div class="row" *ngIf="!tableload">

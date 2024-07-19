@@ -54,8 +54,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     },
   ];
 
-  VoucherRequestModel = new VoucherRequestModel();
-  VoucherDataRequestModel = new VoucherDataRequestModel();
+  voucherModel = new VoucherRequestModel();
+  voucherDataModel = new VoucherDataRequestModel();
   className = "col-xl-3 col-lg-3 col-md-6 col-sm-6 mb-2";
 
 
@@ -100,6 +100,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   rateType: AutoComplete[];
   Demurragecharge: number = 0;
   chargeDetails: any;
+  submitted: boolean = true;
   constructor(private fb: UntypedFormBuilder,
     private router: Router,
     private dialog: MatDialog,
@@ -821,6 +822,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     } else {
       this.snackBarUtilityService.commonToast(async () => {
         try {
+          // Disbale the submit button
+          this.submitted = false;
           let gst = {};
           let GSTAmount = 0;
           this.GSTApplied.map(x => {
@@ -1148,8 +1151,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   //#region Prepare Voucher
   PrepareVoucher(type, branch, dmr, paybase): any {
 
-    let voucherRequestModel = new VoucherRequestModel();
-    let voucherDataRequestModel = new VoucherDataRequestModel();
+    let voucherModel = new VoucherRequestModel();
+    let voucherDataModel = new VoucherDataRequestModel();
     const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
 
     let gst = {};
@@ -1169,64 +1172,64 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
       AccountDetails = this.AccountsBanksList.find(item => item.bANCD == BankDetails?.value && item.bANM == BankDetails?.name)
     }
 
-    voucherRequestModel.companyCode = this.storage.companyCode;
-    voucherRequestModel.docType = "VR";
+    voucherModel.companyCode = this.storage.companyCode;
+    voucherModel.docType = "VR";
 
-    voucherRequestModel.branch = branch; //Nee to change as per Inter branch control logic
-    voucherRequestModel.finYear = financialYear;
+    voucherModel.branch = branch; //Nee to change as per Inter branch control logic
+    voucherModel.finYear = financialYear;
 
-    voucherDataRequestModel.voucherNo = "";
-    voucherDataRequestModel.transCode = VoucherInstanceType.DeliveryMR;
-    voucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.DeliveryMR];
-    voucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
-    voucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
-    voucherDataRequestModel.transDate = new Date();
-    voucherDataRequestModel.docType = "VR";
-    voucherDataRequestModel.branch = branch;
-    voucherDataRequestModel.finYear = financialYear;
+    voucherDataModel.voucherNo = "";
+    voucherDataModel.transCode = VoucherInstanceType.DeliveryMR;
+    voucherDataModel.transType = VoucherInstanceType[VoucherInstanceType.DeliveryMR];
+    voucherDataModel.voucherCode = VoucherType.JournalVoucher;
+    voucherDataModel.voucherType = VoucherType[VoucherType.JournalVoucher];
+    voucherDataModel.transDate = new Date();
+    voucherDataModel.docType = "VR";
+    voucherDataModel.branch = branch;
+    voucherDataModel.finYear = financialYear;
 
-    voucherDataRequestModel.accLocation = branch;
-    voucherDataRequestModel.preperedFor = "Customer"
-    voucherDataRequestModel.partyCode = this.DocketDetails.bPARTY;
-    voucherDataRequestModel.partyName = this.DocketDetails.bPARTYNM;
+    voucherDataModel.accLocation = branch;
+    voucherDataModel.preperedFor = "Customer"
+    voucherDataModel.partyCode = this.DocketDetails.bPARTY;
+    voucherDataModel.partyName = this.DocketDetails.bPARTYNM;
     if (this.DocketDetails.pAYTYP == 'P01') {
-      voucherDataRequestModel.partyState = this.States.find(f => f.ST == parseInt(this.DocketDetails.cSGN.gST.substring(0, 2)))?.STNM || this.DocketDetails.cSGN.gST.substring(0, 2);
+      voucherDataModel.partyState = this.States.find(f => f.ST == parseInt(this.DocketDetails.cSGN.gST.substring(0, 2)))?.STNM || this.DocketDetails.cSGN.gST.substring(0, 2);
     }
     else {
-      voucherDataRequestModel.partyState = this.States.find(f => f.ST == parseInt(this.DocketDetails.cSGE.gST.substring(0, 2)))?.STNM || this.DocketDetails.cSGE.gST.substring(0, 2);
+      voucherDataModel.partyState = this.States.find(f => f.ST == parseInt(this.DocketDetails.cSGE.gST.substring(0, 2)))?.STNM || this.DocketDetails.cSGE.gST.substring(0, 2);
     }
-    voucherDataRequestModel.entryBy = this.storage.userName;
-    voucherDataRequestModel.entryDate = new Date();
+    voucherDataModel.entryBy = this.storage.userName;
+    voucherDataModel.entryDate = new Date();
 
-    voucherDataRequestModel.tcsRate = 0;
-    voucherDataRequestModel.tcsAmount = 0;
+    voucherDataModel.tcsRate = 0;
+    voucherDataModel.tcsAmount = 0;
 
     Object.keys(gst).forEach(item => {
-      voucherDataRequestModel[item] = ConvertToNumber(gst[item], 2)
+      voucherDataModel[item] = ConvertToNumber(gst[item], 2)
     });
 
-    voucherDataRequestModel.GSTTotal = GSTAmount;
+    voucherDataModel.GSTTotal = GSTAmount;
 
-    voucherDataRequestModel.GrossAmount = ConvertToNumber(dmr.cLLCTAMT - GSTAmount, 2) || 0;
-    voucherDataRequestModel.netPayable = ConvertToNumber(dmr.cLLCTAMT, 2) || 0;
-    voucherDataRequestModel.roundOff = 0;
-    voucherDataRequestModel.voucherCanceled = false;
+    voucherDataModel.GrossAmount = ConvertToNumber(dmr.cLLCTAMT - GSTAmount, 2) || 0;
+    voucherDataModel.netPayable = ConvertToNumber(dmr.cLLCTAMT, 2) || 0;
+    voucherDataModel.roundOff = 0;
+    voucherDataModel.voucherCanceled = false;
 
-    voucherDataRequestModel.paymentMode = this.PaymentSummaryFilterForm.value.PaymentMode;
-    voucherDataRequestModel.refNo = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.ChequeOrRefNo : "";
-    voucherDataRequestModel.accountName = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? AccountDetails?.bANM : this.PaymentSummaryFilterForm.value.CashAccount.name;
-    voucherDataRequestModel.accountCode = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? AccountDetails?.bANCD : this.PaymentSummaryFilterForm.value.CashAccount.value;
-    voucherDataRequestModel.date = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.date : "";
+    voucherDataModel.paymentMode = this.PaymentSummaryFilterForm.value.PaymentMode;
+    voucherDataModel.refNo = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.ChequeOrRefNo : "";
+    voucherDataModel.accountName = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? AccountDetails?.bANM : this.PaymentSummaryFilterForm.value.CashAccount.name;
+    voucherDataModel.accountCode = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? AccountDetails?.bANCD : this.PaymentSummaryFilterForm.value.CashAccount.value;
+    voucherDataModel.date = (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.value.date : "";
 
-    voucherDataRequestModel.scanSupportingDocument = "";
-    voucherDataRequestModel.transactionNumber = dmr.docNo;
+    voucherDataModel.scanSupportingDocument = "";
+    voucherDataModel.transactionNumber = dmr.docNo;
 
-    const voucherlineItems = this.GetJournalVoucherLedgers(type, voucherDataRequestModel, gst, paybase);
-    voucherRequestModel.details = voucherlineItems;
-    voucherRequestModel.data = voucherDataRequestModel;
-    voucherRequestModel.debitAgainstDocumentList = [];
+    const voucherlineItems = this.GetJournalVoucherLedgers(type, voucherDataModel, gst, paybase);
+    voucherModel.details = voucherlineItems;
+    voucherModel.data = voucherDataModel;
+    voucherModel.debitAgainstDocumentList = [];
 
-    return voucherRequestModel;
+    return voucherModel;
   }
   //#endregion
 
@@ -1235,7 +1238,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     return (
       !this.deliveryMrTableForm.valid ||
       !this.PaymentSummaryFilterForm.valid ||
-      !this.SummaryForm.valid
+      !this.SummaryForm.valid ||
+      !this.submitted
     );
   }
   //#endregion
@@ -1518,149 +1522,124 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
         const TotalAmount = billData?.aMT || 0;
         const GstAmount = billData?.gST?.aMT || 0;
 
-        this.VoucherRequestModel.companyCode = this.storage.companyCode;
-        this.VoucherRequestModel.docType = "VR";
-        this.VoucherRequestModel.branch = this.storage.branch;
-        this.VoucherRequestModel.finYear = financialYear
+        this.voucherModel = {
+          companyCode: this.storage.companyCode,
+          docType: "VR",
+          branch: this.storage.branch,
+          finYear: financialYear,
+          accountPosting: false,
+          debitAgainstDocumentList: [],
+          data: new VoucherDataRequestModel(),
+          details: []
+        };
 
-        this.VoucherDataRequestModel.voucherNo = "";
-        this.VoucherDataRequestModel.transCode = VoucherInstanceType.BillApproval;
-        this.VoucherDataRequestModel.transType = VoucherInstanceType[VoucherInstanceType.BillApproval];
-        this.VoucherDataRequestModel.voucherCode = VoucherType.JournalVoucher;
-        this.VoucherDataRequestModel.voucherType = VoucherType[VoucherType.JournalVoucher];
-        this.VoucherDataRequestModel.transDate = new Date();
-        this.VoucherDataRequestModel.docType = "VR";
-        this.VoucherDataRequestModel.branch = this.storage.branch;
-        this.VoucherDataRequestModel.finYear = financialYear
+        this.voucherDataModel = {
+          voucherNo: "",
+          transCode: VoucherInstanceType.BillApproval,
+          transType: VoucherInstanceType[VoucherInstanceType.BillApproval],
+          voucherCode: VoucherType.JournalVoucher,
+          voucherType: VoucherType[VoucherType.JournalVoucher],
+          transDate: new Date(),
+          docType: "VR",
+          branch: this.storage.branch,
+          finYear: financialYear,
+          accLocation: this.storage.branch,
+          preperedFor: "Customer",
+          partyCode: billData?.cUST?.cD || "",
+          partyName: billData?.cUST?.nM || "",
+          partyState: billData?.cUST?.sT || "",
+          entryBy: this.storage.userName,
+          entryDate: new Date(),
+          panNo: "",
+          tdsSectionCode: "",
+          tdsSectionName: "",
+          tdsRate: 0,
+          tdsAmount: 0,
+          tdsAtlineitem: false,
+          tcsSectionCode: "",
+          tcsSectionName: "",
+          tcsRate: 0,
+          tcsAmount: 0,
+          IGST: billData?.gST?.iGST || 0,
+          SGST: billData?.gST?.sGST || 0,
+          CGST: billData?.gST?.cGST || 0,
+          UGST: billData?.gST?.uTGST || 0,
+          GSTTotal: GstAmount,
+          GrossAmount: TotalAmount || 0,
+          netPayable: TotalAmount,
+          roundOff: 0,
+          voucherCanceled: false,
+          transactionNumber: BillNo,
+          paymentMode: "",
+          refNo: "",
+          accountName: "",
+          accountCode: "",
+          date: "",
+          scanSupportingDocument: "",
 
-        this.VoucherDataRequestModel.accLocation = this.storage.branch;
-        this.VoucherDataRequestModel.preperedFor = "Customer";
-        this.VoucherDataRequestModel.partyCode = billData?.cUST?.cD || "";
-        this.VoucherDataRequestModel.partyName = billData?.cUST?.nM || "";
-        this.VoucherDataRequestModel.partyState = billData?.cUST?.sT || "";
-        this.VoucherDataRequestModel.entryBy = this.storage.userName;
-        this.VoucherDataRequestModel.entryDate = new Date();
-        this.VoucherDataRequestModel.panNo = ""
+        }
+        var VoucherlineitemList = this.GetVouchersLedgersForAutoBilling(billData, BillNo)
 
-        this.VoucherDataRequestModel.tdsSectionCode = "";
-        this.VoucherDataRequestModel.tdsSectionName = "";
-        this.VoucherDataRequestModel.tdsRate = 0;
-        this.VoucherDataRequestModel.tdsAmount = 0;
-        this.VoucherDataRequestModel.tdsAtlineitem = false;
-        this.VoucherDataRequestModel.tcsSectionCode = "";
-        this.VoucherDataRequestModel.tcsSectionName = "";
-        this.VoucherDataRequestModel.tcsRate = 0;
-        this.VoucherDataRequestModel.tcsAmount = 0;
+        this.voucherModel.details = VoucherlineitemList
+        this.voucherModel.data = this.voucherDataModel;
+        this.voucherModel.debitAgainstDocumentList = [];
 
-        this.VoucherDataRequestModel.IGST = billData?.gST?.iGST || 0;
-        this.VoucherDataRequestModel.SGST = billData?.gST?.sGST || 0;
-        this.VoucherDataRequestModel.CGST = billData?.gST?.cGST || 0;
-        this.VoucherDataRequestModel.UGST = billData?.gST?.uTGST || 0;
-        this.VoucherDataRequestModel.GSTTotal = GstAmount;
-
-        this.VoucherDataRequestModel.GrossAmount = TotalAmount || 0;
-        this.VoucherDataRequestModel.netPayable = TotalAmount;
-        this.VoucherDataRequestModel.roundOff = 0;
-        this.VoucherDataRequestModel.voucherCanceled = false
-        this.VoucherDataRequestModel.transactionNumber = BillNo;
-        this.VoucherDataRequestModel.paymentMode = "";
-        this.VoucherDataRequestModel.refNo = "";
-        this.VoucherDataRequestModel.accountName = "";
-        this.VoucherDataRequestModel.accountCode = "";
-        this.VoucherDataRequestModel.date = "";
-        this.VoucherDataRequestModel.scanSupportingDocument = "";
-        var VoucherlineitemList = this.GetVouchersLedgersForAutoBilling(billData, BillNo);
-
-        this.VoucherRequestModel.details = VoucherlineitemList
-        this.VoucherRequestModel.data = this.VoucherDataRequestModel;
-        this.VoucherRequestModel.debitAgainstDocumentList = [];
-
-        this.voucherServicesService
-          .FinancePost("fin/account/voucherentry", this.VoucherRequestModel)
-          .subscribe({
-            next: (res: any) => {
-
-              let reqBody = {
-                companyCode: this.storage.companyCode,
-                voucherNo: res?.data?.mainData?.ops[0].vNO,
-                transDate: Date(),
-                finYear: financialYear,
-                branch: this.storage.branch,
-                transCode: VoucherInstanceType.BillApproval,
-                transType: VoucherInstanceType[VoucherInstanceType.BillApproval],
-                voucherCode: VoucherType.JournalVoucher,
-                voucherType: VoucherType[VoucherType.JournalVoucher],
-                docType: "Voucher",
-                partyType: "Customer",
-                docNo: BillNo,
-                partyCode: billData?.cUST?.cD || "",
-                partyName: billData?.cUST?.nM || "",
-                entryBy: this.storage.userName,
-                entryDate: Date(),
-                debit: VoucherlineitemList.filter(item => item.credit == 0).map(function (item) {
-                  return {
-                    "accCode": item.accCode,
-                    "accName": item.accName,
-                    "accCategory": item.accCategory,
-                    "amount": item.debit,
-                    "narration": item.narration ?? ""
-                  };
-                }),
-                credit: VoucherlineitemList.filter(item => item.debit == 0).map(function (item) {
-                  return {
-                    "accCode": item.accCode,
-                    "accName": item.accName,
-                    "accCategory": item.accCategory,
-                    "amount": item.credit,
-                    "narration": item.narration ?? ""
-                  };
-                }),
+        const res = await firstValueFrom(this.voucherServicesService.FinancePost("fin/account/voucherentry", this.voucherModel));
+        if (res.success) {
+          let reqBody = {
+            companyCode: this.storage.companyCode,
+            voucherNo: res?.data?.mainData?.ops[0].vNO,
+            transDate: Date(),
+            finYear: financialYear,
+            branch: this.storage.branch,
+            transCode: VoucherInstanceType.BillApproval,
+            transType: VoucherInstanceType[VoucherInstanceType.BillApproval],
+            voucherCode: VoucherType.JournalVoucher,
+            voucherType: VoucherType[VoucherType.JournalVoucher],
+            docType: "Voucher",
+            partyType: "Customer",
+            docNo: BillNo,
+            partyCode: billData?.cUST?.cD || "",
+            partyName: billData?.cUST?.nM || "",
+            entryBy: this.storage.userName,
+            entryDate: Date(),
+            debit: VoucherlineitemList.filter(item => item.credit == 0).map(function (item) {
+              return {
+                "accCode": item.accCode,
+                "accName": item.accName,
+                "accCategory": item.accCategory,
+                "amount": item.debit,
+                "narration": item.narration ?? ""
               };
+            }),
+            credit: VoucherlineitemList.filter(item => item.debit == 0).map(function (item) {
+              return {
+                "accCode": item.accCode,
+                "accName": item.accName,
+                "accCategory": item.accCategory,
+                "amount": item.credit,
+                "narration": item.narration ?? ""
+              };
+            }),
+          };
 
-              this.voucherServicesService
-                .FinancePost("fin/account/posting", reqBody)
-                .subscribe({
-                  next: (res: any) => {
-                    this.router.navigate(["/dashboard/DeliveryMrGeneration/Result"], {
-                      state: {
-                        data: this.chargeDetails
-                      },
-                    });
-                    // Swal.fire({
-                    //   icon: "success",
-                    //   title: "Booked Successfully",
-                    //   text: "DocketNo : " + DocketNo,
-                    //   showConfirmButton: true,
-                    // }).then((result) => {
-                    //   if (result.isConfirmed) {
-                    //     Swal.hideLoading();
-                    //     setTimeout(() => {
-                    //       Swal.close();
-                    //     }, 2000);
-                    //   }
-                    // });
-                  },
-                  error: (err: any) => {
-
-                    if (err.status === 400) {
-                      this.snackBarUtilityService.ShowCommonSwal("error", "Bad Request");
-                    } else {
-                      this.snackBarUtilityService.ShowCommonSwal("error", err);
-                    }
-                  },
-                });
-
-            },
-            error: (err: any) => {
-              this.snackBarUtilityService.ShowCommonSwal("error", err);
-            },
-          });
+          const postingResult = await firstValueFrom(this.voucherServicesService.FinancePost("fin/account/posting", reqBody));
+          if (postingResult.success) {
+            this.router.navigate(["/dashboard/DeliveryMrGeneration/Result"], {
+              state: {
+                data: this.chargeDetails
+              },
+            });
+          } else {
+            this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Do Account Posting!");
+          }
+        }
       } catch (error) {
         this.snackBarUtilityService.ShowCommonSwal("error", "Fail To Submit Data..!");
       }
 
 
-    }, "C-Note Booking Voucher Generating..!");
+    }, "Delivery MR Voucher Generating..!");
 
   }
   GetVouchersLedgersForAutoBilling(billData, BillNo) {

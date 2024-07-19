@@ -16,7 +16,15 @@ export class CreditNoteRegisterReportService {
     let matchQuery = {
       ... {tYP:{D$eq:'C'}},
       ...(data.DocNos && data.DocNos.length > 0
-        ? { nTNO: { D$in: data.DocNos } }
+        ? 
+        {
+          D$or: data.DocNos.map(D => ({
+            D$or: [
+              { nTNO: { D$in: [D] } },
+              { docNo: { D$in: [D] } }
+            ]
+          }))
+        }
         : data.VoucherNos && data.VoucherNos.length > 0
         ? { vNO: { D$in: data.VoucherNos } }
         : {}),

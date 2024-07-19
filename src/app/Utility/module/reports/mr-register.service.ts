@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { SalesRegisterService } from './sales-register';
+import { DocCalledAs } from 'src/app/shared/constants/docCalledAs';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,7 @@ export class MrRegisterService {
     */
 
   async getMrRegisterData(data, optionalRequest) {
+
     // Check if docNoArray exists and is not empty
     const hasMRNO = optionalRequest.docNoArray?.length > 0;
     // Check if CnotenosArray exists and is not empty
@@ -59,256 +61,42 @@ export class MrRegisterService {
       }
     }
 
-    const reqBody = {
-      companyCode: this.storage.companyCode,
-      collectionName: 'delivery_mr_header',
-      filters: [
-        { D$match: matchQuery },
-        {
-          D$lookup: {
-            from: "delivery_mr_details",
-            localField: "docNo",
-            foreignField: "dLMRNO",
-            as: "details",
-          }
-        },
-
-        {
-          D$lookup: {
-            from: "dockets_ltl",
-            localField: "gCNNO", //base collection field
-            foreignField: "dKTNO",//lookup collection field
-            as: "docketDetails",
-          },
-        },
-        {
-          D$addFields: {
-            Party: {
-              D$concat: [
-                { D$arrayElemAt: ["$docketDetails.bPARTY", 0] },
-                " : ",
-                { D$arrayElemAt: ["$docketDetails.bPARTYNM", 0] },
-              ],
-            },
-
-          },
-        },
-        {
-          D$addFields: {
-            "charge": {
-              D$map: {
-                "input": "$details",
-                "as": "item",
-                "in": "$$item.cHG"
-              }
-            }
-          }
-        },
-        {
-          D$project: {
-            _id: 0,   // Exclude the _id field
-            MRNo: {
-              D$ifNull: ["$docNo", ""],
-            },
-            MRDate: {
-              D$ifNull: ["$eNTDT", ""],
-            },
-            MRTime: {
-              D$ifNull: ["$eNTDT", ""],
-            },
-            MRType: "Delivery MR",
-            MRLocation: {
-              D$ifNull: ["$eNTLOC", ""],
-            },
-            PartyName: "$Party",
-            MRAmount: {
-              D$ifNull: ["$dLVRMRAMT", ""],
-            },
-            TDS: {
-              D$ifNull: ["$tDSAmt", ""],
-            },
-            GSTAmount: {
-              D$ifNull: ["$gSTAMT", ""],
-            },
-            // FreightRebate: {
-            //   D$ifNull: ["$FreightRebate", 0],
-            // },
-            CLAIM: {
-              D$ifNull: ["$CLAIM", ""],
-            },
-            OtherDeduction: {
-              D$ifNull: ["$OtherDeduction", ""],
-            },
-            NetMRCloseAmt: {
-              D$ifNull: ["$cLLCTAMT", ""],
-            },
-            MRCloseDate: {
-              D$ifNull: ["$eNTDT", ""],
-            },
-            MRCloseBy: {
-              D$ifNull: ["$eNTBY", ""],
-            },
-            PayMode: {
-              D$ifNull: ["$mOD", ""],
-            },
-            ChequeNo: {
-              D$ifNull: ["$cHQNo", ""],
-            },
-            ChequeDate: {
-              D$ifNull: ["$cHQDT", ""],
-            },
-            ChequeAmount: {
-              D$ifNull: ["$cLLCTAMT", ""],
-            },
-            CancelledBy: "",
-            // Add your logic here
-            CancelledOn: "",
-            // Add your logic here
-            CancelledReason: "",
-            // Add your logic here
-            GatePassNo: {
-              D$ifNull: ["$docNo", ""],
-            },
-            GCNNo: "$gCNNO",
-            BillNo: "",
-            Origin: {
-              D$arrayElemAt: ["$docketDetails.oRGN", 0], // Extracts the first element from the array
-            },
-            Destination: {
-              D$arrayElemAt: ["$docketDetails.dEST", 0],
-            },
-
-            BasicFreight: {
-              D$sum: {
-                D$map: {
-                  input: "$docketDetails",
-                  as: "totaltfRTAMT",
-                  in: "$$totaltfRTAMT.fRTAMT",
-                },
-              }
-            },
-            SubTotal: {
-              D$sum: {
-                D$map: {
-                  input: "$docketDetails",
-                  as: "totalgROAMT",
-                  in: "$$totalgROAMT.gROAMT",
-                },
-              }
-            },
-            DocketTotal: {
-              D$sum: {
-                D$map: {
-                  input: "$docketDetails",
-                  as: "totaltOTAMT",
-                  in: "$$totaltOTAMT.tOTAMT",
-                },
-              }
-            },
-
-            ActualWeight: {
-              D$sum: {
-                D$map: {
-                  input: "$docketDetails",
-                  as: "totalaCTWT",
-                  in: "$$totalaCTWT.aCTWT",
-                },
-              },
-            },
-            ChargedWeight: {
-              D$sum: {
-                D$map: {
-                  input: "$docketDetails",
-                  as: "totalcHRWT",
-                  in: "$$totalcHRWT.cHRWT",
-                },
-              },
-            },
-            NoPkg: {
-              D$sum: {
-                D$map: {
-                  input: "$docketDetails",
-                  as: "totalPKG",
-                  in: "$$totalPKG.pKGS",
-                },
-              },
-            },
-
-            GodownNoName: "",
-
-            DeliveryDateandTime: {
-              D$ifNull: ["$eNTDT", ""],
-            },
-            PrivateMarka: "",
-            VehicleNo: {
-              D$arrayElemAt: ["$docketDetails.vEHNO", 0],
-            },
-            Status: "Delivered",
-            SaidToContains: "",
-            Receiver: {
-              D$ifNull: ["$rCEIVNM", ""],
-            },
-            ReceiverNo: {
-              D$ifNull: ["$cNTCTNO", ""],
-            },
-            Remark: "",
-            chargeList: "$charge"
-          },
-        },
-      ]
-    }
-
     try {
-      const res = await firstValueFrom(this.masterService.masterMongoPost('generic/query', reqBody));
+      const reqBody = {
+        companyCode: this.storage.companyCode,
+        reportName: "MRRegister",
+        filters: { filter: { ...matchQuery } }
+      };
+
+      const res = await firstValueFrom(this.masterService.masterMongoPost("generic/getReportData", reqBody));
+      res.data.grid.columns = this.salesRegisterService.updateColumnHeaders(res.data.grid.columns, DocCalledAs);
 
       const details = await Promise.all(
-        res.data.map(async (item) => {
-          const userName = await this.salesRegisterService.getUserName(item.MRCloseBy);
-
+        res.data.data.map(async (item) => {
+          const userName = await this.salesRegisterService.getUserName(item.eNTBY);
           return {
             ...item,
-            MRCloseBy: userName, // Use the fetched userName here
-            MRTime: item.MRTime ? moment(item.MRDate).format('hh:mmA') : '',
-            MRDate: item.MRDate ? moment(item.MRDate).local().format("DD MMM YYYY HH:mm") : "",
-            DeliveryDateandTime: item.DeliveryDateandTime ? moment(item.DeliveryDateandTime).local().format("DD MMM YYYY HH:mm") : "",
-            ChequeDate: item.ChequeDate ? moment(item.ChequeDate).local().format("DD MMM YYYY HH:mm") : "",
-            MRCloseDate: item.MRCloseDate ? moment(item.MRCloseDate).local().format("DD MMM YYYY HH:mm") : "",
-            chargeList: this.setchargeList(item.chargeList)
+            eNTBY: userName, // Use the fetched userName here
+            mRTP: "Delivery MR",
+            Status: "Delivered",
+            tDSAmt: item.tDSAmt ? item.tDSAmt.toFixed(2) : 0,
+            dLVRMRAMT: item.dLVRMRAMT ? item.dLVRMRAMT.toFixed(2) : 0,
+            gSTAMT: item.gSTAMT ? item.gSTAMT.toFixed(2) : 0,
+            cLLCTAMT: item.cLLCTAMT ? item.cLLCTAMT.toFixed(2) : 0,
+            cHQDT: item.cHQDT ? moment(item.cHQDT).local().format("DD MMM YYYY HH:mm") : "",
+            eNTDT: item.eNTDT ? moment(item.eNTDT).local().format("DD MMM YYYY HH:mm") : "",
           };
         })
       );
-      return details
+
+      return {
+        data: details,
+        grid: res.data.grid
+      };
+
     } catch (error) {
-      console.error('Error fetching Mr data:', error);
-      return [];
-    }
-  }
-  setchargeList(chargeArray) {
-
-    const chargeTotals: { [key: string]: number } = {}; // Initialize chargeTotals to store totals for each charge name
-
-    // Check if chargeArray is valid and not [null]
-    if (chargeArray && chargeArray.length && chargeArray[0] !== null) {
-      chargeArray.forEach(chrge => {
-        chrge.forEach(charge => {
-          if (!chargeTotals[charge.cHGNM]) {
-            chargeTotals[charge.cHGNM] = charge.aMT; // Initialize total for charge name if not already present
-          } else {
-            if (charge.oPS === "+") {
-              chargeTotals[charge.cHGNM] += charge.aMT; // Add amount for addition operation
-            } else if (charge.oPS === "-") {
-              chargeTotals[charge.cHGNM] -= Math.abs(charge.aMT); // Subtract amount for subtraction operation
-            }
-          }
-        });
-      });
-
-      // Convert chargeTotals object to array of objects with desired format
-      const result = Object.keys(chargeTotals).map(chargeName => ({
-        [chargeName]: chargeTotals[chargeName],
-      }));
-
-      return result; // Return the transformed data
+      console.error('Error fetching MR data:', error);
+      return { data: [], grid: null }; // Ensure the structure is always returned
     }
   }
 }

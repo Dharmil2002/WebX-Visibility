@@ -248,8 +248,8 @@ export class SalesRegisterAdvancedComponent implements OnInit {
         const status = this.salesregisterTableForm.value.status;
 
         const data = await this.salesRegisterService.getsalesRegisterReportDetail(startDate, endDate, loct, toloc, payment, bookingtype, cnote, customer, mode, flowType, status);
-        const transformedHeader = this.addChargesToColumns(data.data, data.grid.columns);
-        const newdata = this.setCharges(data.data);
+        const transformedHeader = this.salesRegisterService.addChargesToColumns(data.data, data.grid.columns);
+        const newdata = this.salesRegisterService.setCharges(data.data);
 
         if (data.data.length === 0) {
           if (data) {
@@ -301,46 +301,6 @@ export class SalesRegisterAdvancedComponent implements OnInit {
         );
       }
     }, "Sales Register Advance Generating Please Wait..!");
-  }
-  // function to set charges
-  setCharges(data) {
-    const existingCharges = new Set();
-
-    data.forEach((item) => {
-      if (item.cHGLST && Array.isArray(item.cHGLST) && item.cHGLST.length > 0) {
-        item.cHGLST.forEach((charge) => {
-          if (!existingCharges.has(charge.cHGNM)) {
-            item[charge.cHGNM] = charge.aMT;
-            existingCharges.add(charge.cHGNM);
-          }
-        });
-      }
-    });
-
-    return data;
-  }
-  // function to set charges
-  addChargesToColumns(data, columns) {
-
-    const existingCharges = new Set();
-
-    // Add predefined columns if they don't already exist
-    data.forEach((item) => {
-      if (item.cHGLST && Array.isArray(item.cHGLST) && item.cHGLST.length > 0) {
-        item.cHGLST.forEach((charge) => {
-          if (!existingCharges.has(charge.cHGNM)) {
-            columns.push({
-              header: charge.cHGNM,
-              field: charge.cHGNM,
-              width: 200
-            });
-            existingCharges.add(charge.cHGNM);
-          }
-        });
-      }
-    });
-
-    return columns;
   }
 
   functionCallHandler($event) {

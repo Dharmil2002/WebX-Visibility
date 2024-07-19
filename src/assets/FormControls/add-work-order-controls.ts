@@ -253,7 +253,7 @@ export class WorkOrderFormControls {
       {
         name: "sentdate",
         label: "Sent to workshop date",
-        placeholder: "Location",
+        placeholder: "Sent Date",
         type: "datetimerpicker",
         value: IsUpdate || isClose ? WorkOrder?.sentdate : new Date(),
         filterOptions: "",
@@ -608,7 +608,7 @@ export class WorkOrderFormControls {
       },
       {
         name: "StartDTM",
-        label: "Start DTM",
+        label: "Start Date",
         placeholder: "Start DTM",
         type: "datetimerpicker",
         value: "",
@@ -627,7 +627,7 @@ export class WorkOrderFormControls {
       },
       {
         name: "EndDTM",
-        label: "End DTM",
+        label: "End Date",
         placeholder: "End DTM",
         type: "datetimerpicker",
         value: "",
@@ -799,7 +799,7 @@ export class WorkOrderFormControls {
       },
       {
         name: "StartDTM",
-        label: "Start DTM",
+        label: "Start Date",
         placeholder: "Start DTM",
         type: "datetimerpicker",
         value: "",
@@ -815,7 +815,7 @@ export class WorkOrderFormControls {
       },
       {
         name: "EndDTM",
-        label: "End DTM",
+        label: "End Date",
         placeholder: "End DTM",
         type: "datetimerpicker",
         value: "",

@@ -233,7 +233,6 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
         // Vendors Data
         const VendorItems = [...new Set(jsonData.map((x) => x.VendorCode.trim().toUpperCase()))];
         this.VendorList = await this.fetchVendorsData(VendorItems);
-        debugger
         this.StateList = await stateFromApi(this.masterService);
         const StateValue = this.StateList.map((x) => x.value);
         const StateName = this.StateList.map((x) => x.name);

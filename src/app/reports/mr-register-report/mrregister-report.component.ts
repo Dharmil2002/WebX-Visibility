@@ -254,7 +254,7 @@ export class MRRegisterReportComponent implements OnInit {
 
     return total;
   }
-  // matching key and setting its value
+  // matching key and setting its value for total
   matchKeysAndSetValues(keysMap, valuesMap) {
     const matchedValues = {};
 

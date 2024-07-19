@@ -69,6 +69,7 @@ import { CustomerBillStatus } from "src/app/Models/docStatus";
 import { StateService } from "src/app/Utility/module/masters/state/state.service";
 import { getApiCompanyDetail } from "src/app/finance/invoice-summary-bill/invoice-utility";
 import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
+import _ from "lodash";
 @Component({
   selector: "app-consignment-entry-form",
   templateUrl: "./consignment-entry-form.component.html",
@@ -754,35 +755,36 @@ export class ConsignmentEntryFormComponent
           city
         );
         let clusterArray=[]
-        clusterArray.push({
-          name: `${dest.pincode}`,
-          value: dest.city,
-          ct: dest.city,
-          pincode: dest.pincode, // include pincode here
-          st: dest.locStateId,
-          clusterName: cluster && cluster.length > 0 ? cluster[0].clusterName : "",
-          clusterId: cluster && cluster.length > 0 ? cluster[0].clusterCode : "",
-        });
+          clusterArray.push({
+            name: `${dest.pincode}`,
+            value: dest.city,
+            ct: dest.city,
+            pincode: dest.pincode, // include pincode here
+            st: dest.locStateId,
+            clusterName: cluster && cluster.length > 0 ? cluster[0].clusterName : "",
+            clusterId: cluster && cluster.length > 0 ? cluster[0].clusterCode : "",
+          });
+
         clusterData.forEach((x)=>{
           if(x.clusterName){
             let json={
-            name: `${x.pincode}`,
-            value:`${x.clusterName}`,
-            ct: x.ct,
-            pincode: x.pincode, // include pincode here
-            st: x.st,
-            clusterName: x.clusterName,
-            clusterId:x.clusterId
+              name: `${x.pincode}`,
+              value:`${x.clusterName}`,
+              ct: x.ct,
+              pincode: x.pincode, // include pincode here
+              st: x.st,
+              clusterName: x.clusterName,
+              clusterId:x.clusterId
             }
-          clusterArray.push(json)
+            clusterArray.push(json)
           }
+          else 
             clusterArray.push(x)
-        })
-        const uniqueData = clusterArray.filter((item, index, self) =>
-          index === self.findIndex((t) => (
-              t.value === item.value
-          ))
-      );
+        });
+
+        let uniqueData = _.uniqBy(clusterArray, "value");
+        uniqueData = _.sortBy(uniqueData, "value");
+        
         this.filter.Filter(
           this.model.allformControl,
           this.model.consignmentTableForm,

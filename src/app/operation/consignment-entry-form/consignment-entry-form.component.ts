@@ -702,6 +702,7 @@ export class ConsignmentEntryFormComponent
   }
   /*get pincode detail*/
   async getDestination() {
+    if(this.model.consignmentTableForm.get("destination")?.value.length>2){
     const destinationMapping = await this.locationService.locationFromApi({
       locCode: {
         D$regex: `^${this.model.consignmentTableForm.get("destination")?.value
@@ -716,6 +717,7 @@ export class ConsignmentEntryFormComponent
       this.model.destination,
       this.model.destinationStatus
     );
+  }
   }
   /*end */
   /*below code is for the set city value*/

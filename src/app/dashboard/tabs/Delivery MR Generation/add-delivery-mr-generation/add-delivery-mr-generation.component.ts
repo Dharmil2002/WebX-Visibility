@@ -100,6 +100,7 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
   rateType: AutoComplete[];
   Demurragecharge: number = 0;
   chargeDetails: any;
+  submitted: boolean = true;
   constructor(private fb: UntypedFormBuilder,
     private router: Router,
     private dialog: MatDialog,
@@ -821,6 +822,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     } else {
       this.snackBarUtilityService.commonToast(async () => {
         try {
+          // Disbale the submit button
+          this.submitted = false;
           let gst = {};
           let GSTAmount = 0;
           this.GSTApplied.map(x => {
@@ -1235,7 +1238,8 @@ export class AddDeliveryMrGenerationComponent implements OnInit {
     return (
       !this.deliveryMrTableForm.valid ||
       !this.PaymentSummaryFilterForm.valid ||
-      !this.SummaryForm.valid
+      !this.SummaryForm.valid ||
+      !this.submitted
     );
   }
   //#endregion

@@ -1340,18 +1340,84 @@ export class FreightControl extends BaseControl {
          Validations: [], generatecontrol: true, disable: false
       },
       {
-        name: 'gstAmount', label: 'GST Rate (%)', placeholder: 'GST Rate (%)', type: 'mobile-number',//please consider GstAmount as Gst Rate
-        value: docketDetail?.gstAmount||0, Validations: [], generatecontrol: true, disable: false,
+        name: "sacName",
+        label: "SAC",
+        placeholder: "SAC",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
         functions: {
-          onChange: "calculateRate"
-        }
+          onModel: "GetSacDetails",
+          onOptionSelect: "getSacRate",
+        },
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic",
+        },
+      },  
+      {
+        name: "gstRate",
+        label: "GST Rate(%)",
+        placeholder: "GST Rate",
+        type: "number",
+        value: 0.0,
+        Validations: [],
+        functions: {
+          onModel: "preventNegative",
+          onChange: "calculateRate",
+        },
+        additionalData: {
+          metaData: "freightDetails",
+        },
+        generatecontrol: true,
+        disable: false,
       },
       {
-        name: 'gstChargedAmount', label: 'GST Charged Amount (₹)', placeholder: 'GST Charged Amount', type: 'mobile-number',
-        value: docketDetail?.gstChargedAmount||0, Validations: [], generatecontrol: true, disable: false,
+        name: "gstChargedAmount",
+        label: "GST Charged Amount (₹)",
+        placeholder: "GST Charged Amount",
+        type: "number",
+        value: 0.0,
+        Validations: [],
+        additionalData: {
+          metaData: "freightDetails",
+        },
+        generatecontrol: true,
+        disable: false,
         functions: {
-          onChange: "calculateFreight"
-        }
+          onModel: "preventNegative",
+          onChange: "calculateFreight",
+        },
+      },
+      {
+        name: "gstAmount",
+        label: "GST Amount(₹)",
+        placeholder: "GST Amount",
+        type: "number",
+        value: 0.0,
+        Validations: [],
+        additionalData: {
+          metaData: "freightDetails",
+        },
+        generatecontrol: true,
+        disable: false,
+        functions: {
+          onModel: "preventNegative",
+          onChange: "calculateFreight",
+        },
       },
       {
         name: 'totalAmount', label: 'Total Amount (₹)', placeholder: 'Total Amount', type: 'text',

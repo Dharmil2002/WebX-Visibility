@@ -134,6 +134,8 @@ export class ThcGenerationComponent implements OnInit {
       Title: "Shipment",
       class: "matcolumnleft",
       Style: "min-width:190px",
+      type:'windowLink',
+      functionName:'OpenCnote'
     },
     cNO: {
       Title: "Container Id",
@@ -194,7 +196,7 @@ export class ThcGenerationComponent implements OnInit {
     "bPARTYNM",
     "pKGS",
     // "cNO",
-    "docNo",
+    //"docNo",
     "fCT",
     "tCT",
     "aCTWT"
@@ -1252,6 +1254,7 @@ export class ThcGenerationComponent implements OnInit {
       this.thcTableForm.controls["via"].setValue(via);
     }
     this.VehicleTableForm.controls["inExdt"].setValue(thcNestedDetails?.thcDetails.iNSEXDT)
+    this.VehicleTableForm.controls["vehRegDate"].setValue(thcNestedDetails?.thcDetails.vEHREGDT)
     this.VehicleTableForm.controls["fitdt"].setValue(thcNestedDetails?.thcDetails.fITDT)
     this.thcTableForm.controls["driverLexd"].disable(thcNestedDetails?.thcDetails.eNGNO);
     this.thcTableForm.controls["vendorType"].setValue(`${thcNestedDetails?.thcDetails.vND?.tY}`);
@@ -1531,7 +1534,6 @@ export class ThcGenerationComponent implements OnInit {
   /*End*/
   /*below code is for the */
   GenerateTHCgenerationRequestBody() {
-
     const VendorDetails = this.vendorTypes.find((x) => x.value.toLowerCase() == this.thcTableForm.controls['vendorType'].value.toLowerCase());
     const transitHours = Math.max(...this.tableData.filter(item => item.isSelected == true).map(o => o.transitHours));
     const deptDate = this.thcTableForm.controls['tripDate'].value || new Date();
@@ -1612,6 +1614,7 @@ export class ThcGenerationComponent implements OnInit {
     const tdsUpload = this.imageData?.tdsUpload || ""
     this.thcsummaryData.tdsUpload = tdsUpload;
     this.thcsummaryData.etaDate = getValueOrDefault(this.thcTableForm, "etaDate", null);
+    this.thcsummaryData.vehRegDate = getValueOrDefault(this.VehicleTableForm, "vehRegDate", null);
     this.thcsummaryData.engineNo = getValueOrDefault(this.VehicleTableForm, "engineNo");
     this.thcsummaryData.chasisNo = getValueOrDefault(this.VehicleTableForm, "chasisNo");
     this.thcsummaryData.inExdt = getValueOrDefault(this.VehicleTableForm, "inExdt", null);
@@ -2543,7 +2546,17 @@ export class ThcGenerationComponent implements OnInit {
     const balance = parseFloat(this.balanceAmount) - Math.abs(total)
     this.chargeForm.controls["balAmt"].setValue(balance);
   }
-
+	  
+  OpenCnote(data) {
+    
+    const templateBody = {
+      templateName: "DKT",
+      PartyField:"",
+      DocNo:data?.data?.docNo||"",
+    }
+    const url = `${window.location.origin}/#/Operation/view-print?templateBody=${JSON.stringify(templateBody)}`;
+    window.open(url, '', 'width=1000,height=800');
+  }
   //Voucher Create Thc Generation
   createJournalRequest(data: any, thcNo): Observable<any> {
     // Construct the voucher request payload

@@ -444,15 +444,10 @@ export class DepartureService {
       }
       await firstValueFrom(this.operation.operationMongoPut("generic/updateAll", reqDktOpsDepart));
     }
-    Swal.fire({
-      icon: "info",
-      title: "Departure",
-      text: "Vehicle to " + next + " is about to depart.",
-      confirmButtonText: "OK",
-    });
+
     return data.tripID;
   }
-
+  
   async getDocketDetails(filter) {
     const req = {
       companyCode: this.storage.companyCode,

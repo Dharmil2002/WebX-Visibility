@@ -93,6 +93,9 @@ export class MarkArrivalComponent implements OnInit {
     this.MarkArrivalTableForm.controls.ETA.setValue(moment(this.MarkArrivalTable.Expected).tz(this.storage.timeZone).format("DD MMM YYYY hh:mm A"))
     this.MarkArrivalTableForm.controls.Route.setValue(this.MarkArrivalTable.Route)
     this.MarkArrivalTableForm.controls.TripID.setValue(this.MarkArrivalTable.TripID)
+    //below code not working, need to be checked why?
+    this.MarkArrivalTableForm.controls.ArrivalTime.setValue(moment().format("hh:mm A"));
+
     this.getManifestDetail();
   }
   functionCaller($event) {

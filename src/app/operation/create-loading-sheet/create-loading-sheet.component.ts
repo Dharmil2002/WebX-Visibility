@@ -27,6 +27,10 @@ import { VehicleService } from "src/app/Utility/module/masters/vehicle-master/ve
 import moment from "moment";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import { ThcService } from "src/app/Utility/module/operation/thc/thc.service";
+import { firstValueFrom } from "rxjs";
+import { MarkerVehicleService } from "src/app/Utility/module/operation/market-vehicle/marker-vehicle.service";
+import { ControlPanelService } from "src/app/core/service/control-panel/control-panel.service";
+import { DocCalledAsModel } from "src/app/shared/constants/docCalledAs";
 
 @Component({
   selector: "app-create-loading-sheet",
@@ -58,6 +62,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     { label: "count", componentDetails: LoadingSheetViewComponent },
     // Add more menu items as needed
   ];
+
   // Declaring breadcrumbs
   breadscrums = [
     {
@@ -98,76 +103,7 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
   ];
   addNewTitle: string = "Add Market";
-  columnHeader = {
-    checkBoxRequired: {
-      Title: "",
-      class: "matcolumncenter",
-      Style: "max-width:20px; max-width:20px",
-      sticky: true,
-    },
-    leg: {
-      Title: "Leg",
-      class: "matcolumnleft",
-      Style: "min-width:100px",
-      sticky: true,
-    },
-    count: {
-      Title: "Shipment",
-      class: "matcolumnright",
-      Style: "max-width:50px; min-width:50px"
-    },
-
-    packages: {
-      Title: "Packages",
-      class: "matcolumnright",
-      Style: "max-width:50px; min-width:50px",
-      datatype: 'number',
-      decimalPlaces: 0
-    },
-
-    weightKg: {
-      Title: "Weight (KG)",
-      class: "matcolumnright",
-      Style: "max-width:80px; min-width:80px",
-      datatype: 'number',
-      decimalPlaces: 0
-    },
-
-    volumeCFT: {
-      Title: "Volume (CFT)",
-      class: "matcolumnright",
-      Style: "max-width:80px; min-width:80px",
-      datatype: 'number',
-      decimalPlaces: 0
-    },
-
-    // tCount: {
-    //   Title: "Shipment",
-    //   class: "matcolumnright",
-    //   Style: "max-width:50px; min-width:50px"
-    // },
-    // tPackages: {
-    //   Title: "Packages",
-    //   class: "matcolumnright",
-    //   Style: "max-width:50px; min-width:50px",
-    //   datatype: 'number',
-    //   decimalPlaces: 0
-    // },
-    // tWeightKg: {
-    //   Title: "Weight (KG)",
-    //   class: "matcolumnright",
-    //   Style: "max-width:80px; min-width:80px",
-    //   datatype: 'number',
-    //   decimalPlaces: 0
-    // },
-    // tVolumeCFT: {
-    //   Title: "Volume (CFT)",
-    //   class: "matcolumnright",
-    //   Style: "max-width:80px; min-width:80px",
-    //   datatype: 'number',
-    //   decimalPlaces: 0
-    // }
-  };
+  columnHeader = {};
   staticField = ["leg", "packages", "weightKg", "volumeCFT", "tCount", "tPackages", "tWeightKg", "tVolumeCFT"];
   // Declaring CSV file's header as key and value pair
   headerForCsv = {
@@ -210,6 +146,8 @@ export class CreateLoadingSheetComponent implements OnInit {
   vehicleDetails: any;
   MarketData: any;
   vehicleTypeList: any;
+  DocCalledAs: DocCalledAsModel;
+
   constructor(
     private Route: Router,
     private _operationService: OperationService,
@@ -223,11 +161,92 @@ export class CreateLoadingSheetComponent implements OnInit {
     private vehicleTypeService: VehicleTypeService,
     private thcService:ThcService,
     private vehicleService: VehicleService,
+    private marketVehicleSericve: MarkerVehicleService,
+    private controlPanelService: ControlPanelService,
     public snackBarUtilityService: SnackBarUtilityService
   ) {
     this.companyCode = this.storage.companyCode;
     this.orgBranch = this.storage.branch;
     this.userName = this.storage.userName;
+    this.DocCalledAs = this.controlPanelService.DocCalledAs;
+    this.headerForCsv = {
+      RouteandSchedule: "Leg",
+      Shipments: `${this.DocCalledAs.Docket}s`,
+      Packages: "Packages",
+      WeightKg: "Weight Kg",
+      VolumeCFT: "Volume CFT",
+    };
+
+    this.columnHeader = {
+      checkBoxRequired: {
+        Title: "",
+        class: "matcolumncenter",
+        Style: "max-width:20px; max-width:20px",
+        sticky: true,
+      },
+      leg: {
+        Title: "Leg",
+        class: "matcolumnleft",
+        Style: "min-width:100px",
+        sticky: true,
+      },
+      count: {
+        Title: `${this.DocCalledAs.Docket}s`,
+        class: "matcolumnright",
+        Style: "max-width:50px; min-width:50px"
+      },
+
+      packages: {
+        Title: "Packages",
+        class: "matcolumnright",
+        Style: "max-width:50px; min-width:50px",
+        datatype: 'number',
+        decimalPlaces: 0
+      },
+
+      weightKg: {
+        Title: "Weight (KG)",
+        class: "matcolumnright",
+        Style: "max-width:80px; min-width:80px",
+        datatype: 'number',
+        decimalPlaces: 0
+      },
+
+      volumeCFT: {
+        Title: "Volume (CFT)",
+        class: "matcolumnright",
+        Style: "max-width:80px; min-width:80px",
+        datatype: 'number',
+        decimalPlaces: 0
+      },
+
+      // tCount: {
+      //   Title: "Shipment",
+      //   class: "matcolumnright",
+      //   Style: "max-width:50px; min-width:50px"
+      // },
+      // tPackages: {
+      //   Title: "Packages",
+      //   class: "matcolumnright",
+      //   Style: "max-width:50px; min-width:50px",
+      //   datatype: 'number',
+      //   decimalPlaces: 0
+      // },
+      // tWeightKg: {
+      //   Title: "Weight (KG)",
+      //   class: "matcolumnright",
+      //   Style: "max-width:80px; min-width:80px",
+      //   datatype: 'number',
+      //   decimalPlaces: 0
+      // },
+      // tVolumeCFT: {
+      //   Title: "Volume (CFT)",
+      //   class: "matcolumnright",
+      //   Style: "max-width:80px; min-width:80px",
+      //   datatype: 'number',
+      //   decimalPlaces: 0
+      // }
+    };
 
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
       this.isDisplay = true;
@@ -255,13 +274,16 @@ export class CreateLoadingSheetComponent implements OnInit {
       }
 
     }
-
+  }
+  
+  ngOnInit(): void { 
     // Initialize form controls
     this.IntializeFormControl();
     this.generalMaster();
     // Auto-bind data
-
+    this.checkIsMarketVehicle(false);
   }
+
   async generalMaster() {
     this.products = await this.generalService.getDataForAutoComplete("product_detail", { companyCode: this.storage.companyCode }, "ProductName", "ProductID");
     const product = ["Road", "Express"];
@@ -343,25 +365,25 @@ export class CreateLoadingSheetComponent implements OnInit {
   }
   async getThcDetails() {
     if(this.isUpdate){
-    const res = await this.thcService.getThcDetailsByNo(this.tripData?.TripID || "")
-    if (Object.keys(res.data).length > 0) {
-      this.loadingSheetTableForm.controls['vehicleType'].setValue(res.data?.vTYP||"");
-     // this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(res.data?.vTYP);
-      this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(res.data?.cAP?.vOL||0);
-      this.loadingSheetTableForm.controls['Capacity'].setValue(res.data?.cAP?.wT||"");
-      const fieldName=['vehicle','Capacity','CapacityVolumeCFT','vehicleType'];
-      this.jsonControlArray = this.jsonControlArray.map((x) => {
-        if (fieldName.includes(x.name)) {
-          x.disable = true
-        }
-        return x;
-      });
-     // this.loadingSheetTableForm.controls['vehicle'].disable();
-      //this.loadingSheetTableForm.controls['Capacity'].disable();
-      //this.loadingSheetTableForm.controls['CapacityVolumeCFT'].disable();
-      //this.loadingSheetTableForm.controls['vehicleType'].disable();
+      const res = await this.thcService.getThcDetailsByNo(this.tripData?.TripID || "")
+      if (Object.keys(res.data).length > 0) {
+        this.loadingSheetTableForm.controls['vehicleType'].setValue(res.data?.vTYP||"");
+      // this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(res.data?.vTYP);
+        this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(res.data?.cAP?.vOL||0);
+        this.loadingSheetTableForm.controls['Capacity'].setValue(res.data?.cAP?.wT||"");
+        const fieldName=['vehicle','Capacity','CapacityVolumeCFT','vehicleType'];
+        this.jsonControlArray = this.jsonControlArray.map((x) => {
+          if (fieldName.includes(x.name)) {
+            x.disable = true
+          }
+          return x;
+        });
+        //this.loadingSheetTableForm.controls['vehicle'].disable();
+        //this.loadingSheetTableForm.controls['Capacity'].disable();
+        //this.loadingSheetTableForm.controls['CapacityVolumeCFT'].disable();
+        //this.loadingSheetTableForm.controls['vehicleType'].disable();
+      }
     }
-  }
   }
   /*below function is for the inatalize a forGroup*/
   IntializeFormControl() {
@@ -389,10 +411,7 @@ export class CreateLoadingSheetComponent implements OnInit {
     ]);
   }
   /*End*/
-  ngOnInit(): void { 
-    this.checkIsMarketVehicle(false);
-  }
-
+ 
   functionCallHandler($event) {
     let field = $event.field; // the actual formControl instance
     let functionName = $event.functionName; // name of the function , we have to call
@@ -729,7 +748,7 @@ export class CreateLoadingSheetComponent implements OnInit {
 
   }
   // get vehicleNo
-  GetVehicleDropDown() {
+  async GetVehicleDropDown() {
     const vehRequest = {
       companyCode: this.companyCode,
       collectionName: "vehicle_status",
@@ -743,187 +762,32 @@ export class CreateLoadingSheetComponent implements OnInit {
     };
 
     // Fetch data from the JSON endpoint
-    this._operationService
-      .operationMongoPost("generic/get", vehRequest)
-      .subscribe((res) => {
-        if (res) {
-          let vehicleDetails = res.data.map((x) => {
-            return {
-              name: x.status == 'Available' ? x.vehNo : `${x.vehNo} | In Transit [${x.tripId}] `,
-              value: x.vehNo,
-              status: x.status
-            };
-          }).sort((a, b) => {
-            const statusComparison = a.status.localeCompare(b.status);
-            if (statusComparison !== 0) {
-              return statusComparison;
-            }
-            return a.value.localeCompare(b.value);
-          });
-          this.vehicleDetails = vehicleDetails;
-          this.filter.Filter(
-            this.jsonControlArray,
-            this.loadingSheetTableForm,
-            vehicleDetails,
-            this.vehicleNoControlName,
-            this.vehicleControlStatus
-          );
-        }
+    const res = await firstValueFrom(this._operationService.operationMongoPost("generic/get", vehRequest));
+    if (res) {
+      let vehicleDetails = res.data.map((x) => {
+        return {
+          name: x.status == 'Available' ? x.vehNo : `${x.vehNo} | In Transit [${x.tripId}] `,
+          value: x.vehNo,
+          status: x.status,
+          vendorType: x.vendorTypeCode
+        };
+      }).sort((a, b) => {
+        const sc = a.status.localeCompare(b.status);
+        if (sc !== 0) { return sc; }
+        return a.value.localeCompare(b.value);
       });
-  }
-  //Add tripData
-  async addTripData() {
-    if (this.loadingSheetTableForm.controls["tripID"].value === 'System Generated' || !this.loadingSheetTableForm.controls["tripID"].value) {
-      const randomNumber =
-        "TH/" +
-        this.orgBranch +
-        "/" +
-        runningNumber();
 
-      this.loadingSheetTableForm.controls["tripID"].setValue(randomNumber);
-      // Generate and set a random tripID if not already set
-    }
-    let tripDetails = {
-      startTime: new Date(),
-      vehicleNo: this.loadingSheetTableForm.value.vehicle.value,
-      tripId: this.loadingSheetTableForm.value.tripID,
-      status: "Vehicle Loading",
-      updateBy: this.userName,
-      updateDate: new Date().toISOString()
-    };
-    const reqBody = {
-      companyCode: this.companyCode,
-      collectionName: "trip_detail",
-      filter: { _id: this.tripData.id },
-      update: {
-        ...tripDetails,
-      },
-    };
-    try {
-      // Await the API call's response before proceeding
-      const res = await this._operationService.operationMongoPut("generic/update", reqBody).toPromise();
-      if (res) {
-        // If response is successful, call the next function
-        await this.getDetailsByLeg();
-      }
-    } catch (error) {
-      // Handle any errors that might occur during the API call
-      console.error('Error occurred during the API call:', error);
-    }
-  }
-  async getDetailsByLeg() {
-    for (const leg of this.loadingData) {
-      const [org_loc, destination] = leg.leg.split("-").map(part => part.trim());
-
-      const matchingShipments = this.cnoteDetails.filter(
-        shipment =>
-          shipment.orgLoc === org_loc &&
-          shipment.destination.split(":")[1].trim() === destination
+      this.vehicleDetails = vehicleDetails;
+      this.filter.Filter(
+        this.jsonControlArray,
+        this.loadingSheetTableForm,
+        vehicleDetails,
+        this.vehicleNoControlName,
+        this.vehicleControlStatus
       );
-
-      await this.addLsDetails(leg);
-
-      if (matchingShipments.length > 0) {
-        const updatePromises = matchingShipments.map(matchingShipment =>
-          this.updateDocketDetails(matchingShipment.docketNumber, leg.LoadingSheet)
-        );
-        await Promise.all(updatePromises);
-      }
-    }
-    this.isSubmit = false;
-    // Add your message here
-    const dialogRef: MatDialogRef<LodingSheetGenerateSuccessComponent> =
-      this.dialog.open(LodingSheetGenerateSuccessComponent, {
-        width: "100%", // Set the desired width
-        data: this.loadingData, // Pass the data object
-      });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      this.goBack('Departures');
-      // Handle the result after the dialog is closed
-    });
-  }
-  async updateDocketDetails(docket, lsNo) {
-    let loadingSheetData = {
-      lsNo: lsNo
-    };
-    const trackingDocket = {
-      lsNo: lsNo,
-      tripId: this.loadingSheetTableForm.value.tripID,
-      vehNo: this.loadingSheetTableForm.controls["vehicle"].value?.value || "",
-      route: this.tripData?.RouteandSchedule || "",
-      dktNo: docket
-    };
-
-    try {
-      await Promise.all([
-        await updateTracking(this.companyCode, this._operationService, trackingDocket),
-        await this.updateOperationService(docket, loadingSheetData)
-      ]);
-    } catch (error) {
-      console.error('Error occurred during the API call:', error);
     }
   }
-  async addLsDetails(leg) {
-    const lsDetails = {
-      _id: leg.LoadingSheet,
-      lsno: leg.LoadingSheet,
-      leg: leg.leg,
-      vehno: this.loadingSheetTableForm.value.vehicle.value,
-      tripId: this.loadingSheetTableForm.value?.tripID,
-      location: this.orgBranch,
-      pacakges: leg.packages,
-      weightKg: leg.weightKg,
-      volumeCFT: leg.volumeCFT,
-      entryBy: this.userName,
-      loadedKg: parseFloat(this.loadingSheetTableForm.value.LoadedKg),
-      loadedVolumeCft: parseFloat(this.loadingSheetTableForm.value.LoadedvolumeCFT),
-      loadAddedKg: parseFloat(this.loadingSheetTableForm.value.LoadaddedKg),
-      WeightUtilization: parseFloat(this.loadingSheetTableForm.value.WeightUtilization),
-      volumeUtilization: parseFloat(this.loadingSheetTableForm.value.VolumeUtilization),
-      capacity: this.loadingSheetTableForm.value?.Capacity || 0,
-      capacityVolumeCFT: this.loadingSheetTableForm.value?.CapacityVolumeCFT || 0,
-      volumeAddedCFT: this.loadingSheetTableForm.value?.VolumeaddedCFT || 0,
-      entryDate: new Date().toISOString()
-    };
-    const reqBody = {
-      companyCode: this.companyCode,
-      collectionName: "loadingSheet_detail",
-      data: lsDetails,
-    };
-    try {
-      const res = await this._operationService.operationMongoPost("generic/create", reqBody).toPromise();
-      if (res) {
-        // Perform any necessary actions after the API call
-      }
-    } catch (error) {
-      console.error('Error occurred during the API call:', error);
-    }
-  }
-  updateVehicleStatus() {
-
-    const vehicleDetails = {
-      status: "In-Transit",
-      tripId: this.loadingSheetTableForm.value?.tripID,
-      route: this.tripData?.RouteandSchedule
-    };
-    const reqBody = {
-      companyCode: this.companyCode,
-      collectionName: "vehicle_status",
-      filter: { _id: this.loadingSheetTableForm.value.vehicle.value },
-      update: {
-        ...vehicleDetails,
-      },
-    };
-    this._operationService.operationMongoPut("generic/update", reqBody).subscribe({
-      next: (res: any) => {
-        if (res) {
-
-        }
-      },
-    });
-  }
-
+  
   async loadVehicleDetails() {
     try {
       this.checkVehicle();
@@ -932,18 +796,35 @@ export class CreateLoadingSheetComponent implements OnInit {
         vehControl.setValue("");
         return;
       }
-      const vehicleData = await getVehicleDetailFromApi(this.companyCode, this._operationService, this.loadingSheetTableForm.value.vehicle.value);
-      if (vehicleData) {
-        this.isMarket = false;
-        this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleData.vehicleType);
-        this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(vehicleData.vehicleTypeCode);
-        this.loadingSheetTableForm.controls['vendorType'].setValue(vehicleData?.vendorType || "Market");
-        this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(vehicleData?.cft||0);
-        this.loadingSheetTableForm.controls['Capacity'].setValue(vehicleData?.capacity||0);
+      if(vehControl.value.vendorType == 4) { 
+        const vehicleData = await this.marketVehicleSericve.GetVehicleData(this.loadingSheetTableForm.value.vehicle.value);
+        if (vehicleData) {
+          this.isMarket = true;
+          this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleData.vEHTYP);
+          this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(vehicleData.vEHTYPCD);
+          this.loadingSheetTableForm.controls['vendorType'].setValue("Market");
+          this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(vehicleData?.vOLCP||0);
+          this.loadingSheetTableForm.controls['Capacity'].setValue(vehicleData?.wTCAP||0);
+        }
+        else {
+          this.checkIsMarketVehicle(vehicleData);
+        }
       }
       else {
-        this.checkIsMarketVehicle(vehicleData);
+        const vehicleData = await getVehicleDetailFromApi(this.companyCode, this._operationService, this.loadingSheetTableForm.value.vehicle.value);
+        if (vehicleData) {
+          this.isMarket = false;
+          this.loadingSheetTableForm.controls['vehicleType'].setValue(vehicleData.vehicleType);
+          this.loadingSheetTableForm.controls['vehicleTypeCode'].setValue(vehicleData.vehicleTypeCode);
+          this.loadingSheetTableForm.controls['vendorType'].setValue(vehicleData?.vendorType || "Market");
+          this.loadingSheetTableForm.controls['CapacityVolumeCFT'].setValue(vehicleData?.cft||0);
+          this.loadingSheetTableForm.controls['Capacity'].setValue(vehicleData?.capacity||0);
+        }
+        else {
+          this.checkIsMarketVehicle(vehicleData);
+        }
       }
+      
     } catch (error) {
     }
   }
@@ -1072,28 +953,7 @@ export class CreateLoadingSheetComponent implements OnInit {
       SwalerrorMessage("error", "Please Enter Vehicle No", "", true);
     }
   }
-  async updateOperationService(docket, loadingSheetData) {
-    const reqBody = {
-      companyCode: this.companyCode,
-      collectionName: "docket",
-      filter: {
-        docketNumber: docket,
-      },
-      update: {
-        ...loadingSheetData
-      }
-    };
-
-    try {
-      const res = await this._operationService.operationMongoPut("generic/update", reqBody).toPromise();
-      if (res) {
-        await this.updateVehicleStatus();
-      }
-    } catch (error) {
-      console.error('Error occurred during the API call:', error);
-    }
-  }
-
+  
   //#region addMarket vehicle
   addMarket() {
     const dialogref = this.dialog.open(AddMarketVehicleComponent, {

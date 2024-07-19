@@ -44,7 +44,6 @@ export class CreditNoteRegisterReportComponent implements OnInit {
   source: any[] = []; // Array to hold data
   loading = true // Loading indicator
   LoadTable = false;
-  showOverlay: boolean = false;
   //#region Table
   columns = [];
   //#endregion
@@ -246,21 +245,20 @@ export class CreditNoteRegisterReportComponent implements OnInit {
       this.sorting = result.grid.sorting;
       this.searching = result.grid.searching;
       this.paging = result.grid.paging;
-      this.showOverlay = true;
-      this.source = result.data;
       this.LoadTable = true;
 
-      if (this.source.length === 0) {
-        if (this.source) {
-          Swal.fire({
-            icon: "error",
-            title: "No Records Found",
-            text: "Cannot Download CSV",
-            showConfirmButton: true,
-          });
+      
+      if (result.data.length === 0) {
+        let message = "No Data Found!";
+        if (DocNos.length > 0) {
+          message = "There is No Credit note has been Generated against this Document!";
+        } else if (VoucherNos.length > 0) {
+          message = "This voucher is not generated against Credit note!";
         }
+        this.snackBarUtilityService.ShowCommonSwal("error", message);
         return;
       }
+
       const stateData = {
         data: result,
         formTitle: 'CreditNote Register Report',

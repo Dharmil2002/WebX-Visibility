@@ -8,6 +8,7 @@ const today = new Date();
 today.setHours(23, 59, 59, 999); // Set the time to the end of the day
 let maxDate = today;
 export class ConsignmentLtl extends BaseControl {
+  
   private docketFields: FormControls[];
   private invoiceDetail: FormControls[];
   private freightDetails: FormControls[];
@@ -749,7 +750,8 @@ export class ConsignmentLtl extends BaseControl {
               "Please enter a valid E-way Bill number. It must consist of exactly 12 digits.",
           },
         ],
-        functions: {},
+        
+        functions: { onChange: "getEwayBill"},
         additionalData: {
           metaData: "invoiceDetail",
         },
@@ -767,7 +769,7 @@ export class ConsignmentLtl extends BaseControl {
         displaywith: "",
         Validations: [],
         additionalData: {
-          minDate: new Date(),
+         // minDate: new Date(),
           metaData: "invoiceDetail",
         },
         generatecontrol: true,
@@ -784,7 +786,7 @@ export class ConsignmentLtl extends BaseControl {
         displaywith: "",
         Validations: [],
         additionalData: {
-          minDate: new Date(),
+          //minDate: new Date(),
           metaData: "invoiceDetail",
         },
         generatecontrol: true,
@@ -831,7 +833,7 @@ export class ConsignmentLtl extends BaseControl {
           },
         ],
         additionalData: {
-          maxDate: new Date(),
+         // maxDate: new Date(),
           metaData: "invoiceDetail",
         },
         generatecontrol: true,
@@ -1304,6 +1306,35 @@ export class ConsignmentLtl extends BaseControl {
         },
       },
       {
+        name: "sacName",
+        label: "SAC",
+        placeholder: "SAC",
+        type: "dropdown",
+        value: "",
+        filterOptions: "",
+        autocomplete: "",
+        displaywith: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "invalidAutocompleteObject",
+            message: "Choose proper value",
+          },
+          {
+            name: "autocomplete",
+          },
+        ],
+        functions: {
+          onModel: "GetSacDetails",
+          onOptionSelect: "getSacRate",
+        },
+        additionalData: {
+          showNameAndValue: true,
+          metaData: "Basic",
+        },
+      },
+      {
         name: "gstRate",
         label: "GST Rate(%)",
         placeholder: "GST Rate",
@@ -1324,6 +1355,23 @@ export class ConsignmentLtl extends BaseControl {
         name: "gstChargedAmount",
         label: "GST Charged Amount (₹)",
         placeholder: "GST Charged Amount",
+        type: "number",
+        value: 0.0,
+        Validations: [],
+        additionalData: {
+          metaData: "freightDetails",
+        },
+        generatecontrol: true,
+        disable: false,
+        functions: {
+          onModel: "preventNegative",
+          onChange: "calculateFreight",
+        },
+      },
+      {
+        name: "gstAmount",
+        label: "GST Amount(₹)",
+        placeholder: "GST Amount",
         type: "number",
         value: 0.0,
         Validations: [],

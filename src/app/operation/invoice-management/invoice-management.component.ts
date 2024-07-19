@@ -48,7 +48,7 @@ export class InvoiceManagementComponent implements OnInit {
     },
     genCnt: {
       Title: "Invoice Generated​",
-      class: "matcolumnleft",
+      class: "matcolumncenter",
       Style: "max-width: 100px",
     },
     valueBl: {
@@ -65,7 +65,7 @@ export class InvoiceManagementComponent implements OnInit {
     penApAmt: {
       Title: "Pending Approval Amt",
       class: "matcolumncenter",
-      Style: "max-width: 90px",
+      Style: "max-width: 150px",
       datatype: "amount",
     },
     pendCol: {

@@ -9,7 +9,6 @@ import { JobOrderModel } from "src/app/core/models/operations/joborder/add-job-o
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { firstValueFrom } from "rxjs";
-import { OperationService } from "src/app/core/service/operations/operation.service";
 import Swal from "sweetalert2";
 import { VehicleService } from "src/app/Utility/module/masters/vehicle-master/vehicle-master-service";
 import { JobOrderService } from "src/app/core/service/jobOrder-service/jobOrder-services.service";
@@ -29,12 +28,14 @@ export class AddJobOrderComponent implements OnInit {
   jsonControlJobOrderArray: FormControls[];
   JobOrderForm: UntypedFormGroup;
   JobOrderModel: JobOrderModel;
-  isUpdate: boolean = false;
   submit = "Save";
   companyCode: any;
   vehicleNo: string;
   vehicleNoStatus: any;
   counter: number = 0;
+  isClose: boolean = false;
+  closekm: any;
+  totalcost: any;
   constructor(
     private fb: UntypedFormBuilder,
     private storage: StorageService,
@@ -42,28 +43,31 @@ export class AddJobOrderComponent implements OnInit {
     private filter: FilterUtils,
     private masterService: MasterService,
     private vehicleService: VehicleService,
-    private operation: OperationService,
-    private joborder:JobOrderService,
+    private joborder: JobOrderService
   ) {
     this.companyCode = this.storage.companyCode;
-    this.JobOrderModel = new JobOrderModel({});
-  }
-  ngOnInit(): void {
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
-      this.JobOrderModel = this.router.getCurrentNavigation().extras.state.data;
-      this.isUpdate = true;
-      this.breadScrums[0].active = "Job Order Modify";
-      this.breadScrums[0].title = "Job Order Modify";
-      this.submit = "Modify";
+      const data = this.router.getCurrentNavigation()?.extras?.state.data.data;
+      this.JobOrderModel = new JobOrderModel(data);
+      this.isClose = true;
+      this.breadScrums[0].active = "Job Order Close";
+      this.breadScrums[0].title = "Job Order Close";
+      this.submit = "Close";
+    } else {
+      this.JobOrderModel = new JobOrderModel({});
     }
+  }
+  ngOnInit() {
     this.initializeFormControl();
+    this.getWorkOrderData(this.JobOrderModel.jobNo);
     this.getVehicleStatus();
     this.getJobOrdersData();
+    this.handleDisableProperties();
   }
   initializeFormControl() {
     this.JobOrderFormControls = new JobOrderFormControls(
       this.JobOrderModel,
-      this.isUpdate
+      this.isClose
     );
     this.jsonControlJobOrderArray =
       this.JobOrderFormControls.getJobOrderFormControls();
@@ -77,8 +81,118 @@ export class AddJobOrderComponent implements OnInit {
       this.jsonControlJobOrderArray,
     ]);
   }
+  async getWorkOrderData(JobNo) {
+    if (!this.isClose) {
+      return;
+    }
+    const res = await this.joborder.getWorkOrdersWithFilters([
+      {
+        D$match: {
+          jOBNO: JobNo,
+          sTATUS: "Closed",
+        },
+      },
+      {
+        D$facet: {
+          documentsWithCKM: [
+            {
+              D$addFields: {
+                cKM: { D$max: "$cKM" }, // Ensure cKM is preserved correctly
+              },
+            },
+            {
+              D$sort: { cKM: -1 },
+            },
+            {
+              D$limit: 1,
+            },
+          ],
+          maintenanceServiceData: [
+            {
+              D$lookup: {
+                from: "work_maintenance_service",
+                localField: "wORKNO",
+                foreignField: "wORKNO",
+                as: "maintenanceServiceData",
+              },
+            },
+            { D$unwind: "$maintenanceServiceData" },
+            { D$replaceRoot: { newRoot: "$maintenanceServiceData" } },
+          ],
+          maintenanceSpairData: [
+            {
+              D$lookup: {
+                from: "work_maintenance_spair",
+                localField: "wORKNO",
+                foreignField: "wORKNO",
+                as: "maintenanceSpairData",
+              },
+            },
+            { D$unwind: "$maintenanceSpairData" },
+            { D$replaceRoot: { newRoot: "$maintenanceSpairData" } },
+          ],
+          batteryData: [
+            {
+              D$lookup: {
+                from: "work_battery",
+                localField: "wORKNO",
+                foreignField: "wORKNO",
+                as: "batteryData",
+              },
+            },
+            { D$unwind: "$batteryData" },
+            { D$replaceRoot: { newRoot: "$batteryData" } },
+          ],
+          TyreData: [
+            {
+              D$lookup: {
+                from: "work_tyre_details",
+                localField: "wORKNO",
+                foreignField: "wORKNO",
+                as: "TyreData",
+              },
+            },
+            { D$unwind: "$TyreData" },
+            { D$replaceRoot: { newRoot: "$TyreData" } },
+          ],
+        },
+      },
+      {
+        D$project: {
+          _id: 0,
+          cKM: "$documentsWithCKM.cKM",
+          totalCost: {
+            D$sum: {
+              D$add: [
+                { D$sum: "$maintenanceServiceData.aPCST" },
+                { D$sum: "$maintenanceSpairData.aPCST" },
+                { D$sum: "$batteryData.lBCST" },
+                { D$sum: "$TyreData.lBCST" },
+              ],
+            },
+          },
+        },
+      },
+    ]);
+    this.closekm = res[0].cKM;
+    this.totalcost = res[0].totalCost;
+    this.JobOrderForm.controls["closeKm"].patchValue(this.closekm[0]);
+    this.JobOrderForm.controls["tCost"].patchValue(this.totalcost);
+  }
 
+  handleDisableProperties() {
+    if (this.isClose) {
+      this.JobOrderForm.controls["orderdate"].disable();
+      this.JobOrderForm.controls["closedate"].enable();
+    } else {
+      this.JobOrderForm.controls["closedate"].disable();
+      this.JobOrderForm.controls["orderdate"].enable();
+    }
+  }
   async getVehicleStatus() {
+    if (this.isClose) {
+      return;
+    }
     const filters = [
       {
         D$match: {
@@ -93,6 +207,13 @@ export class AddJobOrderComponent implements OnInit {
           as: "vehData",
         },
       },
+      {
+        D$project: {
+          _id: 0,
+          vehNo: 1,
+          vehData: "$vehData.vehicleType",
+        },
+      },
     ];
     const res = await this.vehicleService.getVehicleNoWithFilters(
       filters,
@@ -100,7 +221,7 @@ export class AddJobOrderComponent implements OnInit {
     );
     const vehicleData = res.map(({ vehNo, vehData }) => ({
       name: vehNo,
-      value: vehData[0]?.vehicleType,
+      value: vehData ? vehData[0] : "",
     }));
     this.filter.Filter(
       this.jsonControlJobOrderArray,
@@ -111,8 +232,14 @@ export class AddJobOrderComponent implements OnInit {
     );
   }
   async getVehicleData() {
+    if (this.isClose) {
+      return;
+    }
     const vehicleNovalue = this.JobOrderForm.controls["vehicleNo"].value;
-    const joborderdata=await this.joborder.getJobOrderData({ vEHNO: vehicleNovalue.name })
+    const joborderdata = await this.joborder.getJobOrderData({
+      vEHNO: vehicleNovalue.name,
+      sTS: "Generated",
+    });
     if (joborderdata.length > 0) {
       // Display an error message
       Swal.fire({
@@ -124,13 +251,21 @@ export class AddJobOrderComponent implements OnInit {
       this.JobOrderForm.controls["vehicleNo"].setValue("");
       return;
     } else {
+      if (!vehicleNovalue.value) {
+        return;
+      }
       const reqBody = {
         companyCode: this.storage.companyCode,
         collectionName: "vehicleType_detail",
-        filter: { vehicleTypeName: vehicleNovalue.value },
+        filters: [
+          { D$match: { vehicleTypeName: vehicleNovalue.value } },
+          {
+            D$project: { _id: 0, oem: 1, oemmodel: 1 },
+          },
+        ],
       };
       const res = await firstValueFrom(
-        this.masterService.masterPost("generic/get", reqBody)
+        this.masterService.masterPost("generic/query", reqBody)
       );
       const vehicletypedata = res.data;
       this.JobOrderForm.controls["oem"].setValue(vehicletypedata[0].oem);
@@ -138,17 +273,19 @@ export class AddJobOrderComponent implements OnInit {
     }
   }
   async getJobOrdersData() {
-    const res=await this.joborder.getJobOrderData({cID:this.storage.companyCode})
-    if (res.length > 0) {
+    const res = await this.joborder.getSingleJobOrderData({
+      cID: this.storage.companyCode,
+    });
+    if (res) {
       const data = res;
-      const lastJobOrder = data[data.length - 1];
-      const lastJobNo = lastJobOrder.jOBNO;
+      const lastJobNo = data.jOBNO;
       const lastFiveDigits = lastJobNo.split("/").pop();
-      this.counter = parseInt(lastFiveDigits);
+      this.counter = parseInt(lastFiveDigits, 10); // Convert to integer
     }
   }
   async save() {
-    const newNumberString = this.counter + 1;
+    this.counter += 1;
+    const newNumberString = this.counter.toString().padStart(6, "0");
     const currentYear = new Date().getFullYear();
     const nextYear = currentYear + 1;
     const currentYearShort = currentYear.toString().slice(-2);
@@ -160,7 +297,7 @@ export class AddJobOrderComponent implements OnInit {
       "/" +
       yearSegment +
       "/" +
-      `0000${newNumberString}`;
+      `${newNumberString}`;
     const data = {
       _id: `${this.storage.companyCode}-${randomNumber}`,
       cID: this.storage.companyCode,
@@ -193,17 +330,46 @@ export class AddJobOrderComponent implements OnInit {
       mODBY: null,
       mODDT: null,
       mODLOC: null,
+      cSBY: null,
+      cSDT: null,
     };
-    const res = await this.joborder.CreateJobOrder(data,{cID:this.storage.companyCode})
-    if (res) {
-      // Display success message
-      Swal.fire({
-        icon: "success",
-        title: "Successful",
-        text: "Record added Successfully",
-        showConfirmButton: true,
-      });
-      this.router.navigateByUrl("/Operation/JobOrder");
+    if (this.isClose) {
+      const id = this.JobOrderModel._id;
+      ["_id", "eNTBY", "eNTDT", "eNTLOC"].forEach((key) => delete data[key]);
+      data.sTS = "Closed";
+      data.cKM = this.JobOrderForm.controls["closeKm"].value;
+      data.jCDT = this.JobOrderForm.controls["closedate"].value;
+      data.wCNO = this.JobOrderForm.controls["workorders"].value;
+      data.tCST = this.JobOrderForm.controls["tCost"].value;
+      data.cSBY = this.storage.userName;
+      data.cSDT = new Date();
+      data.mODBY = this.storage.userName;
+      data.mODDT = new Date();
+      data.mODLOC = this.storage.branch;
+      const res = await this.joborder.updateJobOrder({ _id: id }, data);
+      if (res) {
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: "Job Order Closed Successfully",
+          showConfirmButton: true,
+        }).then(() => {
+          this.router.navigateByUrl("/Operation/JobOrder"); 
+        });
+      }
+    } else {
+      const res = await this.joborder.CreateJobOrder(data);
+      if (res) {
+        // Display success message
+        Swal.fire({
+          icon: "success",
+          title: "Successful",
+          text: "Record added Successfully",
+          showConfirmButton: true,
+        }).then(() => {
+          this.router.navigateByUrl("/Operation/JobOrder");
+        });
+      }
     }
   }
   Reset() {

@@ -9,7 +9,7 @@ export class DeducationControl {
         label: "Customer",
         placeholder: "Customer",
         type: "text",
-        value:"",
+        value: "",
         generatecontrol: true,
         disable: true,
         Validations: [],
@@ -29,7 +29,7 @@ export class DeducationControl {
         label: "Invoice Amount ",
         placeholder: "Invoice Amount ",
         type: "text",
-        value:"",
+        value: "",
         filterOptions: "",
         displaywith: "",
         generatecontrol: true,
@@ -47,7 +47,7 @@ export class DeducationControl {
         label: "Pending Amount",
         placeholder: "State",
         type: "text",
-        value:"",
+        value: "",
         filterOptions: "",
         displaywith: "",
         generatecontrol: true,
@@ -59,22 +59,22 @@ export class DeducationControl {
           metaData: "Basic"
         },
         functions: {
-          
+
         },
       },
-      
+
     ];
-    this.tdsDetail=[
+    this.tdsDetail = [
       {
         name: "tds",
         label: "TDS (-)",
         placeholder: "TDS (-)",
-        type: "text",
-        value: "",
+        type: "number",
+        value: 0,
         generatecontrol: true,
         disable: false,
-        functions:{
-         onChange:"calucatedCharges"
+        functions: {
+          onChange: "calucatedCharges"
         },
         Validations: [],
       },
@@ -82,63 +82,63 @@ export class DeducationControl {
         name: "ftDist",
         label: "Freight discount (-)",
         placeholder: "Freight discount (-)",
-        type: "text",
-        value: "",
+        type: "number",
+        value: 0,
         generatecontrol: true,
         disable: false,
-        functions:{
-          onChange:"calucatedCharges"
-         },
+        functions: {
+          onChange: "calucatedCharges"
+        },
         Validations: [],
       },
       {
         name: "claimsDeduction",
         label: "Claims deduction (-)",
         placeholder: "Claims deduction (-)",
-        type: "text",
-        value: "",
+        type: "number",
+        value: 0,
         generatecontrol: true,
         disable: false,
-        functions:{
-          onChange:"calucatedCharges"
-         },
+        functions: {
+          onChange: "calucatedCharges"
+        },
         Validations: [],
       },
       {
         name: "otherDeduction",
         label: "Other Deduction (-)",
         placeholder: "Other Deduction (-)",
-        type: "text",
-        value: "",
+        type: "number",
+        value: 0,
         generatecontrol: true,
         disable: false,
-        functions:{
-          onChange:"calucatedCharges"
-         },
+        functions: {
+          onChange: "calucatedCharges"
+        },
         Validations: [],
       },
       {
         name: "additionalCharges",
         label: "Additional Charges (+)",
         placeholder: "Additional Charges (+)",
-        type: "text",
-        value: "",
+        type: "number",
+        value: 0,
         generatecontrol: true,
         disable: false,
-        functions:{
-          onChange:"calucatedCharges"
-         },
+        functions: {
+          onChange: "calucatedCharges"
+        },
         Validations: [],
       },
       {
         name: "netDeduction",
         label: "Net Deduction",
         placeholder: "Net Deduction",
-        type: "text",
-        value: "",
-        functions:{
-          onChange:"calucatedCharges"
-         },
+        type: "number",
+        value: 0,
+        functions: {
+          onChange: "calucatedCharges"
+        },
         generatecontrol: true,
         disable: false,
         Validations: [],

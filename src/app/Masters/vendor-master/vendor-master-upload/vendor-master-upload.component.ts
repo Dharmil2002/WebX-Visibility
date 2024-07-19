@@ -358,7 +358,7 @@ export class VendorMasterUploadComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       
-      if (result) {
+      if (result) {        
         //console.log(result);
         this.save(result)
       }
@@ -436,39 +436,37 @@ export class VendorMasterUploadComponent implements OnInit {
       vendorLocations = [element.VendorLocation.trim().toUpperCase()];
     }
 
-    // Create a new VendorModel instance to store processed data
-    const processedData = new VendorMaster({});
-
-    // Set basic properties
     const newVendorCode = nextKeyCodeByN(lastVendorCode, (i + 1));
-    processedData.vendorCode = newVendorCode;
-    processedData._id = `${this.storage.companyCode}-${newVendorCode}`;
-    processedData.companyCode = this.storage.companyCode;
-    processedData.vendorName = element.VendorName.toUpperCase();
-    processedData.vendorManager = element.VendorManager;
-    processedData.vendorType = element.VendorTypeId || '';
-    processedData.vendorTypeName = element.VendorType || '';
-    processedData.vendorAddress = element.VendorAddress;
-    processedData.vendorLocation = vendorLocations || [];
-    processedData.vendorPinCode = element.VendorPinCode;
-    processedData.vendorCity = element.VendorCity;
-    processedData.vendorState = element.VendorState;
-    processedData.vendorCountry = element.Country;
-    processedData.vendorPhoneNo = element.VendorContactNo;
-    processedData.emailId = element.VendorEmailID;
-    processedData.panNo = element.PANNo;
-    processedData.cinNumber = element.CINNo;
-    processedData.itrnumber = element.ITRNo;
-    processedData.vendorAdvance = parseFloat(element['VendorAdvance%']).toFixed(2);
-    processedData['otherdetails'] = []
 
-    // Set timestamp and user information
-    processedData['eNTDT'] = new Date();
-    processedData['eNTBY'] = this.storage.userName;
-    processedData['eNTLOC'] = this.storage.branch;
-
-    // Return the processed data
-    return processedData;
+    // Create a new VendorModel instance to store processed data
+    const vdt = new VendorMaster({
+      _id: `${this.storage.companyCode}-${newVendorCode}`,
+      companyCode: this.storage.companyCode,
+      vendorCode: newVendorCode,
+      vendorName: element.VendorName.toUpperCase(),
+      vendorManager: element.VendorManager,
+      vendorType: element.VendorTypeId || 0,
+      vendorTypeName: element.VendorType || '',
+      vendorAddress: element.VendorAddress || '',
+      vendorLocation: vendorLocations || [],
+      vendorPinCode: element.VendorPinCode,
+      vendorCity: element.VendorCity,
+      vendorState: element.VendorState,
+      vendorCountry: element.Country,
+      vendorPhoneNo: element.VendorContactNo,
+      emailId: element.VendorEmailID,
+      panNo: element.PANNo,
+      cinNumber: element.CINNo,
+      itrnumber: element.ITRNo,
+      vendorAdvance: parseFloat(element['VendorAdvance%']).toFixed(2),
+      otherdetails: [],
+      eNTDT: new Date(),
+      eNTBY: this.storage.userName,
+      eNTBYNM: this.storage.loginName,
+      eNTLOC: this.storage.branch
+    });
+    
+    return vdt;
   }
   //#endregion
   //#region to get Existing Data from collection

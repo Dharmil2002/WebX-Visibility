@@ -969,13 +969,12 @@ export class AdvancePaymentsComponent implements OnInit {
   }
   createDebitRequest(data: any, InterBranch): Observable<any> {
     // Construct the voucher request payload
+    let AccountDetails
     const PaymentMode = this.PaymentSummaryFilterForm.get("PaymentMode").value;
     if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
       const BankDetails = this.PaymentSummaryFilterForm.get("Bank").value;
-      const AccountDetails = this.AccountsBanksList.find(item => item.bANCD == BankDetails?.value && item.bANM == BankDetails?.name)
-      if (AccountDetails != undefined) {
-        this.PaymentSummaryFilterForm.get("Bank").setValue(AccountDetails)
-      } else {
+      AccountDetails = this.AccountsBanksList.find(item => item.bANCD == BankDetails?.value && item.bANM == BankDetails?.name)
+      if (AccountDetails == undefined) {
         this.snackBarUtilityService.ShowCommonSwal("info", "Please select valid Bank Which is mapped with Account Master")
         return;
       }
@@ -1034,8 +1033,8 @@ export class AdvancePaymentsComponent implements OnInit {
         voucherCanceled: false,
         paymentMode: PaymentMode,
         refNo: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.get("ChequeOrRefNo").value : "",
-        accountName: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.get("Bank").value?.bANM : LeadgerDetails?.name,
-        accountCode: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.get("Bank").value?.bANCD : LeadgerDetails?.value,
+        accountName: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? AccountDetails.bANM : LeadgerDetails?.name,
+        accountCode: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? AccountDetails.bANCD : LeadgerDetails?.value,
         date: (PaymentMode === 'Cheque' || PaymentMode === 'RTGS/UTR') ? this.PaymentSummaryFilterForm.get("Date").value : "",
         scanSupportingDocument: "",
         transactionNumber: data?.THC
@@ -1169,7 +1168,8 @@ export class AdvancePaymentsComponent implements OnInit {
     }
     else if (PaymentMode == "Cheque" || PaymentMode == "RTGS/UTR") {
       const BankDetails = this.PaymentSummaryFilterForm.get("Bank").value;
-      Result.push(createVoucher(BankDetails.value, false, 0, PaymentAmountWithoutTDS, thc.THC, BankDetails.name, "ASSET"));
+      const AccountDetails = this.AccountsBanksList.find(item => item.bANCD == BankDetails?.value && item.bANM == BankDetails?.name)
+      Result.push(createVoucher(AccountDetails.value, false, 0, PaymentAmountWithoutTDS, thc.THC, AccountDetails.name, "ASSET"));
     }
 
     // Push TDS Sectiond Data

@@ -168,7 +168,7 @@
                                     <mat-checkbox style="width: 0px; margin: 0px; padding: 0px;"
                                         *ngIf="tableData=='checkBoxRequired'" color="primary"
                                         [(ngModel)]="element.isSelected" [disabled]="this.disbleCheckbox"
-                                        (change)="getCheckData($event)"></mat-checkbox>
+                                        (change)="getCheckData($event, element)"></mat-checkbox>
                                     <ng-container
                                         *ngIf="Link && !shouldDisplayLink(tableData) && toggleArray && !toggleArray.includes(tableData) ">
                                         <p style="text-decoration: none;">{{formatData(element[tableData], tableData )}}

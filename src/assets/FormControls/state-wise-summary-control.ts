@@ -99,7 +99,7 @@ export class StateWiseSummaryControl {
         label: "GST Rate",
         placeholder: "GST Rate",
         type: "text",
-        value: "12%",
+        value: "0",
         generatecontrol: true,
         disable: true,
         Validations: [],
@@ -499,7 +499,7 @@ export class StateWiseSummaryControl {
         type: "number",
         value: 0,
         generatecontrol: true,
-        disable: false,
+        disable: true,
         functions: {
           onChange: "roundOffChange"
         },

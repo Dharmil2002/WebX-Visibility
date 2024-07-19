@@ -46,6 +46,7 @@ export class thcsummaryData {
   Driver_mobile: string
   Driver_lc: string
   Driver_exd?: Date
+  vehRegDate?:Date
   Capacity_ActualWeight: number
   Capacity_volume: number
   Capacity_volumetricWeight: number

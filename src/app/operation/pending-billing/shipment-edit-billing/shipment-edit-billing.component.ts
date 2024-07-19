@@ -18,7 +18,7 @@ export class ShipmentEditBillingComponent implements OnInit {
   headerColumn: any;
   isLoad: boolean = true;
   staticField = [''];
-  menuItems = [{ label: "Approve", status: [0] }, { label: "Edit", status: [1] }, { label: "Hold", status: [1] }];
+  menuItems = [{ label: "Approve", status: [0] }, { label: "Edit", status: [0] }];
   menuItemflag: boolean = true;
   metaData = {
     checkBoxRequired: true,
@@ -67,12 +67,12 @@ export class ShipmentEditBillingComponent implements OnInit {
   async handleMenuItemClick(data) {
 
     if (data.label.label === "Edit") {
-      data.data['tMODE']=this.tMODE;
+      data.data['tMODE'] = this.tMODE;
       const dialogref = this.dialog.open(UpdateShipmentAmountComponent, {
         width: '100vw',
         height: '100vw',
         maxWidth: '232vw',
-        data:data.data,
+        data: data.data,
       });
       dialogref.afterClosed().subscribe((result) => {
         this.getShipmentDetails();
@@ -80,7 +80,7 @@ export class ShipmentEditBillingComponent implements OnInit {
 
     }
     if (data.label.label === "Approve") {
-      await this.invoiceServiceService.confirmApprove(data,this.tMODE);
+      await this.invoiceServiceService.confirmApprove(data, this.tMODE);
       this.getShipmentDetails();
     }
   }

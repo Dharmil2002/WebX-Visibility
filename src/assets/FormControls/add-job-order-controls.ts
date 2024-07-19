@@ -2,14 +2,16 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 import { JobOrderModel } from "src/app/core/models/operations/joborder/add-job-order";
 export class JobOrderFormControls {
   JobOrderArray: FormControls[];
-  constructor(JobOrder: JobOrderModel, IsUpdate: boolean) {
+  constructor(JobOrder: JobOrderModel, isClose: boolean) {
     this.JobOrderArray = [
       {
         name: "vehicleNo",
         label: "Vehicle Number",
         placeholder: "Vehicle Number",
         type: "dropdown",
-        value: "",
+        value: isClose
+          ? { name: JobOrder.vehicleNo, value: JobOrder.vehicleNo }
+          : "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -27,28 +29,27 @@ export class JobOrderFormControls {
           },
         ],
         generatecontrol: true,
-        disable: false,
+        disable: isClose ? true : false,
         additionalData: {
           showNameAndValue: false,
         },
-        functions:{
-          onModel:"Reset",
+        functions: {
+          onModel: "Reset",
           onOptionSelect: "getVehicleData",
-        }
+        },
       },
       {
         name: "oem",
         label: "OEM",
         placeholder: "OEM",
         type: "text",
-        value: "",
+        value: isClose ? JobOrder?.oem : "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
         disable: true,
-        Validations: [
-        ],
+        Validations: [],
       },
 
       {
@@ -56,79 +57,82 @@ export class JobOrderFormControls {
         label: "Model",
         placeholder: "Model",
         type: "text",
-        value: "",
+        value: isClose ? JobOrder?.model : "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
         disable: true,
-        Validations: [
-        ],
+        Validations: [],
       },
       {
         name: "orderdate",
         label: "Order date",
         placeholder: "Order date",
         type: "datetimerpicker",
-        value: new Date(JobOrder?.orderdate || new Date()),
+        value: isClose ? JobOrder?.orderdate : new Date(),
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: isClose ? true : false,
         Validations: [],
-        // additionalData: {
-        //     maxDate: new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate()),
-        //     minDate: new Date("01 Jan 1900")
-        // }
+        additionalData: {
+            // maxDate: new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate()),
+            minDate: new Date()
+        }
       },
       {
         name: "closedate",
         label: "Close date",
         placeholder: "Close date",
         type: "datetimerpicker",
-        value: new Date(JobOrder?.closedate || new Date()),
+        value: isClose ? new Date() : "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: true,
-        Validations: [],
-        // additionalData: {
-        //     maxDate: new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate()),
-        //     minDate: new Date("01 Jan 1900")
-        // }
+        disable: isClose ? false : true,
+        Validations: [
+          {
+            name: "required",
+            message: "Close Date is required..",
+          },
+        ],
+        additionalData: {
+            // maxDate: new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate()),
+            minDate: new Date()
+        }
       },
       {
         name: "workorders",
         label: "Work orders",
         placeholder: "Work orders",
         type: "number",
-        value: JobOrder?.workorders,
+        value: isClose ? JobOrder?.workorders : 0,
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
         disable: true,
-        Validations: [
-        ],
+        Validations: [],
       },
       {
         name: "startKm",
         label: "Start Km",
         placeholder: "Start Km",
         type: "number",
-        value: JobOrder?.startKm,
+        value: isClose ? JobOrder?.startKm : "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
-        disable: false,
+        disable: isClose ? true : false,
         Validations: [
-            {
-                name: "required",
-                message: "Start Km is required..",
-              },
+          {
+            name: "required",
+            message: "Start Km is required..",
+          },
         ],
       },
       {
@@ -136,7 +140,7 @@ export class JobOrderFormControls {
         label: "Close Km",
         placeholder: "Close Km",
         type: "number",
-        value: JobOrder?.closeKm,
+        value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
@@ -150,14 +154,13 @@ export class JobOrderFormControls {
         label: "Total cost",
         placeholder: "Total cost",
         type: "number",
-        value: JobOrder?.tCost,
+        value: "",
         filterOptions: "",
         autocomplete: "",
         displaywith: "",
         generatecontrol: true,
         disable: true,
-        Validations: [
-        ],
+        Validations: [],
       },
     ];
   }

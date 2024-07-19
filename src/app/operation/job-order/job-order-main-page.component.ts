@@ -1,6 +1,6 @@
-import { Component, ViewChild, OnInit } from "@angular/core";
+import { Component, ViewChild, OnInit, ChangeDetectorRef } from "@angular/core";
 import { MatTabGroup } from "@angular/material/tabs";
-import { Router } from "@angular/router";
+import {  Router } from "@angular/router";
 @Component({
   selector: 'app-job-order-main-page',
   templateUrl: './job-order-main-page.component.html',
@@ -31,16 +31,18 @@ export class JobOrderMainPageComponent implements OnInit {
     },
     {
       id: "JobTracker",
-      label: "Tab 3",
+      label: "Tab 4",
     },
   ];
-  constructor(private Route: Router) {
+  constructor(private Route: Router,
+  ) {
     if (this.Route.getCurrentNavigation()?.extras?.state != null) {
     }
   }
-  ngOnInit(): void {}
+  ngOnInit(): void {
+  }
   GetSelectedIndex(event) {
-    this.selectedTabIndex = event;
+    this.selectedTabIndex=event;
   }
   onTabChange(event) {
     this.tabName = event.tab.textLabel;

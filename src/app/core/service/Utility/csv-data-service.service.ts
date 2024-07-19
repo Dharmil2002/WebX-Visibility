@@ -1,12 +1,15 @@
 export class CsvDataServiceService {
 
-  static exportToCsv(filename: string, rows: object[]) {
+  static exportToCsv(filename: string, rows: object[], autoHeader: boolean = false) {
     if (!rows || !rows.length) {
       return;
     }
+    autoHeader = autoHeader || false;
+
     const separator = ',';
-    const keys = Object.keys(rows[0]);
-    const csvData =
+    const keys = this.getDistinctKeys(rows);
+    
+    let csvData =
       // keys.join(separator) +
       // '\n' +
       rows.map(row => {
@@ -22,6 +25,10 @@ export class CsvDataServiceService {
         }).join(separator);
       }).join('\n');
 
+    if(autoHeader) {
+      csvData = keys.join(separator) + '\n' + csvData;
+    }
+
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
     
       const link = document.createElement('a');
@@ -36,5 +43,17 @@ export class CsvDataServiceService {
         document.body.removeChild(link);
       }
     }
-  }
+
+  static getDistinctKeys(arr: any[]): string[] {
+      const keySet = new Set<string>();
+    
+      arr.forEach(obj => {
+        Object.keys(obj).forEach(key => keySet.add(key));
+      });
+    
+      return Array.from(keySet);
+  };
+}
+
+  
 

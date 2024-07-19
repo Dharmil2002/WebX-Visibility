@@ -37,6 +37,7 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
   fileUploadForm: UntypedFormGroup;
   BranchCode: any;
   VendorList: any;
+  StateList: any;
   locationDropDown: any;
   AccountList: any;
   TDSAccountList: any;
@@ -232,6 +233,11 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
         // Vendors Data
         const VendorItems = [...new Set(jsonData.map((x) => x.VendorCode.trim().toUpperCase()))];
         this.VendorList = await this.fetchVendorsData(VendorItems);
+        debugger
+        this.StateList = await stateFromApi(this.masterService);
+        const StateValue = this.StateList.map((x) => x.value);
+        const StateName = this.StateList.map((x) => x.name);
+        const mergeState = [...StateValue, ...StateName];
 
         // Debit Accounts Data And TDS
         const DebitAccount = [...new Set(jsonData.map((x) => x.DebitAccount.trim().toUpperCase()))];
@@ -323,13 +329,7 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
           },
           {
             ItemsName: "StateofSupply",
-            Validations: [{ Required: true },
-            {
-              TakeFromArrayList: this.VendorList.map((x) => {
-                return x.vendorState;
-              }),
-            }
-            ]
+            Validations: [{ Required: true },{ TakeFromList: mergeState}],
           },
           {
             ItemsName: "StateOfBilling",

@@ -14,7 +14,8 @@ import { StorageService } from 'src/app/core/service/storage.service';
 import { ShipmentSelectionComponent } from './shipment-selection/shipment-selection.component';
 import { StateService } from 'src/app/Utility/module/masters/state/state.service';
 import { ConvertToNumber } from 'src/app/Utility/commonFunction/common';
-
+import { DocketService } from 'src/app/Utility/module/operation/docket/docket.service';
+import { Location } from '@angular/common';
 @Component({
   selector: 'app-invoice-summary-bill',
   templateUrl: './invoice-summary-bill.component.html'
@@ -104,13 +105,17 @@ export class InvoiceSummaryBillComponent implements OnInit {
     private locationService: LocationService,
     private stateService: StateService,
     private filter: FilterUtils,
-    private storage: StorageService
+    private storage: StorageService,
+    private docketService: DocketService,
+    private location: Location
   ) {
     this.backPath = "/dashboard/Index?tab=Billing​";
     if (this.router.getCurrentNavigation()?.extras?.state != null) {
       this.navigateExtra = this.router.getCurrentNavigation()?.extras?.state.data.columnData || "";
       this.tMode = this.router.getCurrentNavigation()?.extras?.state.data.columnData.tMODE;
       this.status = this.router.getCurrentNavigation()?.extras?.state.data.title.status;
+    } else {
+      this.location.back();
     }
 
     this.tableLoad = false;
@@ -141,6 +146,9 @@ export class InvoiceSummaryBillComponent implements OnInit {
     this.invoiceSummaryTableForm = formGroupBuilder(this.fb, [this.invoiceSummaryJsonArray])
     this.invoiceTableForm.controls['customerName'].setValue(this.navigateExtra.billingParty || "")
     this.invoiceTableForm.controls['unbilledAmount'].setValue(this.navigateExtra.sum || 0);
+
+    // Set GST Rate to 0% by default
+    this.invoiceTableForm.controls['gstRate'].setValue(this.navigateExtra.gSTRT || 0);
     this.getCustomerDetail();
 
   }
@@ -229,26 +237,45 @@ export class InvoiceSummaryBillComponent implements OnInit {
 
     const custDetail = await getApiCustomerDetail(this.masterService, this.navigateExtra);
     const tranDetail = await getApiCompanyDetail(this.masterService);
-    this.invoiceTableForm.controls['cGstin'].setValue(custDetail?.data[0].GSTdetails[0].gstNo || "");
-    this.invoiceTableForm.controls['cState'].setValue(custDetail?.data[0].GSTdetails[0].gstState || "");
-    this.invoiceTableForm.controls['gstSt'].setValue(custDetail?.data[0].GSTdetails[0].gstNo.substring(0, 2) || "");
-    this.invoiceTableForm.controls['gstCt'].setValue(custDetail?.data[0].GSTdetails[0].gstCity || "");
+    if (custDetail.data.length == 0) {
+      // Get Dockets Details For Transport Mode Wise
+      const Mode = this.navigateExtra.tMODE
+      const Filter = {
+        docNo: this.navigateExtra.dKTNO[0],
+        cID: this.storage.companyCode
+      }
+      let DocketDetails;
+      if (Mode == "LTL") {
+        DocketDetails = await this.docketService.getDocketsDetailsLtl(Filter)
+      } else {
+        DocketDetails = await this.docketService.getDockets(Filter)
+      }
+      const GSTData = DocketDetails[0]?.cSGE;
+      const State = await this.stateService.fetchStateByFilterId(GSTData.gST.substring(0, 2), "ST");
+      this.invoiceTableForm.controls['cGstin'].setValue(GSTData.gST || "");
+      this.invoiceTableForm.controls['cState'].setValue(State[0]?.STNM || "");
+      this.invoiceTableForm.controls['gstSt'].setValue(GSTData.gST.substring(0, 2) || "");
+      this.invoiceTableForm.controls['gstCt'].setValue(GSTData.cT || "");
+
+    } else {
+      this.invoiceTableForm.controls['cGstin'].setValue(custDetail?.data[0].GSTdetails[0].gstNo || "");
+      this.invoiceTableForm.controls['cState'].setValue(custDetail?.data[0].GSTdetails[0].gstState || "");
+      this.invoiceTableForm.controls['gstSt'].setValue(custDetail?.data[0].GSTdetails[0].gstNo.substring(0, 2) || "");
+      this.invoiceTableForm.controls['gstCt'].setValue(custDetail?.data[0].GSTdetails[0].gstCity || "");
+    }
     this.invoiceTableForm.controls['tState'].setValue(tranDetail?.data[0].state || "");
     this.invoiceTableForm.controls['tGstin'].setValue(tranDetail?.data[0].gstNo || "");
     // Check if custDetail and tranDetail have data
-    const gstType = await this.checkGst(custDetail?.data[0].GSTdetails[0].gstNo, tranDetail?.data[0].gstNo);
+    const gstType = await this.stateService.checkGst(this.invoiceTableForm.value.cGstin, tranDetail?.data[0].gstNo);
     const gstTypes = Object.fromEntries(
       Object.entries(gstType).filter(([key, value]) => value === true)
     )
-    this.gstTypeValue = gstTypes;
-    // Helper function to get lowercase state from detail object
-    //const getLowercaseState = (detail) => detail?.data?.[0]?.state.toLowerCase();
-    // Extract lowercase states from custDetail and tranDetail
-    // const custState = getLowercaseState(custDetail);
-    // const tranState = getLowercaseState(tranDetail);
-    // // Set 'gstType' value based on the equality of lowercase states
+    this.gstTypeValue = { ...gstTypes };
+    if (gstTypes.hasOwnProperty('CGST')) {
+      delete gstTypes.CGST;
+    }
     this.invoiceTableForm.controls['gstType'].setValue(Object.keys(gstTypes).join());
-
+    console.log(this.gstTypeValue)
     // const prqDetail = await getPrqApiDetail(this.masterService, this.navigateExtra.columnData.billingparty);
     const invoice = await this.invoiceServiceService.getInvoice(this.navigateExtra.dKTNO, this.status, this.tMode);
     const shipments = await this.invoiceServiceService.filterShipment(invoice);
@@ -267,6 +294,24 @@ export class InvoiceSummaryBillComponent implements OnInit {
   /*End*/
   /*Below function called when the click on checkbox*/
   getCalucationDetails($event) {
+    if ($event.length > 0) {
+      // check if countSelected is greater than 0 and isSelected is true then give the warning message
+      const count = $event.filter((x) => x.countSelected > 0);
+      if (count.length == 0) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Please select shipment first',
+          confirmButtonText: 'OK'
+        });
+        // set all the isSelected to false
+        $event.map(item => {
+          item.isSelected = false;
+          return item
+        });
+        return
+      }
+    }
+
     // Use map to create a new array with updated isSelected property
     const isSelected = $event.filter((x) => x.isSelected == true);
     if (isSelected) {
@@ -342,6 +387,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
       ]
 
     }
+    debugger
     const selectedItems = this.tableData.filter(item => item.isSelected);
     const gstCharged = selectedItems.reduce((sum, item) => sum + item.gstCharged, 0);
     const gstType = Object.keys(this.gstTypeValue);
@@ -356,19 +402,6 @@ export class InvoiceSummaryBillComponent implements OnInit {
 
   }
 
-  async checkGst(supplierGstNo: string, consumerGstNo: string): Promise<{ CGST: boolean, IGST: boolean, SGST: boolean, UTGST: boolean }> {
-    const sGstNo = supplierGstNo.trim().substring(0, 2);
-    const cGstNo = consumerGstNo.trim().substring(0, 2);
-    if (sGstNo !== cGstNo) {
-      return { CGST: false, IGST: true, SGST: false, UTGST: false };
-    } else {
-      const gstDetail = await this.stateService.fetchStateByFilterId(cGstNo, "ST");
-      if (gstDetail[0].ISUT) {
-        return { CGST: true, IGST: false, SGST: false, UTGST: true };
-      }
-      return { CGST: true, IGST: false, SGST: true, UTGST: false };
-    }
-  }
   /*below function is fire when we add values in roundOff*/
   roundOffChange() {
     const roundOff = parseFloat(this.invoiceSummaryTableForm.controls['roundOff'].value || 0);
@@ -404,7 +437,7 @@ export class InvoiceSummaryBillComponent implements OnInit {
       })
     }
     else {
-      const gstRate = parseFloat(this.invoiceTableForm.controls['gstRate'].value.replace('%', '')) / 100;
+      const gstRate = parseFloat(this.invoiceTableForm.controls['gstRate'].value) / 100;
 
       this.tableData.filter((x) => x.isSelected).map((x) => {
         x.extraData.filter((y) => y.isSelected).map((y) => {
@@ -419,13 +452,12 @@ export class InvoiceSummaryBillComponent implements OnInit {
     const gstCharged = this.tableData.filter((x) => x.isSelected).reduce((sum, item) => sum + item.gstCharged, 0);
     const totBillingAmt = shipmentTotal + gstCharged;
 
-    // Set IGST, SGST, CGST, and UTGST based on gstType
     this.invoiceSummaryTableForm.controls['igst'].setValue(gstType.includes("IGST") ? ConvertToNumber(gstCharged, 2) : 0);
     ['SGST', 'CGST', 'UTGST'].forEach(type => {
       this.invoiceSummaryTableForm.controls[type.toLowerCase()].setValue(gstType.includes(type) ? parseFloat(gstCharged) / 2 : 0);
     });
     this.invoiceSummaryTableForm.controls['gst'].setValue(ConvertToNumber(gstCharged, 2) || 0);
-
+    this.KPICountData[2].count = ConvertToNumber(gstCharged, 2);
     this.invoiceSummaryTableForm.controls['invoiceTotal'].setValue(totBillingAmt);
     this.roundOffChange();
   }

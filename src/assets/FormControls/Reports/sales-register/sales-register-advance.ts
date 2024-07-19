@@ -56,29 +56,29 @@ export class salesRegisterControl {
                     },
                     generatecontrol: true, disable: false
                },
-               {
-                    name: 'flowType',
-                    label: 'Flow Type',
-                    placeholder: 'Flow Type',
-                    type: 'Staticdropdown',
-                    value: [
-                         { value: "O", name: "Outgoing" },
-                         { value: "I", name: "Incoming" },
-                    ],
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
-                    Validations: [
-                    ],
-                    additionalData: {
-                         support: "flowTypeHandler",
-                         showNameAndValue: false,
-                    },
-                    functions: {
-                         onToggleAll: "toggleSelectAll",
-                    },
-                    generatecontrol: true, disable: false
-               },
+               // {
+               //      name: 'flowType',
+               //      label: 'Flow Type',
+               //      placeholder: 'Flow Type',
+               //      type: 'Staticdropdown',
+               //      value: [
+               //           { value: "O", name: "Outgoing" },
+               //           { value: "I", name: "Incoming" },
+               //      ],
+               //      filterOptions: "",
+               //      autocomplete: "",
+               //      displaywith: "",
+               //      Validations: [
+               //      ],
+               //      additionalData: {
+               //           support: "flowTypeHandler",
+               //           showNameAndValue: false,
+               //      },
+               //      functions: {
+               //           onToggleAll: "toggleSelectAll",
+               //      },
+               //      generatecontrol: true, disable: false
+               // },
                {
                     name: "pAYBAS",
                     label: "Payment Basis",
@@ -237,39 +237,39 @@ export class salesRegisterControl {
                          onToggleAll: "toggleSelectAll"
                     },
                },
-               {
-                    name: 'status',
-                    label: 'Status',
-                    placeholder: '',
-                    type: 'Staticdropdown',
-                    value: [
-                         { value: "true", name: "Billed" },
-                         { value: "false", name: "Unbilled" },
-                         { value: 3, name: "Delivered" },
-                         { value: 5, name: "Undelivered" },
-                         // { value: "Cancelled", name: "Cancelled" },
-                         // { value: "Finalized", name: "Finalized" },
-                         // { value: "Quick", name: "Quick" },
-                         // { value: "Quick not completed", name: "Quick not completed" },
-                         // { value: "Quick Completed", name: "Quick Completed" },
-                         // { value: "POD Scanned", name: "POD Scanned" },
-                         // { value: "POD Not Scanned", name: "POD Not Scanned" },
-                         // { value: "POD scanned but not billed", name: "POD scanned but not billed" },
-                    ],
-                    filterOptions: "",
-                    autocomplete: "",
-                    displaywith: "",
-                    Validations: [
-                    ],
-                    additionalData: {
-                         support: "statusHandler",
-                         showNameAndValue: false,
-                    },
-                    functions: {
-                         onToggleAll: "toggleSelectAll",
-                    },
-                    generatecontrol: true, disable: false
-               },
+               // {
+               //      name: 'status',
+               //      label: 'Status',
+               //      placeholder: '',
+               //      type: 'Staticdropdown',
+               //      value: [
+               //           { value: "true", name: "Billed" },
+               //           { value: "false", name: "Unbilled" },
+               //           { value: 3, name: "Delivered" },
+               //           { value: 5, name: "Undelivered" },
+               //           // { value: "Cancelled", name: "Cancelled" },
+               //           // { value: "Finalized", name: "Finalized" },
+               //           // { value: "Quick", name: "Quick" },
+               //           // { value: "Quick not completed", name: "Quick not completed" },
+               //           // { value: "Quick Completed", name: "Quick Completed" },
+               //           // { value: "POD Scanned", name: "POD Scanned" },
+               //           // { value: "POD Not Scanned", name: "POD Not Scanned" },
+               //           // { value: "POD scanned but not billed", name: "POD scanned but not billed" },
+               //      ],
+               //      filterOptions: "",
+               //      autocomplete: "",
+               //      displaywith: "",
+               //      Validations: [
+               //      ],
+               //      additionalData: {
+               //           support: "statusHandler",
+               //           showNameAndValue: false,
+               //      },
+               //      functions: {
+               //           onToggleAll: "toggleSelectAll",
+               //      },
+               //      generatecontrol: true, disable: false
+               // },
                // {
                //      name: "billAt",
                //      label: "Billed At",

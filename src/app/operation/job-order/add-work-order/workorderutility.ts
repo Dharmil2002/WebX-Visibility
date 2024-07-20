@@ -2,27 +2,22 @@ export const columnHeader = {
   staticfields: {
     Title: "",
     class: "matcolumnleft",
-    Style: "min-width:80px",
+    Style: "min-width:80px; max-width:80px;",
   },
   Ordergeneration: {
     Title: "Order Generation",
     class: "matcolumncenter",
-    Style: "min-width:80px",
+    Style: "min-width:80px; max-width:80px;",
   },
   Approved: {
     Title: "Approved",
     class: "matcolumncenter",
-    Style: "min-width:80px",
+    Style: "min-width:80px; max-width:80px;",
   },
   WorkClosure: {
     Title: "Work Closure",
     class: "matcolumnleft",
-    Style: "min-width:80px",
-  },
-  JobOrderApproved: {
-    Title: "JobOrderApproved",
-    class: "matcolumnleft",
-    Style: "min-width:80px",
+    Style: "min-width:80px; max-width:80px;",
   },
 };
 export const StaticFields = [
@@ -30,7 +25,6 @@ export const StaticFields = [
   "Ordergeneration",
   "Approved",
   "WorkClosure",
-  "JobOrderApproved",
 ];
 export const DynamicControls = {
   add: false,
@@ -85,11 +79,11 @@ export const ServiceDetailsColumnHeader = {
     class: "matcolumncenter",
     Style: "min-width:4px",
   },
-  // EndDTM: {
-  //   Title: "End DTM",
-  //   class: "matcolumncenter",
-  //   Style: "min-width:4px",
-  // },
+  EndDTM: {
+    Title: "End Date",
+    class: "matcolumncenter",
+    Style: "min-width:4px",
+  },
   actionsItems: {
     Title: "Action",
     class: "matcolumnleft",
@@ -107,7 +101,7 @@ export const ServiceDetailsStaticFields = [
   "ApprovedCost",
   "Mechanic",
   "StartDTM",
-  // "EndDTM",
+  "EndDTM",
 ];
 export const SpareDetailsColumnHeader = {
   TaskGroup: {
@@ -161,12 +155,11 @@ export const SpareDetailsColumnHeader = {
     class: "matcolumncenter",
     Style: "min-width:4px",
   },
-  // EndDTM: {
-  //   Title: "End DTM",
-  //   class: "matcolumncenter",
-  //   // Style: "max-width:150px",
-  //   Style: "min-width:4px",
-  // },
+  EndDTM: {
+    Title: "End Date",
+    class: "matcolumncenter",
+    Style: "min-width:4px",
+  },
   actionsItems: {
     Title: "Action",
     class: "matcolumnleft",
@@ -185,7 +178,7 @@ export const SpareDetailsStaticFields = [
   "ApprovedCost",
   "Mechanic",
   "StartDTM",
-  // "EndDTM",
+  "EndDTM",
 ];
 export const TyreDetailsColumnHeader = {
   position: {

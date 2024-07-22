@@ -1,10 +1,10 @@
 <div>
-   <div style="width: 96%; margin: 10px auto;">
+   <div style="width: 100%; margin: 10px auto;">
 
       <form [formGroup]="AccountQueryForm">
          <app-form-webxpress [form]="AccountQueryForm" [formData]="jsonControlAccountQueryArray"
-            [showSaveAndCancelButton]="true" [FormTitle]="'List Filter'"
-            [className]="'col-xl-8 col-lg-8 col-md-12 col-sm-12 mb-2'" (callFunction)="functionCallHandler($event)"
+            [showSaveAndCancelButton]="true" [FormTitle]="'Account List Filter'"
+            [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'" (callFunction)="functionCallHandler($event)"
             (functionCallEmitter)="functionCallHandler($event)">
          </app-form-webxpress>
       </form>

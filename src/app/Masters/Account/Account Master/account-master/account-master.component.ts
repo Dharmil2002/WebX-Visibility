@@ -106,7 +106,7 @@ export class AccountMasterComponent implements OnInit {
 
   FilterList(event) {
     const dialogRef = this.dialog.open(AccountListFilterComponent, {
-      width: "800px",
+      width: "500px",
       disableClose: true,
     });
 

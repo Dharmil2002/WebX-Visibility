@@ -2,8 +2,10 @@ import { Component, Inject, OnInit } from "@angular/core";
 import { UntypedFormBuilder } from "@angular/forms";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Router } from "@angular/router";
+import { firstValueFrom, Subject, take, takeUntil } from "rxjs";
 import { FilterUtils } from "src/app/Utility/dropdownFilter";
 import { formGroupBuilder } from "src/app/Utility/formGroupBuilder";
+import { GenericActions, StoreKeys } from "src/app/config/myconstants";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import { AccountMasterControls } from "src/assets/FormControls/AccountMasterControls";
@@ -20,6 +22,7 @@ export class AccountListFilterComponent implements OnInit {
       active: "Account Master",
     },
   ];
+  protected _onDestroy = new Subject<void>();
   jsonControlAccountQueryArray: any;
   AccountQueryForm: any;
   GroupCodeCode: any;
@@ -75,19 +78,18 @@ export class AccountListFilterComponent implements OnInit {
     const Body = {
       companyCode: this.CompanyCode,
       collectionName: "General_master",
-      filter: { codeType: "ACT", activeFlag: true },
+      filter: { codeType: "MCT", activeFlag: true },
     };
 
-    const res = await this.masterService
-      .masterPost("generic/get", Body)
-      .toPromise();
+    const res = await firstValueFrom(this.masterService
+      .masterPost("generic/get", Body));
     if (res.success && res.data.length > 0) {
       const MainCategoryData = res.data.map((x) => {
         return {
           name: x.codeDesc,
           value: x.codeId,
         };
-      });
+      }).sort((a, b) => a.name.localeCompare(b.name));
       this.filter.Filter(
         this.jsonControlAccountQueryArray,
         this.AccountQueryForm,
@@ -103,19 +105,21 @@ export class AccountListFilterComponent implements OnInit {
     const Body = {
       companyCode: this.CompanyCode,
       collectionName: "account_group_detail",
-      filter: { CategoryCode: Value },
+      filter: { cATNM: Value },
     };
 
-    const res = await this.masterService
-      .masterPost("generic/get", Body)
-      .toPromise();
+    const res = await firstValueFrom(this.masterService
+      .masterPost("generic/get", Body));
     if (res.success && res.data.length > 0) {
-      const GroupCodeType = res.data.map((x) => {
-        return {
-          name: x.GroupName,
-          value: x.GroupCode,
-        };
-      });
+      const GroupCodeType = res.data
+        .map((x) => {
+          return {
+            name: x.gRPNM,
+            value: x.gRPCD,
+          };
+        })
+        .sort((a, b) => a.name.localeCompare(b.name)); // Sort by name in ascending order
+
       this.filter.Filter(
         this.jsonControlAccountQueryArray,
         this.AccountQueryForm,
@@ -126,6 +130,44 @@ export class AccountListFilterComponent implements OnInit {
     }
   }
 
+  async getAccountDropdown() {
+    const req = {
+      companyCode: this.CompanyCode,
+      collectionName: 'account_detail',
+      filters: [
+        {
+          D$match: {
+            cID: this.CompanyCode,
+            gRPCD: this.AccountQueryForm.value.GroupCode.value
+          }
+        },
+        {
+          D$project: {
+            LeadgerCode: "$aCCD",
+            LeadgerName: "$aCNM",
+          }
+        }
+      ]
+    };
+
+    const res = await firstValueFrom(this.masterService.masterPost(GenericActions.Query, req));
+    if (res.success && res.data.length > 0) {
+      const AccountList = res.data.map((x) => {
+        return {
+          name: x.LeadgerName,
+          value: x.LeadgerCode,
+        };
+      });
+      this.filter.Filter(
+        this.jsonControlAccountQueryArray,
+        this.AccountQueryForm,
+        AccountList,
+        "AccountCode",
+        false
+      );
+    }
+
+  }
   functionCallHandler($event) {
     let functionName = $event.functionName;
     try {
@@ -150,25 +192,43 @@ export class AccountListFilterComponent implements OnInit {
   }
 
   save() {
-    let Body;
-    if (this.AccountQueryForm.value.AccountCode != "") {
-      Body = {
-        AccountCode: this.AccountQueryForm.value.AccountCode,
+    let Body: any = {};
+    // Add values to the AccountCode array if provided
+    if (this.AccountQueryForm.value.AccountCodeDropdown.length > 0) {
+      Body.aCCD = {
+        D$in: this.AccountQueryForm.value.AccountCodeDropdown.map((x) => x.value)
       };
-    } else if (this.AccountQueryForm.value.GroupCode?.value) {
-      Body = {
-        SubCategoryCode: this.AccountQueryForm.value.GroupCode.value,
-      };
-    }else if (this.AccountQueryForm.value.GroupCode?.value){
-      Body = {
-        MainCategoryCode: this.AccountQueryForm.value.MainCategory.value,
-      };
-    }else {
-      Body = {}
     }
+
+    // Add other properties as needed
+    if (this.AccountQueryForm.value.GroupCode?.value) {
+      Body.gRPCD = this.AccountQueryForm.value.GroupCode.value;
+    }
+    if (this.AccountQueryForm.value.MainCategory?.value) {
+      Body.mATCD = this.AccountQueryForm.value.MainCategory.value;
+    }
+
     this.dialogRef.close({ event: true, data: Body });
   }
+
+
   cancel() {
     this.dialogRef.close({ event: false, data: "" });
   }
+  toggleSelectAll(argData: any) {
+    let fieldName = argData.field.name;
+    let autocompleteSupport = argData.field.additionalData.support;
+    let isSelectAll = argData.eventArgs;
+    const index = this.jsonControlAccountQueryArray.findIndex(
+      (obj) => obj.name === fieldName
+    );
+    this.jsonControlAccountQueryArray[index].filterOptions
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe((val) => {
+        this.AccountQueryForm.controls[autocompleteSupport].patchValue(
+          isSelectAll ? val : []
+        );
+      });
+  }
+
 }

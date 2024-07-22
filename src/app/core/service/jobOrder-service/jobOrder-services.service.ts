@@ -12,13 +12,12 @@ export class JobOrderService {
     private masterService: MasterService,
     private storage: StorageService
   ) {}
-  async CreateJobOrder(data, filter) {
+  async CreateJobOrder(data) {
     try {
       const request = {
         companyCode: this.storage.companyCode,
         collectionName: "job_order_headers",
         data: data,
-        filter: filter,
       };
       const res = await firstValueFrom(
         this.masterService.masterPost("generic/create", request)

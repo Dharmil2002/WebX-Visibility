@@ -42,46 +42,46 @@ export class MRRegister {
 
                 generatecontrol: true, disable: false
             },
-            {
-                name: 'division',
-                label: 'Select Division',
-                placeholder: 'Select Division',
-                type: "dropdown",
-                value: [],
-                filterOptions: "",
-                autocomplete: "",
-                displaywith: "",
-                Validations: [
-                    {
-                        name: "autocomplete",
-                    },
-                    {
-                        name: "invalidAutocomplete",
-                        message: "Choose proper value",
-                    }
-                ],
-                additionalData: {
-                    showNameAndValue: false,
-                },
+            // {
+            //     name: 'division',
+            //     label: 'Select Division',
+            //     placeholder: 'Select Division',
+            //     type: "dropdown",
+            //     value: [],
+            //     filterOptions: "",
+            //     autocomplete: "",
+            //     displaywith: "",
+            //     Validations: [
+            //         {
+            //             name: "autocomplete",
+            //         },
+            //         {
+            //             name: "invalidAutocomplete",
+            //             message: "Choose proper value",
+            //         }
+            //     ],
+            //     additionalData: {
+            //         showNameAndValue: false,
+            //     },
 
-                generatecontrol: true, disable: false
-            },
-            {
-                name: 'MRType',
-                label: 'Select MR Type',
-                placeholder: '',
-                type: 'Staticdropdown',
-                value: [
-                    { value: "Paid", name: "Paid" },
-                    { value: "DeliveryBillMR", name: "Delivery Bill MR" },
-                    { value: "DeliveryMR", name: "Delivery MR" },
-                    { value: "DemurrageMR", name: "Demurrage MR" },
-                    { value: "TBB", name: "TBB" },
-                    { value: "Topay", name: "Topay" },
-                ],
-                Validations: [],
-                generatecontrol: true, disable: false
-            },
+            //     generatecontrol: true, disable: false
+            // },
+            // {
+            //     name: 'MRType',
+            //     label: 'Select MR Type',
+            //     placeholder: '',
+            //     type: 'Staticdropdown',
+            //     value: [
+            //         { value: "Paid", name: "Paid" },
+            //         { value: "DeliveryBillMR", name: "Delivery Bill MR" },
+            //         { value: "DeliveryMR", name: "Delivery MR" },
+            //         { value: "DemurrageMR", name: "Demurrage MR" },
+            //         { value: "TBB", name: "TBB" },
+            //         { value: "Topay", name: "Topay" },
+            //     ],
+            //     Validations: [],
+            //     generatecontrol: true, disable: false
+            // },
             {
                 name: 'customer',
                 label: 'Select Customer',
@@ -102,17 +102,7 @@ export class MRRegister {
                 },
                 generatecontrol: true, disable: false
             },
-            {
-                name: '',
-                label: "",
-                placeholder: "",
-                type: '',
-                value: '',
-                generatecontrol: true,
-                disable: false,
-                Validations: []
-            },
-            {
+                       {
                 name: '',
                 label: "",
                 placeholder: "",

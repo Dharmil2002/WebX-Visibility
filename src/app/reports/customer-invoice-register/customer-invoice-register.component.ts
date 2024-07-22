@@ -10,16 +10,13 @@ import { MasterService } from "src/app/core/service/Masters/master.service";
 import { CustomerBillStatus } from "src/app/Models/docStatus";
 import moment from "moment";
 import Swal from "sweetalert2";
-import { ExportService } from "src/app/Utility/module/export.service";
-import { timeString } from "src/app/Utility/date/date-utils";
 import { CustInvoiceRegService } from "src/app/Utility/module/reports/customer-invoice-register-service";
 import { SnackBarUtilityService } from "src/app/Utility/SnackBarUtility.service";
 import { LocationService } from "src/app/Utility/module/masters/location/location.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import { GeneralLedgerReportService } from "src/app/Utility/module/reports/general-ledger-report.service";
-import { firstValueFrom } from 'rxjs';
-import { WINDOW } from "src/app/core/service/window.service";
 import { ModuleCounterService } from "src/app/core/service/Logger/module-counter-service.service";
+import { NavDataService } from "src/app/core/service/navdata.service";
 
 @Component({
   selector: "app-customer-invoice-register",
@@ -42,25 +39,11 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
   stateName: any;
   stateStatus: any;
   SACCodeList: any = [];
-  submit = "Save";
   branchName: any;
   branchStatus: any;
-  ReportingBranches: string[] = [];
   formTitle = "Customer Invoice Register Data"
   csvFileName: string; // name of the csv file, when data is downloaded
-  source: any[] = []; // Array to hold data
-  loading = true // Loading indicator
-  LoadTable = false;
-
-  //#region Table
-  columns = [];
-  //#endregion
-
-  paging: any;
-  sorting: any;
-  searching: any;
-  columnMenu: any;
-  theme: "MATERIAL"
+  source: any[] = [];
 
   constructor(
     public snackBarUtilityService: SnackBarUtilityService,
@@ -70,11 +53,11 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
     private storage: StorageService,
     private masterService: MasterService,
     private filter: FilterUtils,
-    private exportService: ExportService,
     private billdetails: CustInvoiceRegService,
     private locationService: LocationService,
     private generalLedgerReportService: GeneralLedgerReportService,
-    private MCountrService: ModuleCounterService
+    private MCountrService: ModuleCounterService,
+    private nav: NavDataService
   ) {
     this.initializeFormControl();
   }
@@ -187,15 +170,14 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
 
   //#region save
   async save() {
-    ;
-    this.loading = true;
+
     try {
-      this.ReportingBranches = [];
+      let ReportingBranches = [];
       if (this.CustInvREGTableForm.value.Individual == "N") {
-        this.ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.CustInvREGTableForm.value.branch.name);
-        this.ReportingBranches.push(this.CustInvREGTableForm.value.branch?.value || "");
+        ReportingBranches = await this.generalLedgerReportService.GetReportingLocationsList(this.CustInvREGTableForm.value.branch.name);
+        ReportingBranches.push(this.CustInvREGTableForm.value.branch?.value || "");
       } else {
-        this.ReportingBranches.push(this.CustInvREGTableForm.value.branch?.value || "");
+        ReportingBranches.push(this.CustInvREGTableForm.value.branch?.value || "");
       }
       const startDate = new Date(this.CustInvREGTableForm.controls.start.value);
       const endDate = new Date(this.CustInvREGTableForm.controls.end.value);
@@ -206,19 +188,13 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
       const status = this.CustInvREGTableForm.value.sTS.value;
       const cust = this.CustInvREGTableForm.value.CUST.name;
       const sac = this.CustInvREGTableForm.value.sACCODE.value;
-      const branch = this.ReportingBranches;
+      const branch = ReportingBranches;
       const individual = this.CustInvREGTableForm.value.Individual;
       const reqBody = {
         startValue, endValue, docNo, state, status, sac, cust, branch, individual
       }
       const result = await this.billdetails.getcustInvRegReportDetail(reqBody);
-      this.columns = result.grid.columns;
-      this.sorting = result.grid.sorting;
-      this.searching = result.grid.searching;
-      this.paging = result.grid.paging;
-
       this.source = result.data;
-      this.LoadTable = true;
 
       if (this.source.length === 0) {
         if (this.source) {
@@ -231,9 +207,21 @@ export class CustomerInvoiceRegisterComponent implements OnInit {
         }
         return;
       }
+
+      // Prepare the state data to include all necessary properties
+      const stateData = {
+        data: result,
+        formTitle: this.formTitle,
+        csvFileName: this.csvFileName
+      };
+      // Convert the state data to a JSON string and encode it        
+      this.nav.setData(stateData);
+      // Create the new URL with the state data as a query parameter
+      const url = `/#/Reports/generic-report-view`;
+      // Open the URL in a new tab
+      window.open(url, '_blank');
       // Push the module counter data to the server
       this.MCountrService.PushModuleCounter();
-      this.loading = false;
     } catch (error) {
       this.snackBarUtilityService.ShowCommonSwal("error", error.message);
     }

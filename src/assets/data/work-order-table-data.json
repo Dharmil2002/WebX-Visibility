@@ -1,26 +1,22 @@
 {
-    "data": [
-      {
-        "staticfields": "Labour Hours",        
-        "Ordergeneration":"",
-        "Approved":"",
-        "WorkClosure":"",
-        "JobOrderApproved":""
-      },
-      {
-        "staticfields": "Labour Cost",
-        "Ordergeneration":"",
-        "Approved":"",
-        "WorkClosure":"",
-        "JobOrderApproved":""
-      },
-      {
-        "staticfields":"Spare Cost",
-        "Ordergeneration":"",
-        "Approved":"",
-        "WorkClosure":"",
-        "JobOrderApproved":""
-      }
-    ]
-  }
-  
+  "data": [
+    {
+      "staticfields": "Labour Hours",
+      "Ordergeneration": "",
+      "Approved": "",
+      "WorkClosure": ""
+    },
+    {
+      "staticfields": "Labour Cost",
+      "Ordergeneration": "",
+      "Approved": "",
+      "WorkClosure": ""
+    },
+    {
+      "staticfields": "Spare Cost",
+      "Ordergeneration": "",
+      "Approved": "",
+      "WorkClosure": ""
+    }
+  ]
+}

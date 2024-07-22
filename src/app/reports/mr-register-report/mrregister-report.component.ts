@@ -6,7 +6,6 @@ import { GetGeneralMasterData } from 'src/app/Masters/Customer Contract/Customer
 import { SnackBarUtilityService } from 'src/app/Utility/SnackBarUtility.service';
 import { FilterUtils } from 'src/app/Utility/dropdownFilter';
 import { formGroupBuilder } from 'src/app/Utility/formGroupBuilder';
-import { ExportService } from 'src/app/Utility/module/export.service';
 import { CustomerService } from 'src/app/Utility/module/masters/customer/customer.service';
 import { LocationService } from 'src/app/Utility/module/masters/location/location.service';
 import { MrRegisterService } from 'src/app/Utility/module/reports/mr-register.service';
@@ -15,6 +14,8 @@ import { MasterService } from 'src/app/core/service/Masters/master.service';
 import { StorageService } from 'src/app/core/service/storage.service';
 import { MRRegister } from 'src/assets/FormControls/Reports/MR-Register/mr-register';
 import Swal from 'sweetalert2';
+import { NavDataService } from 'src/app/core/service/navdata.service';
+import { SalesRegisterService } from 'src/app/Utility/module/reports/sales-register';
 
 @Component({
   selector: 'app-mrregister-report',
@@ -31,73 +32,19 @@ export class MRRegisterReportComponent implements OnInit {
     },
   ];
   mRRegisterForm: UntypedFormGroup;
-  CSVHeader = {
-    MRNo: "MR No.",
-    MRDate: "MR Date",
-    MRTime: "MR Time",
-    MRType: "MR Type",
-    MRLocation: "MR Location",
-    PartyName: "Party",
-    MRAmount: "MR Amount",
-    TDS: "TDS",
-    GSTAmount: "GST Amount",
-    FreightRebate: "Freight Rebate",
-    CLAIM: "CLAIM",
-    // OtherDeduction: "Other Deduction",
-    NetMRCloseAmt: "Net MR Close Amt",
-    MRCloseDate: "MR Close Date",
-    MRCloseBy: "MR Close By",
-    PayMode: "Pay Mode",
-    ChequeNo: "Cheque No",
-    ChequeDate: "Cheque Date",
-    ChequeAmount: "Cheque Amount",
-    CancelledBy: "Cancelled By",
-    CancelledOn: "Cancelled On",
-    CancelledReasion: "Cancelled Reasion",
-    GatePassNo: "Gate Pass No",
-    GCNNo: "GCN No",
-    BillNo: "Bill No",
-    Origin: "Origin",
-    Destination: "Destination",
-    BasicFreight: "Basic Freight",
-    SubTotal: "Sub. Total",
-    DocketTotal: "Docket Total",
-    ActualWeight: "Actual Weight",
-    ChargedWeight: "Charged Weight",
-    NoPkg: "No Pkg",
-    GodownNoName: "Godown No/Name",
-    DeliveryDateandTime: "Delivery Date and Time",
-    PrivateMarka: "Private Marka",
-    VehicleNo: "Vehicle No.",
-    Status: "Status As Deliver/Undelivered",
-    SaidToContains: "Said to contains",
-    Receiver: "Receiver",
-    ReceiverNo: "Receiver No.",
-    Remark: "Remark",
-    // FreightDeduction: "Freight Deduction",
-    // ClaimDeduction: "Claim Deduction",
-    // OtherAmount: "Other Amount",
-    // ServiceCharges: "Service Charges",
-    // Discount: "Discount",
-    // SpecialCharges: "Special Charges",
-    // UnloadingCharges: "Unloading Charges",
-    // Damurrage: "Damurrage",
-    // DetentionCharge: "Detention charge",
-    // OtherCharges: "Other Charges",
-    // DDCharges: "DD Charges"
-  }
   protected _onDestroy = new Subject<void>();
-  chargesKeys: any[];
+
   constructor(private fb: UntypedFormBuilder,
     private filter: FilterUtils,
     private masterService: MasterService,
     private customerService: CustomerService,
     private locationService: LocationService,
-    private exportService: ExportService,
     private snackBarUtilityService: SnackBarUtilityService,
     private mrRegisterService: MrRegisterService,
     private storage: StorageService,
-    private MCountrService: ModuleCounterService
+    private MCountrService: ModuleCounterService,
+    private salesRegister: SalesRegisterService,
+    private nav: NavDataService
 
   ) { }
 
@@ -123,11 +70,11 @@ export class MRRegisterReportComponent implements OnInit {
   //#endregion
   //#region to get dropdown data
   async getDropdownData() {
-    const divisionList = await GetGeneralMasterData(this.masterService, 'DIVIS');
+    // const divisionList = await GetGeneralMasterData(this.masterService, 'DIVIS');
     const customerList = await this.customerService.customerFromApi();
     const locationList = await this.locationService.locationFromApi();
 
-    this.filter.Filter(this.jsonControlArray, this.mRRegisterForm, divisionList, "division", false);
+    // this.filter.Filter(this.jsonControlArray, this.mRRegisterForm, divisionList, "division", false);
     this.filter.Filter(this.jsonControlArray, this.mRRegisterForm, customerList, "customer", false);
     this.filter.Filter(this.jsonControlArray, this.mRRegisterForm, locationList, "branch", false);
 
@@ -164,7 +111,7 @@ export class MRRegisterReportComponent implements OnInit {
       });
   }
   //#endregion
-  //#region to export csv file
+  //#region to report data file
   async save() {
     this.snackBarUtilityService.commonToast(async () => {
       try {
@@ -178,8 +125,8 @@ export class MRRegisterReportComponent implements OnInit {
           ? this.mRRegisterForm.value.custnmcdHandler.map(x => x.name)
           : [];
 
-        const branch = this.mRRegisterForm.value.branch.name;
-        const division = this.mRRegisterForm.value.division;
+        const branch = this.mRRegisterForm.value.branch.value;
+        // const division = this.mRRegisterForm.value.division;
 
         const MRNOs = this.mRRegisterForm.value.MRNO;
 
@@ -213,33 +160,61 @@ export class MRRegisterReportComponent implements OnInit {
 
         const data = await this.mrRegisterService.getMrRegisterData(request, optionalRequest);
 
-        if (!data || (Array.isArray(data) && data.length === 0)) {
-
-          Swal.fire({
-            icon: "error",
-            title: "No Records Found",
-            text: "Cannot Download CSV",
-            showConfirmButton: true,
-          });
-
+        if (data.data.length === 0) {
+          if (data) {
+            Swal.fire({
+              icon: "error",
+              title: "No Records Found",
+              text: "Cannot Download CSV",
+              showConfirmButton: true,
+            });
+          }
           return;
         }
+        let result = {
+          data: [],
+          grid: {
+            columns: [],
+            sorting: {},
+            searching: {},
+            paging: {}
+          }
+        };
+
+        const transformedHeader = this.salesRegister.addChargesToColumns(data.data, data.grid.columns);
+        const newdata = this.salesRegister.setCharges(data.data);
+        result.grid.columns = transformedHeader;
+        result.grid.sorting = data.grid.sorting;
+        result.grid.searching = data.grid.searching;
+        result.grid.paging = data.grid.paging;
+
+        // Push the module counter data to the server
+        this.MCountrService.PushModuleCounter();
+        const total = this.getSum(data.data); //getting total of charges        
+        const lastRowTTL = this.matchKeysAndSetValues(transformedHeader, total);
+
+        // Add the last row to newdata
+        newdata.push(lastRowTTL);
+
+        // Update the result.data
+        result.data = newdata;
+
+        // Prepare the state data to include all necessary properties
+        const stateData = {
+          data: result,
+          formTitle: "MR Register Data",
+          csvFileName: `MR Register-${moment().format("YYYYMMDD-HHmmss")}`
+        };
+        // Convert the state data to a JSON string and encode it        
+        this.nav.setData(stateData);
+        // Create the new URL with the state data as a query parameter
+        const url = `/#/Reports/generic-report-view`;
+        // Open the URL in a new tab
+        window.open(url, '_blank');
 
         setTimeout(() => {
           Swal.close();
         }, 1000);
-        // Push the module counter data to the server
-        this.MCountrService.PushModuleCounter();
-        const transformedHeader = this.setcharges(data, this.CSVHeader); // Set the header for the CSV file
-        const finalData = this.setCsvData(data); // Set the data for the CSV file
-
-        const total = this.getSum(finalData); //getting total of charges
-        const lastRowTTL = this.matchKeysAndSetValues(transformedHeader, total);
-        finalData.push(lastRowTTL);
-
-        // Export the record to Excel
-        this.exportService.exportAsCSV(finalData, `MR Register-${moment().format("YYYYMMDD-HHmmss")}`, transformedHeader);
-
       } catch (error) {
         console.log(error);
         this.snackBarUtilityService.ShowCommonSwal(
@@ -249,78 +224,52 @@ export class MRRegisterReportComponent implements OnInit {
       }
     }, "MR Register Report Generating Please Wait..!");
   }
+  //#endregion
+  //#region to set key and toal in last row
+  setcharges(data: any[]): string[] {
+    const chargeKeys: Set<string> = new Set();
 
-  // function to set charges
-  setcharges(chargeList: any[], headers) {
-
-    const columnHeader = { ...headers };
-    this.chargesKeys = [];
-    chargeList.forEach((item) => {
-      item.chargeList.forEach((charge) => {
-        const key = Object.keys(charge)[0];
-
-        if (!this.chargesKeys.includes(key)) {
-          this.chargesKeys.push(key);
-        }
-        columnHeader[key] = key;  // Add the charge to the header
-      });
+    data.forEach(item => {
+      if (item.cHGLST) {
+        item.cHGLST.forEach((charge: any) => {
+          chargeKeys.add(charge.cHGNM);
+        });
+      }
     });
 
-    return columnHeader; // Return the transformed data
+    return Array.from(chargeKeys);
   }
-
-  // function to set csv data
-  setCsvData(data: any[]) {
-    const transformed = data.map((item) => {
-      const newItem = { ...item }; // Create a new object for each item
-
-      item.chargeList.forEach((charge: any) => {
-        const key = Object.keys(charge)[0];
-        const value = charge[key];
-        newItem[key] = value; // Add charge properties to the new item
-      });
-
-      delete newItem.chargeList; // Remove the original chargeList property
-      return newItem;
-    });
-    return transformed;
-  }
-
-  //calculating sum of charges
-  getSum(data) {
-    const keys = ['MRAmount', 'TDS', 'GSTAmount', 'NetMRCloseAmt', 'ChequeAmount', 'BasicFreight',
-      'SubTotal', 'DocketTotal', 'ActualWeight', 'ChargedWeight', 'NoPkg'];
-    keys.push(...this.chargesKeys);
+  getSum(data: any[]): { [key: string]: number } {
+    let chargesKeys = this.setcharges(data);
+    const keys = ['dLVRMRAMT', 'tDSAmt', 'gSTAMT', 'cLLCTAMT', 'fRTAMT', 'sBTTL', 'dTTL', 'aCTWT', 'cHRGWT', 'nOPkg'];
+    keys.push(...chargesKeys);
 
     const total = data.reduce((accumulator, item) => {
       keys.forEach(key => {
         const totalKey = key;
-        accumulator[totalKey] = (accumulator[totalKey] || 0) + (item[key] ? parseFloat(item[key]) : 0);
+        accumulator[totalKey] = (accumulator[totalKey] || 0) + (item[totalKey] ? parseFloat(item[totalKey]) : 0);
       });
       return accumulator;
     }, {});
 
     return total;
   }
-  // matching key and setting its value
+  // matching key and setting its value for total
   matchKeysAndSetValues(keysMap, valuesMap) {
-
     const matchedValues = {};
 
-    Object.keys(keysMap).forEach(key => {
-      if (key === 'MRNo') {
-        matchedValues[key] = "Total";
-        return;
+    keysMap.forEach(keyObj => {
+      const key = keyObj.field;
 
+      if (key === 'docNo') {
+        matchedValues[key] = "Total";
       } else {
-        const mappedKey = key;
-        const value = valuesMap[mappedKey];
+        const value = valuesMap[key];
         matchedValues[key] = value !== undefined ? value : "";
       }
     });
 
     return matchedValues;
   }
-
   //#endregion
 }

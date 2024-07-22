@@ -12,7 +12,6 @@ import { firstValueFrom } from "rxjs";
 import Swal from "sweetalert2";
 import { VehicleService } from "src/app/Utility/module/masters/vehicle-master/vehicle-master-service";
 import { JobOrderService } from "src/app/core/service/jobOrder-service/jobOrder-services.service";
-import { id } from "@swimlane/ngx-charts";
 @Component({
   selector: "app-add-job-order",
   templateUrl: "./add-job-order.component.html",
@@ -355,13 +354,11 @@ export class AddJobOrderComponent implements OnInit {
           text: "Job Order Closed Successfully",
           showConfirmButton: true,
         }).then(() => {
-          this.router.navigateByUrl("/Operation/JobOrder");
+          this.router.navigateByUrl("/Operation/JobOrder"); 
         });
       }
     } else {
-      const res = await this.joborder.CreateJobOrder(data, {
-        cID: this.storage.companyCode,
-      });
+      const res = await this.joborder.CreateJobOrder(data);
       if (res) {
         // Display success message
         Swal.fire({

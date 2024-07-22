@@ -3,7 +3,7 @@ import { firstValueFrom } from "rxjs";
 import { MasterService } from "src/app/core/service/Masters/master.service";
 import { StorageService } from "src/app/core/service/storage.service";
 import { chunkArray } from "src/app/Utility/commonFunction/arrayCommonFunction/arrayCommonFunction";
-
+import _ from 'lodash';
 @Injectable({
     providedIn: "root",
 })
@@ -100,39 +100,56 @@ export class ClusterMasterService {
                     console.log(err); // Handle errors if necessary
                   }
                 }
-            
-                // Process city data based on pinResponse and clusterResponse
-                const data = pinResponse.data.reduce((acc, obj) => {
-                    // Check if there's already an entry with the same CT and PIN
-                    const existingItemIndex = acc.findIndex(item => item.ct === obj.CT && item.pincode === obj.PIN);
-                    
-                    if (existingItemIndex === -1) {
-                      // If no such entry exists, add it to the accumulator array
-                      const getCluster = allClusters.find(x => x.pincode.includes(obj.PIN)) || "";
-                      acc.push({
-                        name: `${obj.PIN}`,
-                        value: `${obj.CT}`,
-                        ct: obj.CT,
-                        pincode: obj.PIN,
-                        st: obj.ST,
-                        clusterName: getCluster?.clusterName || "",
-                        clusterId: getCluster?.clusterCode || ""
+
+                let data = [];
+                pinResponse.data.map((d) => {
+                  data.push({
+                    name: `${d.PIN}`,
+                    value: `${d.CT}`,
+                    ct: d.CT,
+                    pincode: d.PIN,
+                    st: d.ST,
+                    clusterName: "",
+                    clusterId: ""
+                  });
+
+                  const clusters = allClusters.filter(x => x.pincode.includes(d.PIN));
+                  if(clusters.length > 0) {
+                    clusters.forEach((c: any) => {
+                      data.push({
+                        name: `${d.PIN}`,
+                        value: `${d.CT}`,
+                        ct: d.CT,
+                        pincode: d.PIN,
+                        st: d.ST,
+                        clusterName: c?.clusterName || "",
+                        clusterId: c?.clusterCode || ""
                       });
-                    } else {
-                      // If an entry with the same CT and PIN already exists, update it if needed
-                      const existingItem = acc[existingItemIndex];
-                      const getCluster = allClusters.find(x => x.pincode.includes(obj.PIN)) || "";
-                      // Update fields if needed (optional)
-                      existingItem.st = obj.ST;
-                      existingItem.clusterName = getCluster?.clusterName || "";
-                      existingItem.clusterId = getCluster?.clusterCode || "";
-                    }
+                    });
+                  }
+                });
+
+                // const data = pinResponse.data.reduce((acc, obj) => {
+                //     // Check if there's already an entry with the same CT and PIN
+                //     const existingItemIndex = acc.findIndex(item => item.ct === obj.CT && item.pincode === obj.PIN);
                     
-                    return acc;
-                  }, []);
-                    return data;
-            
-                return data;
+                //     if (existingItemIndex === -1) {
+                //       // If no such entry exists, add it to the accumulator array
+                //       findClusters(allClusters, obj, acc);
+                //     } else {
+                //       // If an entry with the same CT and PIN already exists, update it if needed
+                //       const existingItem = acc[existingItemIndex];
+                //       const getCluster = allClusters.find(x => x.pincode.includes(obj.PIN)) || "";
+                //       // Update fields if needed (optional)
+                //       existingItem.st = obj.ST;
+                //       existingItem.clusterName = getCluster?.clusterName || "";
+                //       existingItem.clusterId = getCluster?.clusterCode || "";
+                //     }
+                    
+                //     return acc;
+                //   }, []);
+                console.log(data);  
+                return data;            
               } catch (err) {
                 console.log(err);
                 return []; // Return empty array or handle error appropriately
@@ -140,6 +157,34 @@ export class ClusterMasterService {
         } catch (error) {
             console.error('Failed to fetch cluster data:', error);
         }
+
+      function findClusters(allClusters: any[], obj: any, acc: any) {
+        const pincodeClusters = allClusters.filter(x => x.pincode.includes(obj.PIN));
+        if (pincodeClusters.length > 0) {
+          pincodeClusters.forEach((getCluster: any) => {
+            acc.push({
+              name: `${obj.PIN}`,
+              value: `${obj.CT}`,
+              ct: obj.CT,
+              pincode: obj.PIN,
+              st: obj.ST,
+              clusterName: getCluster?.clusterName || "",
+              clusterId: getCluster?.clusterCode || ""
+            });
+          });
+        }
+        else {
+          acc.push({
+            name: `${obj.PIN}`,
+            value: `${obj.CT}`,
+            ct: obj.CT,
+            pincode: obj.PIN,
+            st: obj.ST,
+            clusterName: "",
+            clusterId: ""
+          });
+        }
+      }
     }
 
 

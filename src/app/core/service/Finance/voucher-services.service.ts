@@ -21,17 +21,23 @@ export class VoucherServicesService {
   async GetAccountDetailFromApi() {
     try {
       const companyCode = parseInt(StorageService.getItem(StoreKeys.CompanyCode));
-      const filter = {};
-      const req = { companyCode, collectionName: 'account_detail', filter };
-      const res = await firstValueFrom(this.masterService.masterPost('generic/get', req));
+     
+      const req = { companyCode, collectionName: 'account_detail', 
+        filters:[
+          { D$match: {
+            cID: companyCode
+          }},
+          { D$project: {
+            LeadgerCode: "$aCCD",
+            LeadgerName: "$aCNM",
+            LeadgerCategory: "$mRPNM"
+          }}
+        ] 
+      };
+
+      const res = await firstValueFrom(this.masterService.masterPost(GenericActions.Query, req));
       if (res && res.data) {
-        return res.data.map((item) => {
-          return {
-            LeadgerCode: item.aCCD,
-            LeadgerName: item.aCNM,
-            LeadgerCategory: item.mRPNM
-          };
-        });
+        return res.data;
       }
       else {
         return [];

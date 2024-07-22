@@ -25,6 +25,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { FreightChargeUploadComponent } from "./freight-charge-upload/freight-charge-upload.component";
 import moment from "moment";
 import { formatDate } from "src/app/Utility/date/date-utils";
+import { OperationService } from "src/app/core/service/operations/operation.service";
 
 interface CurrentAccessListType {
   productAccess: string[];
@@ -151,7 +152,8 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
     private sessionService: SessionService,
     private storage: StorageService,
     private objContainerService: ContainerService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private opsService: OperationService
   ) {
     // Retrieve the stored value from session storage
     // const storedData = sessionStorage.getItem("ServiceSelectiondata");
@@ -206,29 +208,18 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
 
   async getTableData() {
     this.isLoad = true;
-    let req = {
-      companyCode: this.storage.companyCode,
-      collectionName: "cust_contract_freight_charge_matrix",
+    const collectionName = "cust_contract_freight_charge_matrix";
+    const FiltersRequestBody = {
       filter: {
         cONID: this.contractData.cONID,
-        lTYPE: this.ServiceSelectiondata.loadType,
       },
     };
 
-    const res = await firstValueFrom(
-      this.masterService.masterPost("generic/get", req)
-    );
+    const res = await this.opsService.GetPaginatedData(FiltersRequestBody, collectionName);
 
     if (res.success) {
       this.tableData = res.data;
       this.tableData.sort((a, b) => (a.fCID > b.fCID ? -1 : 1));
-      // this.tableData = this.tableData.map((x, index) => {
-      //   return {
-      //     ...x, // Spread the original item to retain other fields
-      //     vFDT: formatDate(x.vFDT || '', "dd-MM-yyyy"),
-      //     vEDT: formatDate(x.vEDT || '', "dd-MM-yyyy"),
-      //   };
-      // })
       this.tableLoad = true;
       this.isLoad = false;
     }

@@ -669,7 +669,7 @@ export class AddLocationMasterComponent implements OnInit {
         const filter ={CT: {'D$regex' : `^${search}`,'D$options' : 'i'}}
         const city= await this.objPinCodeService.getPincodeNestedData(filter,search);
         data = city?city
-          .filter((element) => element.allData.CT.toLowerCase().startsWith(search))
+          .filter((element) => element.allData.CT.toLowerCase().startsWith(search.toLowerCase()))
           .filter((element) => {
             if (!uniqueCTs.has(element.allData.CT)) {
               uniqueCTs.add(element.allData.CT);

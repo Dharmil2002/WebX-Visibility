@@ -80,9 +80,9 @@ export class ModuleCounterService {
     const Branch = BranchList.find((x: any) => x.locCode === this.storage.branch);
     return Branch.locName || '';
   }
-  GetMenuInfo() {
+  GetMenuInfo(url?: string) {
     // Get Menu Details From Router
-    const MenuURI = this.router.url;
+    const MenuURI = url != null ? this.router.url : url;
     const MenuList = this.storage.getItem('menu');
     const Menu = JSON.parse(MenuList);
     const MenuInfo = Menu.find((x: any) => x.MenuLink === MenuURI);

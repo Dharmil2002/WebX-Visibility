@@ -330,7 +330,6 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
           SubCategoryName: result?.SubCategoryName,
           actions: ["Edit", "Remove"],
         };
-        console.log(json);
         this.tableData.push(json);
         this.LoadVoucherDetails = true;
       }
@@ -448,7 +447,7 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
     );
 
     this.CustomerGeneralInvoiceTaxationGSTFilterForm.controls["GSTNumber"].setValue(
-      this.tranDetail.data.find(detail => detail.state  === Billbookingstate.name)?.gstNo || ""
+      this.tranDetail.data.find(detail => detail.state === Billbookingstate.name)?.gstNo || ""
     );
 
     if (Billbookingstate && CustomerGeneralInvoicestate && SACcode) {
@@ -731,7 +730,6 @@ export class GeneralInvoiceCriteriaComponent implements OnInit {
         "eNTLOC": this.storage.branch,
         "eNTBY": this.storage.userName,
       }
-      console.log(billData)
       const req = {
         companyCode: this.storage.companyCode,
         docType: "BILL",

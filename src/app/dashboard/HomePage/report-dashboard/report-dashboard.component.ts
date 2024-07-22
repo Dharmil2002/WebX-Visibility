@@ -14,7 +14,7 @@ import { MenuService } from "src/app/core/service/menu-access/menu.serrvice";
 import { Router } from "@angular/router";
 import { extractUniqueValues } from "src/app/Utility/commonFunction/arrayCommonFunction/uniqArray";
 import { MasterService } from "src/app/core/service/Masters/master.service";
-
+import { ModuleCounterService } from 'src/app/core/service/Logger/module-counter-service.service';
 @Component({
   selector: "app-report-dashboard",
   templateUrl: "./report-dashboard.component.html",
@@ -40,7 +40,8 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
     private storage: StorageService,
     private menuService: MenuService,
     private masterService: MasterService,
-    private router: Router) {}
+    // private ModuleCounterService: ModuleCounterService,
+    private router: Router) { }
 
   async ngOnInit(): Promise<void> {
     const res = await this.GetReports();
@@ -58,43 +59,43 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
   }
 
   async GetReports() {
-    let menu = JSON.parse( this.storage.menu);
+    let menu = JSON.parse(this.storage.menu);
     let menuItems = menu.filter((x) => x.MenuGroup == "ANALYTICS" && x.HasLink);
 
     let catData = menuItems.map((x) => {
       const d = {
-          title: x.SubCategory,
-          category: x.Category || "Report",
-          selected :false
+        title: x.SubCategory,
+        category: x.Category || "Report",
+        selected: false
       };
       return d;
     }).sort((a, b) => a.title.localeCompare(b.title));
-    
-    catData.unshift({ title: "All", category: "All", selected: true});
- 
+
+    catData.unshift({ title: "All", category: "All", selected: true });
+
     let reportData = menuItems.filter(f => f.Category == "Reports").map((x) => {
       const d = {
-          iconName: x.Icon || "sticky_note_2",
-          title: x.MenuName,
-          category: x.SubCategory || "",
-          type: x.Category,
-          route: x.MenuLink,
-          bgColor: x.Color || "#1a3e84",
-          color: x.TextColor || "#ffffff"
+        iconName: x.Icon || "sticky_note_2",
+        title: x.MenuName,
+        category: x.SubCategory || "",
+        type: x.Category,
+        route: x.MenuLink,
+        bgColor: x.Color || "#1a3e84",
+        color: x.TextColor || "#ffffff"
       };
       return d;
     });
 
     let dashboardData = menuItems.filter(f => f.Category == "Dashboards").map((x) => {
       const d = {
-          iconName: x.Icon || "sticky_note_2",
-          title: x.MenuName,
-          category: x.SubCategory || "",
-          type: x.Category,
-          route: x.MenuLink,
-          bgColor: x.Color || "#1a3e84",
-          color: x.TextColor || "#ffffff",
-          data: []
+        iconName: x.Icon || "sticky_note_2",
+        title: x.MenuName,
+        category: x.SubCategory || "",
+        type: x.Category,
+        route: x.MenuLink,
+        bgColor: x.Color || "#1a3e84",
+        color: x.TextColor || "#ffffff",
+        data: []
       };
       return d;
     });
@@ -103,14 +104,14 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
     console.log(ctData);
     if (ctData) {
       const c = {
-          iconName:  "map",
-          title: ctData.title,
-          category: "Operation",
-          type: "Dashboards",
-          route: ctData.link,
-          bgColor: "#6bc0dd",
-          color: "#3c414d",
-          data: []
+        iconName: "map",
+        title: ctData.title,
+        category: "Operation",
+        type: "Dashboards",
+        route: ctData.link,
+        bgColor: "#6bc0dd",
+        color: "#3c414d",
+        data: []
       };
       dashboardData.unshift(c);
     }
@@ -122,14 +123,15 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
       return acc;
     }, []);
 
-    return  { 
-      reports: reportData.sort((a, b) => a.title.localeCompare(b.title)), 
-      menu: menuData, 
-      dashboards: dashboardData.sort((a, b) => a.title.localeCompare(b.title))};
+    return {
+      reports: reportData.sort((a, b) => a.title.localeCompare(b.title)),
+      menu: menuData,
+      dashboards: dashboardData.sort((a, b) => a.title.localeCompare(b.title))
+    };
   }
 
   async getConfig() {
-    
+
     let req = {
       companyCode: this.storage.companyCode,
       collectionName: "dashboard_config",
@@ -163,15 +165,16 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
   }
 
   OpenReports(event) {
+    //console.log(this.ModuleCounterService.GetMenuInfo(event.route));
     //this.router.navigate([event.route]);
-    window.open(`/#${event.route}`, '_blank');  
+    window.open(`/#${event.route}`, '_blank');
   }
 
   OpenDashboards(event) {
-    if(event.route.startsWith("http")){
-      window.open(event.route);  
+    if (event.route.startsWith("http")) {
+      window.open(event.route);
     } else {
-      window.open(`/#${event.route}`, '_blank');  
+      window.open(`/#${event.route}`, '_blank');
     }
   }
 
@@ -181,7 +184,7 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
     this.filterReports(null);
   }
 
-  filterReports(event) {   
+  filterReports(event) {
     // Determine the data source and data based on the category
     let dataSource, data;
     if (this.Category === "Reports") {
@@ -191,7 +194,7 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
       dataSource = 'dashboardDataSource';
       data = this.DashboardData;
     }
-  
+
     // Filter the data if necessary
     if (this.selectedCategory === "All") {
       this[dataSource] = new MatTableDataSource<any>(data);
@@ -200,7 +203,7 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
       const filteredData = filterPipe.transform(data, this.selectedCategory);
       this[dataSource] = new MatTableDataSource<any>(filteredData);
     }
-  
+
     // Connect the data source to the observable
     if (this.Category === "Reports") {
       this.reportObs = this.reportDataSource.connect();
@@ -208,7 +211,7 @@ export class ReportDashboardComponent implements OnInit, OnDestroy {
       this.dashboardObs = this.dashboardDataSource.connect();
     }
   }
-  
+
   SearchReports(SearchText) {
     const filterPipe = new CustomFilterPipe();
     const filteredArr = filterPipe.transform(this.ReportData, SearchText);

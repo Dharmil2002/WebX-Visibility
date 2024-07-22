@@ -214,197 +214,434 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
   }
 
 
-  //#region to select file
-  selectedFile(event) {
-    let fileList: FileList = event.target.files;
-    if (fileList.length !== 1) {
-      throw new Error("Cannot use multiple files");
-    }
-    const file = fileList[0];
-    if (file) {
-      this.xlsxUtils.readFile(file).then(async (jsonData) => {
+// //#region to select file
+selectedFile(event) {
+  let fileList: FileList = event.target.files;
+  if (fileList.length !== 1) {
+    throw new Error("Cannot use multiple files");
+  }
+  const file = fileList[0];
+  if (file) {
+    this.xlsxUtils.readFile(file).then(async (jsonData) => {
 
-        // Locations Data
-        this.locationDropDown = await locationFromApi(this.masterService);
-        const locationValue = this.locationDropDown.map((x) => x.name);
-        const locationName = this.locationDropDown.map((x) => x.value);
-        const mergelocations = [...locationValue, ...locationName];
+      // Locations Data
+      this.locationDropDown = await locationFromApi(this.masterService);
+      const locationValue = this.locationDropDown.map((x) => x.name);
+      const locationName = this.locationDropDown.map((x) => x.value);
+      const mergelocations = [...locationValue, ...locationName];
 
-        // Vendors Data
-        const VendorItems = [...new Set(jsonData.map((x) => x.VendorCode.trim().toUpperCase()))];
-        this.VendorList = await this.fetchVendorsData(VendorItems);
-        this.StateList = await stateFromApi(this.masterService);
-        const StateValue = this.StateList.map((x) => x.value);
-        const StateName = this.StateList.map((x) => x.name);
-        const mergeState = [...StateValue, ...StateName];
+      // Vendors Data
+      const VendorItems = [...new Set(jsonData.map((x) => x.VendorCode.trim().toUpperCase()))];
+      this.VendorList = await this.fetchVendorsData(VendorItems);
+      this.StateList = await stateFromApi(this.masterService);
+      const StateValue = this.StateList.map((x) => x.value);
+      const StateName = this.StateList.map((x) => x.name);
+      const mergeState = [...StateValue, ...StateName];
 
-        // Debit Accounts Data And TDS
-        const DebitAccount = [...new Set(jsonData.map((x) => x.DebitAccount.trim().toUpperCase()))];
-        this.AccountList = await this.AccountDataBasedOnAccountCode(DebitAccount);
-        this.TDSAccountList = await this.AccountDataForTDS("TDS");
+      // Debit Accounts Data And TDS
+      const DebitAccount = [...new Set(jsonData.map((x) => x.DebitAccount.trim().toUpperCase()))];
+      this.AccountList = await this.AccountDataBasedOnAccountCode(DebitAccount);
+      this.TDSAccountList = await this.AccountDataForTDS("TDS");
 
 
-        // SAC Code Data
-        const SACCode = [...new Set(jsonData.map((x) => x.SACCode))];
-        this.SachsnList = await this.fetchAllSacHsnData(SACCode);
+      // SAC Code Data
+      const SACCode = [...new Set(jsonData.map((x) => x.SACCode))];
+      this.SachsnList = await this.fetchAllSacHsnData(SACCode);
 
-        // Company Masters Data
-        this.CompanyMastersData = await this.GetCompanmyMastersData();
+      // Company Masters Data
+      this.CompanyMastersData = await this.GetCompanmyMastersData();
 
-        const validationRules = [
+      
+      const validationRules = [
+        {
+          ItemsName: "ManualBillNo",
+          Validations: [{ Required: true }, { Type: "text" }],
+        },
+        {
+          ItemsName: "BillDate",
+          Validations: [{ Required: true }, { Type: "date" }, { Date: true }],
+        },
+        {
+          ItemsName: "DueDate",
+          Validations: [{ Required: true }, { Type: "date" }, { Date: true }],
+        },
+        {
+          ItemsName: "VendorCode",
+          Validations: [{ Required: true },
           {
-            ItemsName: "ManualBillNo",
-            Validations: [{ Required: true }, { Type: "text" }],
-          },
+            TakeFromArrayList: this.VendorList.map((x) => {
+              return x.vendorCode;
+            }),
+          }
+          ]
+        },
+        {
+          ItemsName: "AgreementNo",
+          Validations: [{ Required: true }],
+        },
+        {
+          ItemsName: "PaymentBranch",
+          Validations: [{ Required: true }, { TakeFromList: mergelocations }],
+        },
+        {
+          ItemsName: "BillingBranch",
+          Validations: [{ Required: true }, { TakeFromList: mergelocations }],
+        },
+        {
+          ItemsName: "Narration",
+          Validations: [{ Required: true }, { Type: "text" }],
+        },
+        {
+          ItemsName: "DebitAccount",
+          Validations: [{ Required: true },
           {
-            ItemsName: "BillDate",
-            Validations: [{ Required: true }, { Type: "date" }, { Date: true }],
-          },
+            TakeFromArrayList: this.AccountList.map((x) => {
+              return x.aCCD;
+            }),
+          }
+          ]
+        },
+        {
+          ItemsName: "Amount",
+          Validations: [{ Required: true }, { Numeric: true }, { MinValue: 1 }],
+        },
+        {
+          ItemsName: "GSTApplicable",
+          Validations: [{ Required: true }, { Type: "text" }, { YN: true }],
+        },
+        // {
+        //   ItemsName: "GSTRate",
+        //   Validations: [{ Required: true }, { Numeric: true }],
+        // },
+        {
+          ItemsName: "RCM",
+          Validations: [{ Required: true }, { Type: "text" }, { YN: true }],
+        },
+        {
+          ItemsName: "SACCode",
+          Validations: [{ Required: true },
           {
-            ItemsName: "DueDate",
-            Validations: [{ Required: true }, { Type: "date" }, { Date: true }],
-          },
+            TakeFromArrayList: this.SachsnList.map((x) => {
+              return x.SHCD;
+            }),
+          }
+          ]
+        },
+        {
+          ItemsName: "StateofSupply",
+          Validations: [{ Required: true },{ TakeFromList: mergeState}],
+        },
+        {
+          ItemsName: "StateOfBilling",
+          Validations: [{ Required: true },
           {
-            ItemsName: "VendorCode",
-            Validations: [{ Required: true },
-            {
-              TakeFromArrayList: this.VendorList.map((x) => {
-                return x.vendorCode;
-              }),
+            TakeFromArrayList: this.CompanyMastersData.map((x) => {
+              return x.StateName;
+            }),
+          }
+          ]
+        },
+        // {
+        //   ItemsName: "VendorGSTNO",
+        //   Validations: [{ Pattern: "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$" },
+        //   {
+        //     TakeFromArrayList: this.VendorList.map((x) => {
+        //       return x.otherdetails[0].gstNumber;
+        //     }),
+        //   }
+        //   ]
+        // },
+        {
+          ItemsName: "CompanyGSTNo",
+          Validations: [{ Required: true }, { Pattern: "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$" },
+          {
+            TakeFromArrayList: this.CompanyMastersData.map((x) => {
+              return x.gstInNumber;
+            }),
+          }],
+        },
+        {
+          ItemsName: "TDSRate",
+          Validations: [{ Required: true }, { Numeric: true }],
+        },
+        {
+          ItemsName: "TDSLedger",
+          Validations: [{ Required: true },
+          {
+            TakeFromArrayList: this.TDSAccountList.map((x) => {
+              return x.aCCD;
+            }),
+          }
+          ]
+        },
+      ];
+      const rPromise = firstValueFrom(this.xlsxUtils.validateData(jsonData, validationRules));
+      
+      rPromise.then(async response => {
+        response.forEach((element) => {
+         debugger
+         console.log(element.Validations)
+         const GSTPattern= "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$" 
+          if (element.DebitAccount == "LIA001001") {
+            element.error.push("Debit Account Should Not Be LIA001001 Account");
+          }
+          if (element.GSTApplicable == "Y")  
+          {
+            if (!element.error) {
+              element.error = [];
             }
-            ]
-          },
-          {
-            ItemsName: "AgreementNo",
-            Validations: [{ Required: true }],
-          },
-          {
-            ItemsName: "PaymentBranch",
-            Validations: [{ Required: true }, { TakeFromList: mergelocations }],
-          },
-          {
-            ItemsName: "BillingBranch",
-            Validations: [{ Required: true }, { TakeFromList: mergelocations }],
-          },
-          {
-            ItemsName: "Narration",
-            Validations: [{ Required: true }, { Type: "text" }],
-          },
-          {
-            ItemsName: "DebitAccount",
-            Validations: [{ Required: true },
+            if(!element.GSTRate || isNaN(parseFloat(element.GSTRate)) || parseFloat(element.GSTRate) <= 0)
             {
-              TakeFromArrayList: this.AccountList.map((x) => {
-                return x.aCCD;
-              }),
-            }
-            ]
-          },
-          {
-            ItemsName: "Amount",
-            Validations: [{ Required: true }, { Numeric: true }, { MinValue: 1 }],
-          },
-          {
-            ItemsName: "GSTApplicable",
-            Validations: [{ Required: true }, { Type: "text" }, { YN: true }],
-          },
-          // {
-          //   ItemsName: "GSTRate",
-          //   Validations: [{ Required: true }, { Numeric: true }],
-          // },
-          {
-            ItemsName: "RCM",
-            Validations: [{ Required: true }, { Type: "text" }, { YN: true }],
-          },
-          {
-            ItemsName: "SACCode",
-            Validations: [{ Required: true },
-            {
-              TakeFromArrayList: this.SachsnList.map((x) => {
-                return x.SHCD;
-              }),
-            }
-            ]
-          },
-          {
-            ItemsName: "StateofSupply",
-            Validations: [{ Required: true },{ TakeFromList: mergeState}],
-          },
-          {
-            ItemsName: "StateOfBilling",
-            Validations: [{ Required: true },
-            {
-              TakeFromArrayList: this.CompanyMastersData.map((x) => {
-                return x.StateName;
-              }),
-            }
-            ]
-          },
-          {
-            ItemsName: "VendorGSTNO",
-            Validations: [{ Required: true }, { Pattern: "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$" },
-            {
-              TakeFromArrayList: this.VendorList.map((x) => {
-                return x.otherdetails[0].gstNumber;
-              }),
-            }
-            ]
-          },
-          {
-            ItemsName: "CompanyGSTNo",
-            Validations: [{ Required: true }, { Pattern: "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$" },
-            {
-              TakeFromArrayList: this.CompanyMastersData.map((x) => {
-                return x.gstInNumber;
-              }),
-            }],
-          },
-          {
-            ItemsName: "TDSRate",
-            Validations: [{ Required: true }, { Numeric: true }],
-          },
-          {
-            ItemsName: "TDSLedger",
-            Validations: [{ Required: true },
-            {
-              TakeFromArrayList: this.TDSAccountList.map((x) => {
-                return x.aCCD;
-              }),
-            }
-            ]
-          },
-
-        ];
-        const rPromise = firstValueFrom(this.xlsxUtils.validateData(jsonData, validationRules));
-
-        rPromise.then(async response => {
-          response.forEach((element) => {
-           
-           
-            if (element.DebitAccount == "LIA001001") {
-              element.error.push("Debit Account Should Not Be LIA001001 Account");
-            }
-            if (element.GSTApplicable == "Y" && (!element.GSTRate || isNaN(parseFloat(element.GSTRate)) || parseFloat(element.GSTRate) <= 0))  
-            {
-              if (!element.error) {
-                element.error = [];
-              }
                 element.error.push("GSTRate is required and must be a numeric value greater than 0.");
             }
-          });
+            if (!element.VendorGSTNO || !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(element.VendorGSTNO))
+            {
+              element.error.push("VendorGSTNO is required and must match the pattern.");
+            }
+            else if (!this.VendorList.includes(element.VendorGSTNO)) {
+              element.error.push("VendorGSTNO must be one of the valid GST numbers.");
+            }
 
-          // Filter out objects with errors
-          const objectsWithoutErrors = response.filter(obj => obj.error == null || obj.error.length === 0);
-          const objectsWithErrors = response.filter(obj => obj.error != null);
-
-          const sortedValidatedData = [...objectsWithoutErrors, ...objectsWithErrors];
-          this.OpenPreview(sortedValidatedData);
+          }
+          
         });
 
-      });
-    }
-  }
+        // Filter out objects with errors
+        const objectsWithoutErrors = response.filter(obj => obj.error == null || obj.error.length === 0);
+        const objectsWithErrors = response.filter(obj => obj.error != null);
 
+        const sortedValidatedData = [...objectsWithoutErrors, ...objectsWithErrors];
+        this.OpenPreview(sortedValidatedData);
+      });
+
+    });
+  }
+}
+
+//#region to select file
+// selectedFile(event) {
+//   let fileList: FileList = event.target.files;
+//   if (fileList.length !== 1) {
+//     throw new Error("Cannot use multiple files");
+//   }
+//   const file = fileList[0];
+//   if (file) {
+//     this.xlsxUtils.readFile(file).then(async (jsonData) => {
+
+//       // Locations Data
+//       this.locationDropDown = await locationFromApi(this.masterService);
+//       const locationValue = this.locationDropDown.map((x) => x.name);
+//       const locationName = this.locationDropDown.map((x) => x.value);
+//       const mergelocations = [...locationValue, ...locationName];
+
+//       // Vendors Data
+//       const VendorItems = [...new Set(jsonData.map((x) => x.VendorCode.trim().toUpperCase()))];
+//       this.VendorList = await this.fetchVendorsData(VendorItems);
+//       this.StateList = await stateFromApi(this.masterService);
+//       const StateValue = this.StateList.map((x) => x.value);
+//       const StateName = this.StateList.map((x) => x.name);
+//       const mergeState = [...StateValue, ...StateName];
+
+//       // Debit Accounts Data And TDS
+//       const DebitAccount = [...new Set(jsonData.map((x) => x.DebitAccount.trim().toUpperCase()))];
+//       this.AccountList = await this.AccountDataBasedOnAccountCode(DebitAccount);
+//       this.TDSAccountList = await this.AccountDataForTDS("TDS");
+
+//       // SAC Code Data
+//       const SACCode = [...new Set(jsonData.map((x) => x.SACCode))];
+//       this.SachsnList = await this.fetchAllSacHsnData(SACCode);
+
+//       // Company Masters Data
+//       this.CompanyMastersData = await this.GetCompanmyMastersData();
+
+//       const validationRules = [
+//         {
+//           ItemsName: "ManualBillNo",
+//           Validations: [{ Required: true }, { Type: "text" }],
+//         },
+//         {
+//           ItemsName: "BillDate",
+//           Validations: [{ Required: true }, { Type: "date" }, { Date: true }],
+//         },
+//         {
+//           ItemsName: "DueDate",
+//           Validations: [{ Required: true }, { Type: "date" }, { Date: true }],
+//         },
+//         {
+//           ItemsName: "VendorCode",
+//           Validations: [
+//             { Required: true },
+//             {
+//               TakeFromArrayList: this.VendorList.map((x) => {
+//                 return x.vendorCode;
+//               }),
+//             },
+//           ],
+//         },
+//         {
+//           ItemsName: "AgreementNo",
+//           Validations: [{ Required: true }],
+//         },
+//         {
+//           ItemsName: "PaymentBranch",
+//           Validations: [{ Required: true }, { TakeFromList: mergelocations }],
+//         },
+//         {
+//           ItemsName: "BillingBranch",
+//           Validations: [{ Required: true }, { TakeFromList: mergelocations }],
+//         },
+//         {
+//           ItemsName: "Narration",
+//           Validations: [{ Required: true }, { Type: "text" }],
+//         },
+//         {
+//           ItemsName: "DebitAccount",
+//           Validations: [
+//             { Required: true },
+//             {
+//               TakeFromArrayList: this.AccountList.map((x) => {
+//                 return x.aCCD;
+//               }),
+//             },
+//           ],
+//         },
+//         {
+//           ItemsName: "Amount",
+//           Validations: [{ Required: true }, { Numeric: true }, { MinValue: 1 }],
+//         },
+//         {
+//           ItemsName: "GSTApplicable",
+//           Validations: [{ Required: true }, { Type: "text" }, { YN: true }],
+//         },
+//         // {
+//         //   ItemsName: "RCM",
+//         //   Validations: [{ Required: true }, { Type: "text" }, { YN: true }],
+//         // },
+//         // {
+//         //   ItemsName: "SACCode",
+//         //   Validations: [
+//         //     { Required: true },
+//         //     {
+//         //       TakeFromArrayList: this.SachsnList.map((x) => {
+//         //         return x.SHCD;
+//         //       }),
+//         //     },
+//         //   ],
+//         // },
+//         // {
+//         //   ItemsName: "StateofSupply",
+//         //   Validations: [{ Required: true }, { TakeFromList: mergeState }],
+//         // },
+//         // {
+//         //   ItemsName: "StateOfBilling",
+//         //   Validations: [
+//         //     { Required: true },
+//         //     {
+//         //       TakeFromArrayList: this.CompanyMastersData.map((x) => {
+//         //         return x.StateName;
+//         //       }),
+//         //     },
+//         //   ],
+//         // },
+//         // {
+//         //   ItemsName: "CompanyGSTNo",
+//         //   Validations: [
+//         //     { Required: true },
+//         //     { Pattern: "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$" },
+//         //     {
+//         //       TakeFromArrayList: this.CompanyMastersData.map((x) => {
+//         //         return x.gstInNumber;
+//         //       }),
+//         //     },
+//         //   ],
+//         // },
+//         {
+//           ItemsName: "TDSRate",
+//           Validations: [{ Required: true }, { Numeric: true }],
+//         },
+//         // {
+//         //   ItemsName: "TDSLedger",
+//         //   Validations: [
+//         //     { Required: true },
+//         //     {
+//         //       TakeFromArrayList: this.TDSAccountList.map((x) => {
+//         //         return x.aCCD;
+//         //       }),
+//         //     },
+//         //   ],
+//         // },
+//       ];
+
+//       const rPromise = firstValueFrom(this.xlsxUtils.validateData(jsonData, validationRules));
+
+//       rPromise.then(async (response) => {
+//         response.forEach((element) => {
+//           const GSTPattern = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+//           if (!element.error) {
+//             element.error = [];
+//           }
+//           if (element.DebitAccount == "LIA001001") {
+//             element.error.push("Debit Account Should Not Be LIA001001 Account");
+//           }
+
+//           if (element.GSTApplicable == "Y") {
+//             // GSTRate Validation
+//             if (!element.GSTRate || isNaN(parseFloat(element.GSTRate)) || parseFloat(element.GSTRate) <= 0) {
+//               element.error.push("GSTRate is required and must be a numeric value greater than 0.");
+//             }
+//             // VendorGSTNO Validation
+//             if (!element.VendorGSTNO || !GSTPattern.test(element.VendorGSTNO)) {
+//               element.error.push("VendorGSTNO is required and must match the pattern.");
+//             } 
+//             // else if (!this.VendorList.some((vendor) => vendor.otherdetails[0].gstNumber === element.VendorGSTNO)) {
+//             //   element.error.push("VendorGSTNO must be one of the valid GST numbers.");
+//             // }
+//             // StateofSupply Validation
+//             if (!element.StateofSupply || !mergeState.includes(element.StateofSupply)) {
+//               element.error.push("StateofSupply is required and must be one of the valid states.");
+//             }
+//             // StateOfBilling Validation
+//             if (!element.StateOfBilling || !mergeState.includes(element.StateOfBilling)) {
+//               element.error.push("StateOfBilling is required and must be one of the valid states.");
+//             }
+            
+//             // CompanyGSTNo Validation
+//             if (!element.CompanyGSTNo || !GSTPattern.test(element.CompanyGSTNo)) {
+//               element.error.push("CompanyGSTNo is required and must match the pattern.");
+//             } 
+//             // else if (!this.CompanyMastersData.some((data) => data.gstInNumber === element.CompanyGSTNo)) {
+//             //   element.error.push("CompanyGSTNo must be one of the valid GST numbers.");
+//             // }
+//             // RCM Validation
+//             if (!element.RCM || !['Y', 'N'].includes(element.RCM)) {
+//               element.error.push("RCM is required and must be 'Y' or 'N'.");
+//             }
+//             // SACCode Validation
+//             if (!element.SACCode || !this.SachsnList.some((sac) => sac.SHCD === element.SACCode)) {
+//               element.error.push("SACCode is required and must be one of the valid SAC codes.");
+//             }
+//           }
+//           if (element.TDSRate && !isNaN(parseFloat(element.TDSRate)) && parseFloat(element.TDSRate) > 0) {
+//             if (!element.TDSLedger || !this.TDSAccountList.some((tds) => tds.aCCD === element.TDSLedger)) {
+//               element.error.push("TDSLedger is required and must be one of the valid TDS accounts when TDSRate is provided and greater than 0.");
+//             }
+//           }
+//           if (element.error.length === 0) {
+//             element.error = null;
+//           }
+//         });
+
+//         // Filter out objects with errors
+//         const objectsWithoutErrors = response.filter((obj) => obj.error == null || obj.error.length === 0);
+//         const objectsWithErrors = response.filter((obj) => obj.error != null && obj.error.length > 0);
+//         console.log('Objects without errors:', objectsWithoutErrors);
+//         console.log('Objects with errors:', objectsWithErrors);
+//         const sortedValidatedData = [...objectsWithoutErrors, ...objectsWithErrors];
+//         this.OpenPreview(sortedValidatedData);
+//       });
+//     });
+//   }
+// }
 
   OpenPreview(results) {
     const dialogRef = this.dialog.open(XlsxPreviewPageComponent, {
@@ -450,6 +687,7 @@ export class SetOpeningBalanceVendorWiseComponent implements OnInit {
         const Response = [];
         for (let i = 0; i < jsonData.length; i++) {
           const data = jsonData[i];
+          debugger
           const BillResult = await firstValueFrom(this.createVendorBillRequest(data));
           const VoucherResult = await firstValueFrom(this.createJournalRequest(data, BillResult?.data.data.ops[0].docNo));
           const ResultObject = {

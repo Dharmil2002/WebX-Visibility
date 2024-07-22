@@ -21,7 +21,7 @@ export class CreditNoteRegisterReportService {
           D$or: data.DocNos.map(D => ({
             D$or: [
               { nTNO: { D$in: [D] } },
-              { docNo: { D$in: [D] } }
+              { bILLNO: { D$in: [D] } }
             ]
           }))
         }

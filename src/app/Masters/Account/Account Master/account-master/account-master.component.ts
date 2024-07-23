@@ -52,6 +52,11 @@ export class AccountMasterComponent implements OnInit {
       class: "matcolumnleft",
       Style: "min-width:25%",
     },
+    mRPNM: {
+      Title: "Main Category",
+      class: "matcolumnleft",
+      Style: "min-width:25%",
+    },
     EditAction: {
       type: 'iconClick',
       Title: "Action",
@@ -83,6 +88,7 @@ export class AccountMasterComponent implements OnInit {
     "Account",
     "gRPNM",
     "cATNM",
+    "mRPNM",
   ];
   TableData: any;
   isTableLode = false;
@@ -139,14 +145,17 @@ export class AccountMasterComponent implements OnInit {
     ;
     const res = await firstValueFrom(this.masterService.masterPost("generic/get", Body));
     if (res.success && res.data.length > 0) {
-      this.TableData = res.data.map((x, index) => {
-        return {
-          ...x,
-          SrNo: index + 1,
-          Account: x.aCCD + ' : ' + x.aCNM,
-          AccountGroup: x.SubCategoryCode == "" && x.SubCategoryName == "" ? "" : x.SubCategoryCode + ' : ' + x.SubCategoryName,
-        };
-      });
+      this.TableData = res.data
+        .map((x, index) => {
+          return {
+            ...x,
+            SrNo: index + 1,
+            Account: x.aCCD + ' : ' + x.aCNM,
+            AccountGroup: x.SubCategoryCode === "" && x.SubCategoryName === "" ? "" : x.SubCategoryCode + ' : ' + x.SubCategoryName,
+          };
+        })
+        .sort((a, b) => a.Account.localeCompare(b.Account)); // Sort by Account in ascending order
+
     }
     this.isTableLode = true;
   }

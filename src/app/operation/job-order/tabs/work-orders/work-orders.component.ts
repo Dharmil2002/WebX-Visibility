@@ -105,7 +105,6 @@ export class WorkOrdersComponent implements OnInit {
   }
   async handleMenuItemClick(data) {
     const label = data.label.label;
-    let successMessage = "";
     switch (label) {
       case "Update":
         this.dataService.setMenuItemData(data);
@@ -140,20 +139,24 @@ export class WorkOrdersComponent implements OnInit {
           if (data.data.docNo) {
             let details = {
               sTATUS: "Cancelled",
-              cLBY:this.storage.userName,
+              cLBY: this.storage.userName,
               cL: true,
               cLDT: new Date(),
               cREMARKS: result.value,
             };
-            const res=await this.joborder.updateWorkOrder("work_order_headers",{docNo: data.data.docNo},details)
+            const res = await this.joborder.updateWorkOrder(
+              "work_order_headers",
+              { docNo: data.data.docNo },
+              details
+            );
             if (res) {
               Swal.fire({
                 icon: "success",
                 title: "WorkOrder Successfully Cancelled",
                 showConfirmButton: true,
-              }).then(()=>{
+              }).then(() => {
                 this.getWorkOrderData();
-              })
+              });
             }
           }
         } else {
@@ -167,6 +170,7 @@ export class WorkOrdersComponent implements OnInit {
   async getWorkOrderData() {
     const res = await this.joborder.getWorkOrderData({
       cID: this.storage.companyCode,
+      lOC: this.storage.branch,
     });
     if (res) {
       const data = res;
@@ -175,8 +179,8 @@ export class WorkOrdersComponent implements OnInit {
           ...item,
           actions: ["Update", "Close", "Cancel"],
         };
-        if(newItem.sTATUS === "Cancelled" || newItem.sTATUS==="Closed"){
-          newItem.actions = []
+        if (newItem.sTATUS === "Cancelled" || newItem.sTATUS === "Closed") {
+          newItem.actions = [];
         }
         // Conditionally add the Vendor property
         if (item?.vEND?.vCD && item?.vEND?.vNM) {

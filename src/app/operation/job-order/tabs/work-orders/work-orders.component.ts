@@ -105,7 +105,6 @@ export class WorkOrdersComponent implements OnInit {
   }
   async handleMenuItemClick(data) {
     const label = data.label.label;
-    let successMessage = "";
     switch (label) {
       case "Update":
         this.dataService.setMenuItemData(data);
@@ -166,7 +165,7 @@ export class WorkOrdersComponent implements OnInit {
   }
   async getWorkOrderData() {
     const res = await this.joborder.getWorkOrderData({
-      cID: this.storage.companyCode,
+      lOC: this.storage.branch,
     });
     if (res) {
       const data = res;

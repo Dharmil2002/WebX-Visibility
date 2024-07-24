@@ -272,9 +272,12 @@ export class AddJobOrderComponent implements OnInit {
       this.JobOrderForm.controls["model"].setValue(vehicletypedata[0].oemmodel);
     }
   }
-  async getJobOrdersData() {
+  async getJobOrdersData() {  
+    if(this.isClose){
+      return;
+    }
     const res = await this.joborder.getSingleJobOrderData({
-      cID: this.storage.companyCode,
+      lOC: this.storage.branch,
     });
     if (res) {
       const data = res;

@@ -165,7 +165,7 @@ export class AddWorkOrderComponent implements OnInit {
     this.handleDisabledProperties();
     this.WorkOrderForm.controls["workshoptype"].valueChanges.subscribe((x) => {
       this.valuechanged = true;
-    });
+    });    
   }
   initializeFormControl() {
     this.WorkOrderFormControls = new WorkOrderFormControls(
@@ -1145,8 +1145,11 @@ export class AddWorkOrderComponent implements OnInit {
     }
   }
   async getWorkOrdersData() {
+    if(this.isUpdate || this.isClose){
+      return;
+    }
     const res = await this.joborder.getSingleWorkOrderData({
-      cID: this.storage.companyCode,
+      lOC: this.storage.branch,
     });
     if (res) {
       const data = res;
@@ -1897,6 +1900,7 @@ export class AddWorkOrderComponent implements OnInit {
   cancel() {
     this.router.navigateByUrl("Operation/JobOrder");
   }
+  
   functionCallHandler($event) {
     let functionName = $event.functionName; // name of the function , we have to call
     // function of this name may not exists, hence try..catch

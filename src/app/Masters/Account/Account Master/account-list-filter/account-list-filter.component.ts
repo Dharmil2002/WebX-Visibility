@@ -66,11 +66,6 @@ export class AccountListFilterComponent implements OnInit {
         this.MainCategoryStatus = data.additionalData.showNameAndValue;
         this.getMainCategoryDropdown();
       }
-      if (data.name === "GroupCode") {
-        // Set category-related variables
-        this.GroupCodeCode = data.name;
-        this.GroupCodeStatus = data.additionalData.showNameAndValue;
-      }
     });
   }
 
@@ -98,14 +93,70 @@ export class AccountListFilterComponent implements OnInit {
         this.MainCategoryStatus
       );
     }
+    // Call Account Code Dropdown
+    this.getAccountDropdown();
   }
 
-  async getGroupCodeDropdown() {
+  async GetBalanceCategoryDropdown() {
     const Value = this.AccountQueryForm.value.MainCategory.name;
     const Body = {
       companyCode: this.CompanyCode,
       collectionName: "account_group_detail",
-      filter: { cATNM: Value },
+      filters: [
+        {
+          D$match: {
+            cATNM: Value,
+          },
+        },
+        {
+          "D$group": {
+            "_id": {
+              "bCATCD": "$bCATCD",
+              "bCATNM": "$bCATNM"
+            }
+          }
+        },
+        {
+          D$project: {
+            "_id": 0,
+            "bCATCD": "$_id.bCATCD",
+            "bCATNM": "$_id.bCATNM"
+          },
+        },
+      ],
+    };
+
+    const res = await firstValueFrom(this.masterService
+      .masterPost("generic/query", Body));
+    if (res.success && res.data.length > 0) {
+      const GroupCodeType = res.data
+        .map((x) => {
+          return {
+            name: x.bCATNM,
+            value: x.bCATCD,
+          };
+        })
+      this.filter.Filter(
+        this.jsonControlAccountQueryArray,
+        this.AccountQueryForm,
+        GroupCodeType,
+        "BalanceGategory",
+        false
+      );
+    }
+    // Call Account Code Dropdown
+    this.getAccountDropdown();
+  }
+  async GetGroupCodeDropdown() {
+    const MainCategory = this.AccountQueryForm.value.MainCategory.name;
+    const BalanceCategory = this.AccountQueryForm.value.BalanceGategory.value;
+    const Body = {
+      companyCode: this.CompanyCode,
+      collectionName: "account_group_detail",
+      filter: {
+        cATNM: MainCategory,
+        bCATCD: BalanceCategory
+      },
     };
 
     const res = await firstValueFrom(this.masterService
@@ -124,22 +175,78 @@ export class AccountListFilterComponent implements OnInit {
         this.jsonControlAccountQueryArray,
         this.AccountQueryForm,
         GroupCodeType,
-        this.GroupCodeCode,
-        this.GroupCodeStatus
+        "GroupCode",
+        false
       );
     }
+    // Call Account Code Dropdown
+    this.getAccountDropdown();
+  }
+  async GetCategoryDropdown() {
+    const MainCategory = this.AccountQueryForm.value.MainCategory.name;
+    const BalanceCategory = this.AccountQueryForm.value.BalanceGategory.value;
+    const GroupCode = this.AccountQueryForm.value.GroupCode.value;
+
+    const Body = {
+      companyCode: this.CompanyCode,
+      collectionName: "account_group_detail",
+      filter: {
+        cATNM: MainCategory,
+        bCATCD: BalanceCategory,
+        gRPCD: GroupCode
+      },
+    };
+
+    const res = await firstValueFrom(this.masterService
+      .masterPost("generic/get", Body));
+    if (res.success && res.data.length > 0) {
+      const GroupCodeType = res.data
+        .map((x) => {
+          return {
+            name: x.cATNM,
+            value: x.cATCD,
+          };
+        })
+        .sort((a, b) => a.name.localeCompare(b.name)); // Sort by name in ascending order
+
+      this.filter.Filter(
+        this.jsonControlAccountQueryArray,
+        this.AccountQueryForm,
+        GroupCodeType,
+        "Category",
+        false
+      );
+    }
+    // Call Account Code Dropdown
+    this.getAccountDropdown();
   }
 
   async getAccountDropdown() {
+    let match: any = {};
+    const MainCategory = this.AccountQueryForm.value.MainCategory.name;
+    const BalanceCategory = this.AccountQueryForm.value.BalanceGategory.value;
+    const GroupCode = this.AccountQueryForm.value.GroupCode.value;
+    const Category = this.AccountQueryForm.value.Category.value;
+
+    if (MainCategory) {
+      match.mRPNM = MainCategory;
+    }
+    if (BalanceCategory) {
+      match.bCATCD = BalanceCategory;
+    }
+    if (GroupCode) {
+      match.gRPCD = GroupCode;
+    }
+    if (Category) {
+      match.cATCD = Category;
+    }
+
     const req = {
       companyCode: this.CompanyCode,
       collectionName: 'account_detail',
       filters: [
         {
-          D$match: {
-            cID: this.CompanyCode,
-            gRPCD: this.AccountQueryForm.value.GroupCode.value
-          }
+          D$match: match
         },
         {
           D$project: {
@@ -151,7 +258,7 @@ export class AccountListFilterComponent implements OnInit {
     };
 
     const res = await firstValueFrom(this.masterService.masterPost(GenericActions.Query, req));
-    if (res.success && res.data.length > 0) {
+    if (res.success) {
       const AccountList = res.data.map((x) => {
         return {
           name: x.LeadgerName,
@@ -199,8 +306,12 @@ export class AccountListFilterComponent implements OnInit {
         D$in: this.AccountQueryForm.value.AccountCodeDropdown.map((x) => x.value)
       };
     }
-
-    // Add other properties as needed
+    if (this.AccountQueryForm.value.BalanceGategory?.value) {
+      Body.bCATCD = this.AccountQueryForm.value.BalanceGategory.value;
+    }
+    if (this.AccountQueryForm.value.Category?.value) {
+      Body.cATCD = this.AccountQueryForm.value.Category.value;
+    }
     if (this.AccountQueryForm.value.GroupCode?.value) {
       Body.gRPCD = this.AccountQueryForm.value.GroupCode.value;
     }

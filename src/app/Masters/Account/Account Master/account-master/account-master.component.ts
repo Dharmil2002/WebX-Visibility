@@ -24,6 +24,8 @@ export class AccountMasterComponent implements OnInit {
   ];
   linkArray = [];
   menuItems = [];
+  csvData = [];
+  csvDataType = {};
   csvFileName: string;
   EventButton = {
     functionName: 'AddFunction',
@@ -69,15 +71,17 @@ export class AccountMasterComponent implements OnInit {
   };
 
   headerForCsv = {
-    "aCCD": 'Account Code',
     "mRPNM": 'Main Category',
-    "gRPCD": 'Group Code',
-    "aCNM": 'Account Description',
-    "cATNM": 'Account Category',
-    "pARTNM": 'Party Selection',
-    "bCATNM": 'Balance Sheet Category',
-    "bSSCH": 'BS Schedule',
-    "iSTRUEPST": 'Activeflag'
+    "bCATCD": 'Balance Category Code',
+    "bCATNM": 'Balance Category Name',
+    "gRPCD": "Group Code",
+    "gRPNM": "Group Name",
+    "cATCD": "Category Code",
+    "cATNM": "Category Name",
+    "aCCD": "Account Code",
+    "aCNM": "Account Name",
+
+
   };
 
   FilterButton = {
@@ -155,6 +159,31 @@ export class AccountMasterComponent implements OnInit {
           };
         })
         .sort((a, b) => a.Account.localeCompare(b.Account)); // Sort by Account in ascending order
+      // Formate Data and Store in csv file
+      this.csvData = this.TableData.map((x) => {
+        return {
+          "mRPNM": String(x.mRPNM),
+          "bCATCD": `${x.bCATCD}`,
+          "bCATNM": String(x.bCATNM),
+          "gRPCD": String(x.gRPCD),
+          "gRPNM": String(x.gRPNM),
+          "cATCD": String(x.cATCD),
+          "cATNM": String(x.cATNM),
+          "aCCD": String(x.aCCD),
+          "aCNM": String(x.aCNM),
+        };
+      });
+      this.csvDataType = {
+        "mRPNM": "string",
+        "bCATCD": "string",
+        "bCATNM": "string",
+        "gRPCD": "string",
+        "gRPNM": "string",
+        "cATCD": "string",
+        "cATNM": "string",
+        "aCCD": "string",
+        "aCNM": "string",
+      };
 
     }
     this.isTableLode = true;

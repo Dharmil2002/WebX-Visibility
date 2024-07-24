@@ -1,17 +1,18 @@
 <app-common-wrapper-webxpress [breadscrums]="breadScrums">
-   <div>
-      <div *ngIf="!isTableLode" class="d-flex justify-content-center align-items-center">
-         <!-- Bootstrap loader -->
-         <div class="spinner-border text-primary" role="status">
-           <span class="visually-hidden">Loading...</span>
-         </div>
-       </div>
-       <div *ngIf="isTableLode">
-         <app-generic-table-v2  [dynamicControls]="dynamicControls" [columnHeader]="columnHeader"
-           [tableData]="TableData" [EventButton]="EventButton" [FilterButton]="FilterButton" (functionCallEmitter)="functionCallHandler($event)" [metaData]="metaData"
-           [Link]="linkArray" [addAndEditPath]="'Masters/AccountMaster/AddAccountMaster'" [FormTitle]="'Accounts List'" [staticField]="staticField"
-           [csvHeaders]="headerForCsv" [csvFileName]="csvFileName" >
-         </app-generic-table-v2>
-       </div>
-   </div>
+  <div>
+    <div *ngIf="!isTableLode" class="d-flex justify-content-center align-items-center">
+      <!-- Bootstrap loader -->
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    <div *ngIf="isTableLode">
+      <app-generic-table-v2 [dynamicControls]="dynamicControls" [columnHeader]="columnHeader" [tableData]="TableData"
+        [EventButton]="EventButton" [FilterButton]="FilterButton" (functionCallEmitter)="functionCallHandler($event)"
+        [metaData]="metaData" [Link]="linkArray" [addAndEditPath]="'Masters/AccountMaster/AddAccountMaster'"
+        [FormTitle]="'Accounts List'" [staticField]="staticField" [csvHeaders]="headerForCsv"
+        [csvFileName]="csvFileName" [csvData]="csvData" [csvDataType]="csvDataType">
+      </app-generic-table-v2>
+    </div>
+  </div>
 </app-common-wrapper-webxpress>

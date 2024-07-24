@@ -12,68 +12,6 @@ export class AccountMasterControls {
 
   constructor(isUpdate) {
     this.AccountQureyArray = [
-      // {
-      //   name: "RadioAccountCode",
-      //   label: "",
-      //   placeholder: "",
-      //   type: "radiobutton",
-      //   value: [
-      //     {
-      //       value: "CompanyAccount",
-      //       name: "Company Account Code",
-      //       checked: true,
-      //     },
-      //     { value: "SystemAccount", name: "System Account Code" },
-      //   ],
-      //   Validations: [],
-      //   generatecontrol: true,
-      //   disable: false,
-      //   functions: {
-      //       onChange:'SelectAccountCode'
-      //   },
-      // },
-      // {
-      //   name: "temp",
-      //   label: "",
-      //   placeholder: "",
-      //   type: "",
-      //   value: "",
-      //   generatecontrol: true,
-      //   disable: false,
-      //   Validations: [],
-      // },
-
-      // {
-      //   name: "temp",
-      //   label: "",
-      //   placeholder: "",
-      //   type: "",
-      //   value: "",
-      //   generatecontrol: true,
-      //   disable: false,
-      //   Validations: [],
-      // },
-      // {
-      //   name: "temp",
-      //   label: "",
-      //   placeholder: "",
-      //   type: "OR",
-      //   value: "",
-      //   generatecontrol: true,
-      //   disable: false,
-      //   Validations: [],
-      // },
-      // {
-      //   name: "temp",
-      //   label: "",
-      //   placeholder: "",
-      //   type: "",
-      //   value: "",
-      //   generatecontrol: true,
-      //   disable: false,
-      //   Validations: [],
-      // },
-
       {
         name: "MainCategory",
         label: "Main Category",
@@ -95,13 +33,61 @@ export class AccountMasterControls {
           showNameAndValue: false,
         },
         functions: {
-          onOptionSelect: "getGroupCodeDropdown",
+          onOptionSelect: "GetBalanceCategoryDropdown",
+        },
+      },
+      {
+        name: "BalanceGategory",
+        label: "Balance Category",
+        placeholder: "Balance Category",
+        type: "dropdown",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
+        functions: {
+          onOptionSelect: "GetGroupCodeDropdown",
         },
       },
       {
         name: "GroupCode",
         label: "Group Code",
         placeholder: "Group Code",
+        type: "dropdown",
+        value: "",
+        generatecontrol: true,
+        disable: false,
+        Validations: [
+          {
+            name: "autocomplete",
+          },
+          {
+            name: "invalidAutocomplete",
+            message: "Choose proper value",
+          },
+        ],
+        additionalData: {
+          showNameAndValue: true,
+        },
+        functions: {
+          onOptionSelect: "GetCategoryDropdown",
+        },
+      },
+      {
+        name: "Category",
+        label: "Category",
+        placeholder: "Category",
         type: "dropdown",
         value: "",
         generatecontrol: true,
@@ -192,7 +178,7 @@ export class AccountMasterControls {
           showNameAndValue: false,
         },
         functions: {
-          onOptionSelect: "getGroupCodeDropdown",
+          onOptionSelect: "GetGroupCodeDropdown",
         },
       },
       {
@@ -339,7 +325,7 @@ export class AccountMasterControls {
           showNameAndValue: true,
         },
         // functions: {
-        //   onOptionSelect: "getGroupCodeDropdown",
+        //   onOptionSelect: "GetGroupCodeDropdown",
         // },
       },
       {
@@ -380,7 +366,7 @@ export class AccountMasterControls {
           showNameAndValue: true,
         },
         // functions: {
-        //   onOptionSelect: "getGroupCodeDropdown",
+        //   onOptionSelect: "GetGroupCodeDropdown",
         // },
       },
 
@@ -440,9 +426,9 @@ export class AccountMasterControls {
       {
         name: "GroupCode",
         label: "Group Code",
-        placeholder: "System Genreted",
+        placeholder: "System Generated",
         type: "text",
-        value: "System Genreted",
+        value: "System Generated",
         Validations: [],
         generatecontrol: true,
         disable: true,

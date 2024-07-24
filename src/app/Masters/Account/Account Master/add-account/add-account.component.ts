@@ -285,7 +285,7 @@ export class AddAccountComponent implements OnInit {
           (x) => x.name == this.UpdateData.mRPNM
         );
         this.AccountForm.controls["MainCategory"].setValue(element);
-        this.getGroupCodeDropdown();
+        this.GetGroupCodeDropdown();
       }
       this.filter.Filter(
         this.jsonControlAccountArray,
@@ -297,7 +297,7 @@ export class AddAccountComponent implements OnInit {
     }
   }
 
-  async getGroupCodeDropdown() {
+  async GetGroupCodeDropdown() {
     this.AccountForm.controls["GroupCode"].setValue("");
     const Value = this.AccountForm.value.MainCategory.name;
     const Body = {
@@ -615,13 +615,13 @@ export class AddAccountComponent implements OnInit {
             },
             sorting: { aCCD: -1 },
           };
-  
+
           const idRes = await firstValueFrom(
             this.masterService.masterPost("generic/findLastOne", idReq)
           );
           const lastId = idRes?.data?.aCCD ?? `${commonBody.gRPCD}000`;
           const accountcode = nextKeyCode(lastId);
-  
+
           commonBody["_id"] = `${this.CompanyCode}-${accountcode}`;
           commonBody["aCCD"] = accountcode;
           commonBody["cID"] = this.CompanyCode;
@@ -633,7 +633,7 @@ export class AddAccountComponent implements OnInit {
           commonBody["mODLOC"] = this.storage.branch;
           commonBody["mODBY"] = this.storage.userName;
         }
-  
+
         const req = {
           companyCode: this.CompanyCode,
           collectionName: "account_detail",
@@ -641,15 +641,15 @@ export class AddAccountComponent implements OnInit {
           update: this.isUpdate ? commonBody : undefined,
           data: this.isUpdate ? undefined : commonBody,
         };
-  
+
         const res = this.isUpdate
           ? await firstValueFrom(
-              this.masterService.masterPut("generic/update", req)
-            )
+            this.masterService.masterPut("generic/update", req)
+          )
           : await firstValueFrom(
-              this.masterService.masterPost("generic/create", req)
-            );
-  
+            this.masterService.masterPost("generic/create", req)
+          );
+
         if (res.success) {
           this.Route.navigateByUrl("/Masters/AccountMaster/AccountMasterList");
           Swal.fire({

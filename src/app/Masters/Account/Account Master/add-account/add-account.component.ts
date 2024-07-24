@@ -161,9 +161,6 @@ export class AddAccountComponent implements OnInit {
         this.UpdateData.isTDS == 0 ? false : true
       );
       this.AccountForm.controls["bSSCH"].setValue(this.UpdateData.bSSCH);
-      this.AccountForm.controls["iSTRUEPST"].setValue(
-        this.UpdateData.iSTRUEPST
-      );
     }
   }
 
@@ -592,7 +589,6 @@ export class AddAccountComponent implements OnInit {
           bANM: this.AccountForm.value.bank.name || "",
           isTDS: this.AccountForm.value.isTDSapplicable,
           bSSCH: this.AccountForm.value.bSSCH,
-          iSTRUEPST: this.AccountForm.value.iSTRUEPST,
           tSEC: this.AccountForm.value.isTDSapplicable
             ? this.AccountForm.value.TDSsection?.name || ""
             : "",

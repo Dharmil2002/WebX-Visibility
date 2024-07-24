@@ -7,9 +7,9 @@ export class ContainerFormControls {
       {
         name: "ContainerCode",
         label: "Container Code",
-        placeholder: "System Genreted",
+        placeholder: "System Generated",
         type: "text",
-        value: isUpdate ? UpdateData.cNCD : "System Genreted",
+        value: isUpdate ? UpdateData.cNCD : "System Generated",
         Validations: [],
         generatecontrol: true,
         disable: true,
@@ -39,7 +39,7 @@ export class ContainerFormControls {
           showNameAndValue: false,
         },
         functions: {
-        //   onOptionSelect: "getAcGroupDropdown",
+          //   onOptionSelect: "getAcGroupDropdown",
         },
       },
       {
@@ -121,7 +121,7 @@ export class ContainerFormControls {
         label: "Gross Weight",
         placeholder: "Gross Weight",
         type: "number",
-        value: isUpdate?UpdateData.gRW : 0,
+        value: isUpdate ? UpdateData.gRW : 0,
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -131,7 +131,7 @@ export class ContainerFormControls {
           },
         ],
         functions: {
-          onChange:"WeightCalculate"
+          onChange: "WeightCalculate"
         },
       },
       {
@@ -149,7 +149,7 @@ export class ContainerFormControls {
           },
         ],
         functions: {
-          onChange:"WeightCalculate"
+          onChange: "WeightCalculate"
         },
       },
       {

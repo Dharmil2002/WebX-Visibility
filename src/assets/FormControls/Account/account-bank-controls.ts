@@ -7,9 +7,9 @@ export class AccountBankControls {
       {
         name: "BankCode",
         label: "Bank Code",
-        placeholder: "System Genreted",
+        placeholder: "System Generated",
         type: "text",
-        value: isUpdate ? UpdateData.Bankcode : "System Genreted",
+        value: isUpdate ? UpdateData.Bankcode : "System Generated",
         Validations: [],
         generatecontrol: true,
         disable: true,
@@ -192,7 +192,7 @@ export class AccountBankControls {
           showNameAndValue: false,
         },
         functions: {
-          onOptionSelect:'AccountTypeFunction'
+          onOptionSelect: 'AccountTypeFunction'
         },
       },
       {
@@ -200,7 +200,7 @@ export class AccountBankControls {
         label: "Credit Limit",
         placeholder: "Credit Limit",
         type: "number",
-        value: isUpdate && UpdateData.CreditLimit != 0? UpdateData.CreditLimit : "",
+        value: isUpdate && UpdateData.CreditLimit != 0 ? UpdateData.CreditLimit : "",
         generatecontrol: true,
         disable: false,
         Validations: [

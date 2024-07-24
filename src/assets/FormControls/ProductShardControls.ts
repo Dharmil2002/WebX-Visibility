@@ -119,7 +119,7 @@ export class ProductShardControls {
         label: "Services ID",
         placeholder: "System Genrated",
         type: "text",
-        value: "System Genreted",
+        value: "System Generated",
         Validations: [{
           name: "required",
           message: "Required",

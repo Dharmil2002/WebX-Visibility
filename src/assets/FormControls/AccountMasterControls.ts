@@ -86,8 +86,8 @@ export class AccountMasterControls {
       },
       {
         name: "Category",
-        label: "Category",
-        placeholder: "Category",
+        label: "Account Category",
+        placeholder: "Account Category",
         type: "dropdown",
         value: "",
         generatecontrol: true,
@@ -146,9 +146,9 @@ export class AccountMasterControls {
       {
         name: "AccountCode",
         label: "Account Code",
-        placeholder: "System Genreted",
+        placeholder: "System Generated",
         type: "text",
-        value: "System Genreted",
+        value: "System Generated",
         Validations: [],
         generatecontrol: true,
         disable: true,
@@ -246,7 +246,7 @@ export class AccountMasterControls {
           },
         ],
         additionalData: {
-          showNameAndValue: false,
+          showNameAndValue: true,
         },
         functions: {
           onOptionSelect: "HandlAccountCategory",
@@ -399,17 +399,7 @@ export class AccountMasterControls {
         },
         functions: {},
       },
-      {
-        name: "iSTRUEPST",
-        label: "Receptance",
-        placeholder: "",
-        type: "toggle",
-        value: false,
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-        functions: {},
-      },
+
       {
         name: "ActiveFlag",
         label: "Active Flag",

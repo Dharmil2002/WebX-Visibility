@@ -47,7 +47,7 @@
     <div class="row" style="margin-top: 30px; margin-left: 10px;">
       <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2">
         <div class="example-button-row">
-          <button type="button" [disabled]="!customerTableForm.valid || tableData.length==0" mat-raised-button color="primary"
+          <button type="button" [disabled]="!customerTableForm.valid" mat-raised-button color="primary"
             (click)="save()">
             <ng-container *ngIf="isUpdate; else saveButton">Modify</ng-container>
             <ng-template #saveButton>Save</ng-template>

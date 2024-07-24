@@ -130,6 +130,18 @@ export class AccountMasterControls {
         disable: false,
       },
       {
+        name: "ActiveFlag",
+        label: "Active Flag",
+        placeholder: "",
+        type: "toggle",
+        value: true,
+        generatecontrol: true,
+        disable: false,
+        Validations: [],
+        functions: {
+        },
+      },
+      {
         name: "AccountCodeDropdown",
         label: "Account Code",
         placeholder: "Account Code",

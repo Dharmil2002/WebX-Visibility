@@ -4,7 +4,7 @@
       <form [formGroup]="AccountQueryForm">
          <app-form-webxpress [form]="AccountQueryForm" [formData]="jsonControlAccountQueryArray"
             [showSaveAndCancelButton]="true" [FormTitle]="'Account List Filter'"
-            [className]="'col-xl-12 col-lg-12 col-md-12 col-sm-12 mb-2'" (callFunction)="functionCallHandler($event)"
+            [className]="'col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-2'" (callFunction)="functionCallHandler($event)"
             (functionCallEmitter)="functionCallHandler($event)">
          </app-form-webxpress>
       </form>

@@ -318,10 +318,10 @@ export class AccountListFilterComponent implements OnInit {
     if (this.AccountQueryForm.value.MainCategory?.value) {
       Body.mATCD = this.AccountQueryForm.value.MainCategory.value;
     }
+    Body.iSSYS = this.AccountQueryForm.value.ActiveFlag
 
     this.dialogRef.close({ event: true, data: Body });
   }
-
 
   cancel() {
     this.dialogRef.close({ event: false, data: "" });

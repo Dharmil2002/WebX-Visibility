@@ -1145,10 +1145,8 @@ export class AddWorkOrderComponent implements OnInit {
     }
   }
   async getWorkOrdersData() {
-    if(this.isUpdate || this.isClose){
-      return;
-    }
     const res = await this.joborder.getSingleWorkOrderData({
+      cID:this.storage.companyCode,
       lOC: this.storage.branch,
     });
     if (res) {

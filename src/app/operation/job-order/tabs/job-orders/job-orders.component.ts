@@ -142,6 +142,7 @@ export class JobOrdersComponent implements OnInit {
   }
   async getJobOrdersData() {
     const res = await this.jobOrder.getJobOrderData({
+      cID:this.storage.companyCode,
       lOC: this.storage.branch,
     });
     if (res) {

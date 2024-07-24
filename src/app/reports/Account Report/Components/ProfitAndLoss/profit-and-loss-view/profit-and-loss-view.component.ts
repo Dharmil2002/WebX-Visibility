@@ -32,6 +32,9 @@ export class ProfitAndLossViewComponent implements OnInit {
       if (item.SubCategory === "Total") {
         item["FontWeight"] = "bold";
       }
+      if (item.SubCategory) {
+        item["SubCategoryLink"] = encodeURIComponent(item.SubCategory);
+      }
       const currentAmount = Number(item.TotalAmountCurrentFinYear);
       if (!isNaN(currentAmount)) {
         item.TotalAmountCurrentFinYear = currentAmount.toLocaleString('en-US');

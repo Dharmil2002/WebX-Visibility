@@ -2,14 +2,14 @@ import { FormControls } from "src/app/Models/FormControl/formcontrol";
 
 export class AccountControls {
   AccountArray: FormControls[];
-  constructor(isUpdate ,UpdateData) {
+  constructor(isUpdate, UpdateData) {
     this.AccountArray = [
       {
         name: "GroupCode",
         label: "Group Code",
-        placeholder: "System Genreted",
+        placeholder: "System Generated",
         type: "text",
-        value: isUpdate? UpdateData.AcLedgerCode:"System Genreted",
+        value: isUpdate ? UpdateData.AcLedgerCode : "System Generated",
         Validations: [],
         generatecontrol: true,
         disable: true,
@@ -39,11 +39,11 @@ export class AccountControls {
           showNameAndValue: false,
         },
         functions: {
-          onOptionSelect:'getAcGroupDropdown'
+          onOptionSelect: 'getAcGroupDropdown'
         },
       },
 
-      
+
       {
         name: "AcGroup",
         label: "Account Group",
@@ -69,7 +69,7 @@ export class AccountControls {
           showNameAndValue: true,
         },
         functions: {
-          
+
         },
       },
       {
@@ -103,7 +103,7 @@ export class AccountControls {
         label: "Account Ledger ",
         placeholder: "Account Ledger ",
         type: "text",
-        value: isUpdate? UpdateData.AcLedger:"",
+        value: isUpdate ? UpdateData.AcLedger : "",
         generatecontrol: true,
         disable: false,
         Validations: [
@@ -125,7 +125,7 @@ export class AccountControls {
         label: "System ledger",
         placeholder: "",
         type: "toggle",
-        value: isUpdate? UpdateData.isSystemledger:false,
+        value: isUpdate ? UpdateData.isSystemledger : false,
         generatecontrol: true,
         disable: false,
         Validations: [],
@@ -135,7 +135,7 @@ export class AccountControls {
         label: "TDS applicable",
         placeholder: "",
         type: "toggle",
-        value: isUpdate? UpdateData.isTDSapplicable:false,
+        value: isUpdate ? UpdateData.isTDSapplicable : false,
         generatecontrol: true,
         disable: false,
         Validations: [],

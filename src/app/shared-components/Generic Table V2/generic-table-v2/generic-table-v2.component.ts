@@ -27,6 +27,7 @@ export class GenericTableV2Component
   @Input() tableData;
   @Input() columnGroup;
   @Input() csvData;
+  @Input() csvDataType;
   @Input() columnHeader = [];
   @Input() TableStyle;
   @Input() TableContainerStyle;
@@ -247,6 +248,15 @@ export class GenericTableV2Component
       }
     }
     else {
+      // Check if the CSvDataType is defined and has a key for the current column
+      if (this.csvDataType && this.csvDataType[key]) {
+        if (this.csvDataType[key] === "number") {
+          return ConvertToNumber(val || 0).toFixed(2);
+        }
+        if (this.csvDataType[key] === "string") {
+          return val;
+        }
+      }
       if (val) {
         if (typeof val !== 'boolean' && isValidNumber(val)) {
           return Number(val);
@@ -289,13 +299,13 @@ export class GenericTableV2Component
   }
   //#region Funtion to open Dialog to view
   View(item) {
-    const dialogRef=this.dialog.open(this.viewComponent, {
+    const dialogRef = this.dialog.open(this.viewComponent, {
       width: "800px",
       height: "500px",
       data: item,
     });
     dialogRef.afterClosed().subscribe((result) => {
-       this.dialogClosed.emit(result);
+      this.dialogClosed.emit(result);
     });
   }
   //#endregion
@@ -398,7 +408,7 @@ export class GenericTableV2Component
       this.onFlagChange.emit(this.dataSource.filteredData);
     } else {
       this.onFlagChange.emit(this.getSelecteditems());
-    }    
+    }
     this.onSelectionChange.emit(item);
     this.selectAllClicked.emit(this.dataSource.filteredData);
   }
@@ -517,13 +527,13 @@ export class GenericTableV2Component
     });
   }
   openImageDialog(data) {
-    const dialogRef =  this.dialog.open(ImagePreviewComponent, {
+    const dialogRef = this.dialog.open(ImagePreviewComponent, {
       data: { imageUrl: data.pod },
       width: '30%',
       height: '50%',
     });
     dialogRef.afterClosed().subscribe((result) => {
-       this.dialogClosed.emit(result);
+      this.dialogClosed.emit(result);
     });
   }
   formatNumberWithThousandSeparator(value: number | string): string {

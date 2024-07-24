@@ -555,12 +555,12 @@ export class CustomerContractFreightMatrixComponent implements OnInit {
 
   Save() {
     // this.FreightMatrixData = this.tableData
-    const genretedid = this.companyCode + "-" + this.contractData.cONID;
+    const Generatedid = this.companyCode + "-" + this.contractData.cONID;
     const companyCode = this.companyCode;
     const cONID = this.contractData.cONID;
     let FreightMatrixdetails = this.tableData.map((x, index) => {
       return {
-        _id: genretedid + "-" + index,
+        _id: Generatedid + "-" + index,
         companyCode: companyCode,
         cONID: cONID,
         From: x.From,

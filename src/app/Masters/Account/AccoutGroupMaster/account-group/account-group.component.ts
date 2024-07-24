@@ -47,13 +47,13 @@ export class AccountGroupComponent implements OnInit {
       class: "matcolumncenter",
       Style: "min-width:20%",
     },
-    EditAction:{
-      type:'iconClick',
+    EditAction: {
+      type: 'iconClick',
       Title: "Action",
       class: "matcolumncenter",
       Style: "min-width:15%",
-      functionName:'EditFunction',
-      iconName:'edit'
+      functionName: 'EditFunction',
+      iconName: 'edit'
     }
   };
   staticField = [
@@ -64,7 +64,7 @@ export class AccountGroupComponent implements OnInit {
     "gRPCD",
   ];
   TableData: any = [];
-  jsonControlAccountGroupArray:FormControls[];
+  jsonControlAccountGroupArray: FormControls[];
   AccountGroupForm: any;
   CategoryCodeCode: string;
   CategoryCodeStatus: any;
@@ -79,9 +79,9 @@ export class AccountGroupComponent implements OnInit {
   FirstUpdate: boolean = false;
   FormTitle = 'Add Account Group'
   EventButton = {
-    functionName:'AddNew',
+    functionName: 'AddNew',
     name: "Add Account Group",
-    iconName:'add'
+    iconName: 'add'
   }
   BalanceSheetCode: string;
   BalanceSheetStatus: any;
@@ -123,7 +123,7 @@ export class AccountGroupComponent implements OnInit {
     this.isTableLode = true;
   }
 
-  EditFunction(event){
+  EditFunction(event) {
     this.isUpdate = true
     this.updateData = event.data
     this.FormTitle = 'Edit Account Group'
@@ -205,7 +205,7 @@ export class AccountGroupComponent implements OnInit {
       collectionName: "General_master",
       filter: { codeType: "BLC", activeFlag: true },
     };
-    const res = await  firstValueFrom(this.masterService
+    const res = await firstValueFrom(this.masterService
       .masterPost("generic/get", Body));
     if (res.success && res.data.length > 0) {
       const BalanceSheetcategory = res.data.map((x) => {
@@ -280,7 +280,7 @@ export class AccountGroupComponent implements OnInit {
         return {
           name: x.gRPNM,
           value: x.gRPCD,
-          level:x.gLEVEL
+          level: x.gLEVEL
         };
       });
       if (this.isUpdate && !this.FirstUpdate) {
@@ -300,25 +300,27 @@ export class AccountGroupComponent implements OnInit {
     }
   }
 
-  GetGroupName(event){
-    const filterData = this.GroupCodeTableData.filter((x)=> x.gRPNM == this.AccountGroupForm.value.gRPNM)
-    if(this.isUpdate && this.AccountGroupForm.value.gRPNM != this.updateData.gRPNM ){
-      if(filterData.length > 0){
+  GetGroupName(event) {
+    const filterData = this.GroupCodeTableData.filter((x) => x.gRPNM == this.AccountGroupForm.value.gRPNM)
+    if (this.isUpdate && this.AccountGroupForm.value.gRPNM != this.updateData.gRPNM) {
+      if (filterData.length > 0) {
         this.AccountGroupForm.controls["GroupName"].setValue("");
       }
     }
-    if(!this.isUpdate && filterData.length > 0){
+    if (!this.isUpdate && filterData.length > 0) {
       this.AccountGroupForm.controls["GroupName"].setValue("");
     }
   }
 
   async save() {
-    if(this.isUpdate){
+    if (this.isUpdate) {
       const Body = {
         gRPNM: this.AccountGroupForm.value.GroupName,
-        pGCD: this.AccountGroupForm.value.GroupCodeType.value,
-        pGNM: this.AccountGroupForm.value.GroupCodeType.name,
-        gLEVEL:`${parseInt(this.AccountGroupForm.value.GroupCodeType.level)+1}`,
+        pGCD: this.AccountGroupForm.value?.GroupCodeType?.value || "",
+        pGNM: this.AccountGroupForm.value?.GroupCodeType?.name || "",
+        bCATNM: this.AccountGroupForm.value.BalanceSheet.name,
+        bCATCD: this.AccountGroupForm.value.BalanceSheet.value,
+        gLEVEL: `${parseInt(this.AccountGroupForm.value?.GroupCodeType?.level || 0) + 1}`,
         mODDT: new Date(),
         mODLOC: this.storage.branch,
         mODBY: this.storage.userName,
@@ -341,27 +343,26 @@ export class AccountGroupComponent implements OnInit {
           showConfirmButton: true,
         });
       }
-    }else{
+    } else {
       const index = parseInt(
         this.GroupCodeTableData[
           this.GroupCodeTableData.length - 1
         ].gRPCD.substring(3)
-      )+1;
-      const groupcode = `${this.AccountGroupForm.value.CategoryCode.name.substr(0, 3)}${
-        index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""
-      }${index}`;
+      ) + 1;
+      const groupcode = `${this.AccountGroupForm.value.CategoryCode.name.substr(0, 3)}${index < 9 ? "00" : index > 9 && index < 99 ? "0" : ""
+        }${index}`;
       const Body = {
-        _id:`${this.CompanyCode}-${groupcode}`,
+        _id: `${this.CompanyCode}-${groupcode}`,
         cID: this.CompanyCode,
-        gRPCD:groupcode,
+        gRPCD: groupcode,
         gRPNM: this.AccountGroupForm.value.GroupName,
         pGCD: this.AccountGroupForm.value.GroupCodeType?.value || "",
         pGNM: this.AccountGroupForm.value.GroupCodeType?.name || "",
-        gLEVEL: parseInt(this.AccountGroupForm.value.GroupCodeType.level)+ 1 || 0,
+        gLEVEL: parseInt(this.AccountGroupForm.value.GroupCodeType.level) + 1 || 0,
         cATNM: this.AccountGroupForm.value.CategoryCode.name,
         cATCD: this.AccountGroupForm.value.CategoryCode.value,
-        bCATNM:this.AccountGroupForm.value.BalanceSheet.name,
-        bCATCD:this.AccountGroupForm.value.BalanceSheet.value,
+        bCATNM: this.AccountGroupForm.value.BalanceSheet.name,
+        bCATCD: this.AccountGroupForm.value.BalanceSheet.value,
         eNTDT: new Date(),
         eNTLOC: this.storage.branch,
         eNTBY: this.storage.userName,

@@ -4,14 +4,14 @@ import * as StorageService from "src/app/core/service/storage.service";
 
 export class AccountGroupControls {
   AccountGroupAddArray: FormControls[];
-  constructor(isUpdate ,UpdateData) {
+  constructor(isUpdate, UpdateData) {
     this.AccountGroupAddArray = [
       {
         name: "GroupCode",
         label: "Group Code",
-        placeholder: "System Genreted",
+        placeholder: "System Generated",
         type: "text",
-        value: isUpdate?UpdateData.Groupcode: "System Genreted",
+        value: isUpdate ? UpdateData.Groupcode : "System Generated",
         Validations: [],
         generatecontrol: true,
         disable: true,
@@ -41,7 +41,7 @@ export class AccountGroupControls {
           showNameAndValue: false,
         },
         functions: {
-          onOptionSelect:'getBalanceSheetDropdown'
+          onOptionSelect: 'getBalanceSheetDropdown'
         },
       },
 
@@ -70,7 +70,7 @@ export class AccountGroupControls {
           showNameAndValue: true,
         },
         functions: {
-          
+
         },
       },
       {
@@ -78,7 +78,7 @@ export class AccountGroupControls {
         label: "Account Group Name",
         placeholder: "Account Group Name",
         type: "text",
-        value: isUpdate?UpdateData.GroupName: "",
+        value: isUpdate ? UpdateData.GroupName : "",
         generatecontrol: true,
         disable: false,
         Validations: [

@@ -42,16 +42,7 @@ export class AccountMasterControls {
       //   disable: false,
       //   Validations: [],
       // },
-      {
-        name: "AccountCode",
-        label: "Company Account Code",
-        placeholder: "Please Enter Company Account Code",
-        type: "text",
-        value: "",
-        generatecontrol: true,
-        disable: false,
-        Validations: [],
-      },
+
       // {
       //   name: "temp",
       //   label: "",
@@ -127,7 +118,41 @@ export class AccountMasterControls {
         additionalData: {
           showNameAndValue: true,
         },
-        functions: {},
+        functions: {
+          onOptionSelect: "getAccountDropdown",
+        },
+      },
+      {
+        name: "AccountCode",
+        label: "Account Code",
+        placeholder: "Please Select Account Code",
+        type: "multiselect",
+        value: "",
+        Validations: [],
+        additionalData: {
+          isIndeterminate: false,
+          isChecked: false,
+          support: "AccountCodeDropdown",
+          showNameAndValue: true,
+          Validations: [
+          ],
+        },
+        functions: {
+          onToggleAll: "toggleSelectAll",
+        },
+        generatecontrol: true,
+        disable: false,
+      },
+      {
+        name: "AccountCodeDropdown",
+        label: "Account Code",
+        placeholder: "Account Code",
+        type: "",
+        value: [],
+        Validations: [
+        ],
+        generatecontrol: false,
+        disable: false,
       },
     ];
 
@@ -358,7 +383,7 @@ export class AccountMasterControls {
         //   onOptionSelect: "getGroupCodeDropdown",
         // },
       },
-     
+
       // {
       //   name: "LocationsDrop",
       //   label: "Locations",
@@ -404,7 +429,7 @@ export class AccountMasterControls {
         label: "Active Flag",
         placeholder: "",
         type: "toggle",
-        value:true,
+        value: true,
         generatecontrol: false,
         disable: false,
         Validations: [],

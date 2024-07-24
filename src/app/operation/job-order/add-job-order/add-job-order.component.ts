@@ -275,6 +275,7 @@ export class AddJobOrderComponent implements OnInit {
   async getJobOrdersData() {
     const res = await this.joborder.getSingleJobOrderData({
       cID: this.storage.companyCode,
+      lOC: this.storage.branch,
     });
     if (res) {
       const data = res;
@@ -335,7 +336,9 @@ export class AddJobOrderComponent implements OnInit {
     };
     if (this.isClose) {
       const id = this.JobOrderModel._id;
-      ["_id", "eNTBY", "eNTDT", "eNTLOC"].forEach((key) => delete data[key]);
+      ["_id", "eNTBY", "eNTDT", "eNTLOC", "cID", "jOBNO", "docNo"].forEach(
+        (key) => delete data[key]
+      );
       data.sTS = "Closed";
       data.cKM = this.JobOrderForm.controls["closeKm"].value;
       data.jCDT = this.JobOrderForm.controls["closedate"].value;
@@ -354,7 +357,7 @@ export class AddJobOrderComponent implements OnInit {
           text: "Job Order Closed Successfully",
           showConfirmButton: true,
         }).then(() => {
-          this.router.navigateByUrl("/Operation/JobOrder"); 
+          this.router.navigateByUrl("/Operation/JobOrder");
         });
       }
     } else {

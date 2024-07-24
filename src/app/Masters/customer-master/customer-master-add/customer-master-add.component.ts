@@ -741,11 +741,11 @@ export class CustomerMasterAddComponent implements OnInit {
         updatedBy: this.storage.userName,
         GSTdetails: this.tableData.map((x) => {
           return {
-            gstAddres: x.gstAddres,
-            gstCity: x.gstCity,
-            gstNo: x.gstNo,
-            gstPinCode: x.gstPinCode,
-            gstState: x.gstState,
+            gstAddres: x?.gstAddres || "",
+            gstCity: x?.gstCity || "",
+            gstNo: x?.gstNo || "",
+            gstPinCode: x?.gstPinCode || "",
+            gstState: x?.gstState || "",
           };
         }),
       };
